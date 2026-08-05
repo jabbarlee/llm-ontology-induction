@@ -1,0 +1,182 @@
+@prefix :     <http://example.org/cre-ontology#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+<http://example.org/cre-ontology> a owl:Ontology ;
+    rdfs:label "Commercial Real Estate Leasing & Operations Ontology" ;
+    rdfs:comment "Gold-standard schema, Corpus B (synthetic), Step 1 output." .
+
+#################################################################
+# CLASSES
+#################################################################
+
+:Party a owl:Class ;
+    rdfs:comment "Any actor (person or organization) that plays a role in the system. Superclass introduced because Owner/Tenant/Agent/Vendor share attributes (name, contactInfo) and a common relation pattern (hasParty), while Property/Lease/MaintenanceRequest do not act, they are acted upon." .
+
+:Owner a owl:Class ;
+    rdfs:subClassOf :Party ;
+    rdfs:comment "Owns one or more Property instances; the landlord side of a Lease." .
+
+:Tenant a owl:Class ;
+    rdfs:subClassOf :Party ;
+    rdfs:comment "Occupies leased space; the lessee side of a Lease; reports MaintenanceRequests." .
+
+:Agent a owl:Class ;
+    rdfs:subClassOf :Party ;
+    rdfs:comment "Broker/leasing-and-light-property-management role. Deliberately covers both listing and maintenance-coordination duties rather than modeling a separate PropertyManager class (scope decision, not an oversight)." .
+
+:Vendor a owl:Class ;
+    rdfs:subClassOf :Party ;
+    rdfs:comment "External maintenance/service provider. Distinct from Owner -- a Vendor services a Property, it does not own one." .
+
+:Property a owl:Class ;
+    rdfs:comment "A physical real-estate asset." .
+
+:OfficeProperty a owl:Class ;
+    rdfs:subClassOf :Property ;
+    rdfs:comment "Office-type property. Split from Property because it carries attributes (numberOfFloors, parkingSpaces) meaningless for retail/industrial space." .
+
+:RetailProperty a owl:Class ;
+    rdfs:subClassOf :Property ;
+    rdfs:comment "Retail-type property. Carries attributes (storefrontType, footTraffic) meaningless for office/industrial space." .
+
+:IndustrialProperty a owl:Class ;
+    rdfs:subClassOf :Property ;
+    rdfs:comment "Industrial-type property. Carries attributes (ceilingHeight, loadingDocks) meaningless for office/retail space." .
+
+:Lease a owl:Class ;
+    rdfs:comment "The leasing contract/state binding an Owner, a Tenant, and a Property." .
+
+:MaintenanceRequest a owl:Class ;
+    rdfs:comment "A hub entity connecting Tenant (reporter), Property (subject), Agent (coordinator), Vendor (resolver), and optionally Owner (approver)." .
+
+#################################################################
+# DATATYPE PROPERTIES (attributes)
+#################################################################
+
+:name          a owl:DatatypeProperty ; rdfs:domain :Party ; rdfs:range xsd:string .
+:contactInfo   a owl:DatatypeProperty ; rdfs:domain :Party ; rdfs:range xsd:string .
+
+:ownerType     a owl:DatatypeProperty ; rdfs:domain :Owner ; rdfs:range xsd:string ;
+    rdfs:comment "Enum: individual | LLC | trust | corporation" .
+:taxId         a owl:DatatypeProperty ; rdfs:domain :Owner ; rdfs:range xsd:string .
+
+:businessName  a owl:DatatypeProperty ; rdfs:domain :Tenant ; rdfs:range xsd:string .
+:industryType  a owl:DatatypeProperty ; rdfs:domain :Tenant ; rdfs:range xsd:string ;
+    rdfs:comment "Enum: retail | office/professional | restaurant/food service | medical | warehouse/logistics | other" .
+
+:licenseNumber a owl:DatatypeProperty ; rdfs:domain :Agent ; rdfs:range xsd:string .
+:brokerage     a owl:DatatypeProperty ; rdfs:domain :Agent ; rdfs:range xsd:string .
+
+:serviceType a owl:DatatypeProperty ; rdfs:domain :Vendor ; rdfs:range xsd:string ;
+    rdfs:comment "Enum: HVAC | plumbing | electrical | landscaping | general contractor | cleaning | pest control" .
+:insured a owl:DatatypeProperty ; rdfs:domain :Vendor ; rdfs:range xsd:boolean .
+:insuranceExpiryDate a owl:DatatypeProperty ; rdfs:domain :Vendor ; rdfs:range xsd:date .
+
+:address        a owl:DatatypeProperty ; rdfs:domain :Property ; rdfs:range xsd:string .
+:squareFootage  a owl:DatatypeProperty ; rdfs:domain :Property ; rdfs:range xsd:integer .
+
+:numberOfFloors a owl:DatatypeProperty ; rdfs:domain :OfficeProperty ; rdfs:range xsd:integer .
+:parkingSpaces  a owl:DatatypeProperty ; rdfs:domain :OfficeProperty ; rdfs:range xsd:integer .
+
+:storefrontType a owl:DatatypeProperty ; rdfs:domain :RetailProperty ; rdfs:range xsd:string ;
+    rdfs:comment "Enum: strip mall | standalone | mall inline | street-front" .
+:footTraffic a owl:DatatypeProperty ; rdfs:domain :RetailProperty ; rdfs:range xsd:string ;
+    rdfs:comment "Enum: low | medium | high" .
+
+:ceilingHeight  a owl:DatatypeProperty ; rdfs:domain :IndustrialProperty ; rdfs:range xsd:decimal .
+:loadingDocks   a owl:DatatypeProperty ; rdfs:domain :IndustrialProperty ; rdfs:range xsd:integer .
+
+:startDate a owl:DatatypeProperty ; rdfs:domain :Lease ; rdfs:range xsd:date .
+:endDate   a owl:DatatypeProperty ; rdfs:domain :Lease ; rdfs:range xsd:date ;
+    rdfs:comment "Original contractual end date. Current effective end (if renewed) is whatever the latest hasAmendment-linked Lease states." .
+:rentAmount a owl:DatatypeProperty ; rdfs:domain :Lease ; rdfs:range xsd:decimal .
+:escalationType a owl:DatatypeProperty ; rdfs:domain :Lease ; rdfs:range xsd:string ;
+    rdfs:comment "Enum: fixed percentage | CPI-indexed | none" .
+:securityDeposit a owl:DatatypeProperty ; rdfs:domain :Lease ; rdfs:range xsd:decimal .
+
+:status a owl:DatatypeProperty ; rdfs:domain :MaintenanceRequest ; rdfs:range xsd:string ;
+    rdfs:comment "Enum: open | assigned | in-progress | resolved" .
+:priority a owl:DatatypeProperty ; rdfs:domain :MaintenanceRequest ; rdfs:range xsd:string ;
+    rdfs:comment "Enum: low | medium | high | emergency" .
+:dateReported  a owl:DatatypeProperty ; rdfs:domain :MaintenanceRequest ; rdfs:range xsd:date .
+:dateResolved  a owl:DatatypeProperty ; rdfs:domain :MaintenanceRequest ; rdfs:range xsd:date .
+:description   a owl:DatatypeProperty ; rdfs:domain :MaintenanceRequest ; rdfs:range xsd:string .
+:estimatedCost a owl:DatatypeProperty ; rdfs:domain :MaintenanceRequest ; rdfs:range xsd:decimal ;
+    rdfs:comment "Underlying signal for :requiresApproval (e.g. above a cost threshold typically requires owner sign-off)." .
+
+#################################################################
+# OBJECT PROPERTIES (non-taxonomic relations)
+#################################################################
+
+:owns a owl:ObjectProperty ;
+    rdfs:domain :Owner ; rdfs:range :Property .
+
+# hasParty: general type constraint (range Party). The two role-specific
+# sub-properties below are the actual asserted edges -- a Lease structurally
+# requires one of EACH role, which a single collapsed hasParty->Party edge
+# cannot express.
+:hasParty a owl:ObjectProperty ;
+    rdfs:domain :Lease ; rdfs:range :Party .
+
+:hasOwnerParty a owl:ObjectProperty ;
+    rdfs:subPropertyOf :hasParty ;
+    rdfs:domain :Lease ; rdfs:range :Owner .
+
+:hasTenantParty a owl:ObjectProperty ;
+    rdfs:subPropertyOf :hasParty ;
+    rdfs:domain :Lease ; rdfs:range :Tenant .
+
+:covers a owl:ObjectProperty ;
+    rdfs:domain :Lease ; rdfs:range :Property .
+
+:lists a owl:ObjectProperty ;
+    rdfs:domain :Agent ; rdfs:range :Property .
+
+:reports a owl:ObjectProperty ;
+    rdfs:domain :Tenant ; rdfs:range :MaintenanceRequest .
+
+# concerns: kept general (range Property, not split per Property subtype).
+# A MaintenanceRequest only needs to point at SOME property -- there is no
+# second role being asserted, so inheritance already covers Office/Retail/
+# IndustrialProperty for free. Contrast with hasParty above, which needed
+# splitting because Lease has a genuine two-role structural requirement.
+:concerns a owl:ObjectProperty ;
+    rdfs:domain :MaintenanceRequest ; rdfs:range :Property .
+
+:assigns a owl:ObjectProperty ;
+    rdfs:domain :Agent ; rdfs:range :MaintenanceRequest .
+
+:resolves a owl:ObjectProperty ;
+    rdfs:domain :Vendor ; rdfs:range :MaintenanceRequest .
+
+# represents: general type constraint (range Party), split the same way as
+# hasParty -- an Agent's representation role differs materially depending on
+# which side (Owner listing-side vs. Tenant rep-side) they represent.
+:represents a owl:ObjectProperty ;
+    rdfs:domain :Agent ; rdfs:range :Party .
+
+:representsOwner a owl:ObjectProperty ;
+    rdfs:subPropertyOf :represents ;
+    rdfs:domain :Agent ; rdfs:range :Owner .
+
+:representsTenant a owl:ObjectProperty ;
+    rdfs:subPropertyOf :represents ;
+    rdfs:domain :Agent ; rdfs:range :Tenant .
+
+:negotiates a owl:ObjectProperty ;
+    rdfs:domain :Agent ; rdfs:range :Lease .
+
+:engages a owl:ObjectProperty ;
+    rdfs:comment "Standing service relationship (who's on contract), distinct from the per-incident :resolves edge." ;
+    rdfs:domain :Owner ; rdfs:range :Vendor .
+
+:hasAmendment a owl:ObjectProperty ;
+    rdfs:comment "Self-referential: one Lease instance points to a later Lease instance representing its renewal/escalation, rather than introducing a separate LeaseAmendment class." ;
+    rdfs:domain :Lease ; rdfs:range :Lease .
+
+:requiresApproval a owl:ObjectProperty ;
+    rdfs:comment "Large repairs needing Owner sign-off. A genuinely implicit relationship in source text (e.g. 'waiting on landlord to sign off on the roof repair')." ;
+    rdfs:domain :MaintenanceRequest ; rdfs:range :Owner .
