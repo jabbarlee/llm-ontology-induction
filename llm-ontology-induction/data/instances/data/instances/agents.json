@@ -1,0 +1,100 @@
+[
+  {
+    "id": "agt-001",
+    "name": "Valerie Gray",
+    "contactInfo": "valerie.gray@crebrokerage.com",
+    "licenseNumber": "TX-488162",
+    "brokerage": "Anchor Point CRE"
+  },
+  {
+    "id": "agt-002",
+    "name": "Sandra Montgomery",
+    "contactInfo": "sandra.montgomery@crebrokerage.com",
+    "licenseNumber": "TX-319684",
+    "brokerage": "Anchor Point CRE"
+  },
+  {
+    "id": "agt-003",
+    "name": "Laura Bush",
+    "contactInfo": "laura.bush@crebrokerage.com",
+    "licenseNumber": "TX-835911",
+    "brokerage": "Summit Commercial Realty"
+  },
+  {
+    "id": "agt-004",
+    "name": "Darren Roberts",
+    "contactInfo": "darren.roberts@crebrokerage.com",
+    "licenseNumber": "TX-738720",
+    "brokerage": "Bayou City Brokers"
+  },
+  {
+    "id": "agt-005",
+    "name": "David Garcia",
+    "contactInfo": "david.garcia@crebrokerage.com",
+    "licenseNumber": "TX-660086",
+    "brokerage": "Bayou City Brokers"
+  },
+  {
+    "id": "agt-006",
+    "name": "Mark Diaz",
+    "contactInfo": "mark.diaz@crebrokerage.com",
+    "licenseNumber": "TX-271339",
+    "brokerage": "Lonestar Property Advisors"
+  },
+  {
+    "id": "agt-007",
+    "name": "Daniel Adams",
+    "contactInfo": "daniel.adams@crebrokerage.com",
+    "licenseNumber": "TX-497887",
+    "brokerage": "Anchor Point CRE"
+  },
+  {
+    "id": "agt-008",
+    "name": "Maria Lynch",
+    "contactInfo": "maria.lynch@crebrokerage.com",
+    "licenseNumber": "TX-771088",
+    "brokerage": "Bayou City Brokers"
+  },
+  {
+    "id": "agt-009",
+    "name": "Nicholas Martin",
+    "contactInfo": "nicholas.martin@crebrokerage.com",
+    "licenseNumber": "TX-817870",
+    "brokerage": "Anchor Point CRE"
+  },
+  {
+    "id": "agt-010",
+    "name": "William Bowman",
+    "contactInfo": "william.bowman@crebrokerage.com",
+    "licenseNumber": "TX-983794",
+    "brokerage": "Summit Commercial Realty"
+  },
+  {
+    "id": "agt-011",
+    "name": "Melinda Cameron",
+    "contactInfo": "melinda.cameron@crebrokerage.com",
+    "licenseNumber": "TX-340174",
+    "brokerage": "Summit Commercial Realty"
+  },
+  {
+    "id": "agt-012",
+    "name": "Crystal Johnson",
+    "contactInfo": "crystal.johnson@crebrokerage.com",
+    "licenseNumber": "TX-944151",
+    "brokerage": "Anchor Point CRE"
+  },
+  {
+    "id": "agt-013",
+    "name": "Derek Clark",
+    "contactInfo": "derek.clark@crebrokerage.com",
+    "licenseNumber": "TX-520651",
+    "brokerage": "Anchor Point CRE"
+  },
+  {
+    "id": "agt-014",
+    "name": "Sherri Edwards",
+    "contactInfo": "sherri.edwards@crebrokerage.com",
+    "licenseNumber": "TX-169403",
+    "brokerage": "Bayou City Brokers"
+  }
+]

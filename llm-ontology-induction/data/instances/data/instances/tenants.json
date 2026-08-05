@@ -1,0 +1,247 @@
+[
+  {
+    "id": "ten-001",
+    "name": "Ann Williams",
+    "contactInfo": "contact1@bright.com",
+    "businessName": "Bright Partners",
+    "industryType": "office-professional"
+  },
+  {
+    "id": "ten-002",
+    "name": "Rebecca Henderson",
+    "contactInfo": "contact2@rodriguez.com",
+    "businessName": "Rodriguez & Associates",
+    "industryType": "office-professional"
+  },
+  {
+    "id": "ten-003",
+    "name": "Zachary Rice",
+    "contactInfo": "contact3@brown.com",
+    "businessName": "Brown & Associates",
+    "industryType": "retail"
+  },
+  {
+    "id": "ten-004",
+    "name": "Alexandra Le",
+    "contactInfo": "contact4@maddox.com",
+    "businessName": "Maddox Partners",
+    "industryType": "warehouse-logistics"
+  },
+  {
+    "id": "ten-005",
+    "name": "Debra Davidson",
+    "contactInfo": "contact5@maldonado.com",
+    "businessName": "Maldonado Holdings",
+    "industryType": "warehouse-logistics"
+  },
+  {
+    "id": "ten-006",
+    "name": "Jesse Mckay",
+    "contactInfo": "contact6@rodriguez.com",
+    "businessName": "Rodriguez & Associates",
+    "industryType": "office-professional"
+  },
+  {
+    "id": "ten-007",
+    "name": "Jonathan White",
+    "contactInfo": "contact7@liu.com",
+    "businessName": "Liu Group",
+    "industryType": "office-professional"
+  },
+  {
+    "id": "ten-008",
+    "name": "Elizabeth Fowler",
+    "contactInfo": "contact8@gaines.com",
+    "businessName": "Gaines Group",
+    "industryType": "medical"
+  },
+  {
+    "id": "ten-009",
+    "name": "Phillip Ryan",
+    "contactInfo": "contact9@lynch.com",
+    "businessName": "Lynch LLC",
+    "industryType": "office-professional"
+  },
+  {
+    "id": "ten-010",
+    "name": "April Nguyen",
+    "contactInfo": "contact10@osborne.com",
+    "businessName": "Osborne & Associates",
+    "industryType": "restaurant-food service"
+  },
+  {
+    "id": "ten-011",
+    "name": "Sherry Decker",
+    "contactInfo": "contact11@smith.com",
+    "businessName": "Smith Holdings",
+    "industryType": "other"
+  },
+  {
+    "id": "ten-012",
+    "name": "Shawn Arroyo",
+    "contactInfo": "contact12@parker.com",
+    "businessName": "Parker & Associates",
+    "industryType": "office-professional"
+  },
+  {
+    "id": "ten-013",
+    "name": "Mr. Philip Cannon",
+    "contactInfo": "contact13@miller.com",
+    "businessName": "Miller Partners",
+    "industryType": "office-professional"
+  },
+  {
+    "id": "ten-014",
+    "name": "Joshua Baker",
+    "contactInfo": "contact14@anderson.com",
+    "businessName": "Anderson & Associates",
+    "industryType": "retail"
+  },
+  {
+    "id": "ten-015",
+    "name": "Daniel Ryan",
+    "contactInfo": "contact15@brennan.com",
+    "businessName": "Brennan Holdings",
+    "industryType": "retail"
+  },
+  {
+    "id": "ten-016",
+    "name": "Eric Carney",
+    "contactInfo": "contact16@blair.com",
+    "businessName": "Blair Holdings",
+    "industryType": "office-professional"
+  },
+  {
+    "id": "ten-017",
+    "name": "Joseph Martinez",
+    "contactInfo": "contact17@santos.com",
+    "businessName": "Santos Group",
+    "industryType": "medical"
+  },
+  {
+    "id": "ten-018",
+    "name": "Kevin Hall",
+    "contactInfo": "contact18@walker.com",
+    "businessName": "Walker Partners",
+    "industryType": "restaurant-food service"
+  },
+  {
+    "id": "ten-019",
+    "name": "Mark Perez",
+    "contactInfo": "contact19@robinson.com",
+    "businessName": "Robinson Group",
+    "industryType": "office-professional"
+  },
+  {
+    "id": "ten-020",
+    "name": "Andrea Young",
+    "contactInfo": "contact20@whitehead.com",
+    "businessName": "Whitehead LLC",
+    "industryType": "other"
+  },
+  {
+    "id": "ten-021",
+    "name": "Carlos Walls",
+    "contactInfo": "contact21@caldwell.com",
+    "businessName": "Caldwell Group",
+    "industryType": "medical"
+  },
+  {
+    "id": "ten-022",
+    "name": "Richard Aguirre",
+    "contactInfo": "contact22@duncan.com",
+    "businessName": "Duncan Partners",
+    "industryType": "restaurant-food service"
+  },
+  {
+    "id": "ten-023",
+    "name": "Jeffrey Henderson",
+    "contactInfo": "contact23@lee.com",
+    "businessName": "Lee LLC",
+    "industryType": "restaurant-food service"
+  },
+  {
+    "id": "ten-024",
+    "name": "Megan Joyce",
+    "contactInfo": "contact24@owens.com",
+    "businessName": "Owens Partners",
+    "industryType": "other"
+  },
+  {
+    "id": "ten-025",
+    "name": "Gerald Hensley",
+    "contactInfo": "contact25@garcia.com",
+    "businessName": "Garcia Enterprises",
+    "industryType": "medical"
+  },
+  {
+    "id": "ten-026",
+    "name": "Jerry Henderson",
+    "contactInfo": "contact26@wright.com",
+    "businessName": "Wright & Associates",
+    "industryType": "warehouse-logistics"
+  },
+  {
+    "id": "ten-027",
+    "name": "Thomas Ramos",
+    "contactInfo": "contact27@ramirez.com",
+    "businessName": "Ramirez Partners",
+    "industryType": "retail"
+  },
+  {
+    "id": "ten-028",
+    "name": "Amber Kidd",
+    "contactInfo": "contact28@callahan.com",
+    "businessName": "Callahan LLC",
+    "industryType": "restaurant-food service"
+  },
+  {
+    "id": "ten-029",
+    "name": "Tammy Allison",
+    "contactInfo": "contact29@huff.com",
+    "businessName": "Huff Group",
+    "industryType": "warehouse-logistics"
+  },
+  {
+    "id": "ten-030",
+    "name": "Mr. James Brown",
+    "contactInfo": "contact30@martin.com",
+    "businessName": "Martin Partners",
+    "industryType": "retail"
+  },
+  {
+    "id": "ten-031",
+    "name": "Mrs. Rachel Gibson",
+    "contactInfo": "contact31@gray.com",
+    "businessName": "Gray LLC",
+    "industryType": "warehouse-logistics"
+  },
+  {
+    "id": "ten-032",
+    "name": "Whitney Peters",
+    "contactInfo": "contact32@henderson.com",
+    "businessName": "Henderson Holdings",
+    "industryType": "restaurant-food service"
+  },
+  {
+    "id": "ten-033",
+    "name": "Edward Novak",
+    "contactInfo": "contact33@higgins.com",
+    "businessName": "Higgins & Associates",
+    "industryType": "restaurant-food service"
+  },
+  {
+    "id": "ten-034",
+    "name": "Nicole Brown",
+    "contactInfo": "contact34@riley.com",
+    "businessName": "Riley Holdings",
+    "industryType": "warehouse-logistics"
+  },
+  {
+    "id": "ten-035",
+    "name": "Sarah Moore",
+    "contactInfo": "contact35@silva.com",
+    "businessName": "Silva Enterprises",
+    "industryType": "retail"
+  }
+]

@@ -1,0 +1,128 @@
+[
+  {
+    "id": "own-001",
+    "name": "Allison Hill",
+    "contactInfo": "allison@owner1mail.com",
+    "ownerType": "individual",
+    "taxId": "13-5614226"
+  },
+  {
+    "id": "own-002",
+    "name": "Walker Group",
+    "contactInfo": "walker@owner2mail.com",
+    "ownerType": "LLC",
+    "taxId": "27-2719583"
+  },
+  {
+    "id": "own-003",
+    "name": "Megan Mcclain",
+    "contactInfo": "megan@owner3mail.com",
+    "ownerType": "individual",
+    "taxId": "85-8078673"
+  },
+  {
+    "id": "own-004",
+    "name": "Javier Johnson",
+    "contactInfo": "javier@owner4mail.com",
+    "ownerType": "individual",
+    "taxId": "13-2571945"
+  },
+  {
+    "id": "own-005",
+    "name": "Robinson Group",
+    "contactInfo": "robinson@owner5mail.com",
+    "ownerType": "LLC",
+    "taxId": "74-1445199"
+  },
+  {
+    "id": "own-006",
+    "name": "Wagner & Associates",
+    "contactInfo": "wagner@owner6mail.com",
+    "ownerType": "LLC",
+    "taxId": "93-8038374"
+  },
+  {
+    "id": "own-007",
+    "name": "Johnson Holdings",
+    "contactInfo": "johnson@owner7mail.com",
+    "ownerType": "LLC",
+    "taxId": "85-5667265"
+  },
+  {
+    "id": "own-008",
+    "name": "Matthew Gardner",
+    "contactInfo": "matthew@owner8mail.com",
+    "ownerType": "individual",
+    "taxId": "30-8090293"
+  },
+  {
+    "id": "own-009",
+    "name": "Robinson Partners",
+    "contactInfo": "robinson@owner9mail.com",
+    "ownerType": "trust",
+    "taxId": "29-4612365"
+  },
+  {
+    "id": "own-010",
+    "name": "Lawrence LLC",
+    "contactInfo": "lawrence@owner10mail.com",
+    "ownerType": "trust",
+    "taxId": "21-7374122"
+  },
+  {
+    "id": "own-011",
+    "name": "Abigail Shaffer",
+    "contactInfo": "abigail@owner11mail.com",
+    "ownerType": "individual",
+    "taxId": "55-6770619"
+  },
+  {
+    "id": "own-012",
+    "name": "Wolfe LLC",
+    "contactInfo": "wolfe@owner12mail.com",
+    "ownerType": "trust",
+    "taxId": "68-9996414"
+  },
+  {
+    "id": "own-013",
+    "name": "Christopher Bernard",
+    "contactInfo": "christopher@owner13mail.com",
+    "ownerType": "individual",
+    "taxId": "58-2322047"
+  },
+  {
+    "id": "own-014",
+    "name": "Rogers & Associates",
+    "contactInfo": "rogers@owner14mail.com",
+    "ownerType": "trust",
+    "taxId": "89-7067228"
+  },
+  {
+    "id": "own-015",
+    "name": "Davis & Associates",
+    "contactInfo": "davis@owner15mail.com",
+    "ownerType": "LLC",
+    "taxId": "18-1768805"
+  },
+  {
+    "id": "own-016",
+    "name": "Davis Partners",
+    "contactInfo": "davis@owner16mail.com",
+    "ownerType": "LLC",
+    "taxId": "20-4905582"
+  },
+  {
+    "id": "own-017",
+    "name": "Lindsey Roman",
+    "contactInfo": "lindsey@owner17mail.com",
+    "ownerType": "individual",
+    "taxId": "58-5663623"
+  },
+  {
+    "id": "own-018",
+    "name": "Blair & Associates",
+    "contactInfo": "blair@owner18mail.com",
+    "ownerType": "corporation",
+    "taxId": "56-3728882"
+  }
+]

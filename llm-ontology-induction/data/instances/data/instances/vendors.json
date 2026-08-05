@@ -1,0 +1,98 @@
+[
+  {
+    "id": "ven-001",
+    "name": "Rios Co.",
+    "contactInfo": "dispatch1@rios.com",
+    "serviceType": "HVAC",
+    "insured": true,
+    "insuranceExpiryDate": "2028-10-19"
+  },
+  {
+    "id": "ven-002",
+    "name": "Foster Maintenance",
+    "contactInfo": "dispatch2@foster.com",
+    "serviceType": "plumbing",
+    "insured": true,
+    "insuranceExpiryDate": "2028-07-28"
+  },
+  {
+    "id": "ven-003",
+    "name": "Rocha Solutions",
+    "contactInfo": "dispatch3@rocha.com",
+    "serviceType": "electrical",
+    "insured": true,
+    "insuranceExpiryDate": "2027-05-21"
+  },
+  {
+    "id": "ven-004",
+    "name": "Ellis Co.",
+    "contactInfo": "dispatch4@ellis.com",
+    "serviceType": "landscaping",
+    "insured": true,
+    "insuranceExpiryDate": "2028-05-27"
+  },
+  {
+    "id": "ven-005",
+    "name": "Baker Maintenance",
+    "contactInfo": "dispatch5@baker.com",
+    "serviceType": "general contractor",
+    "insured": true,
+    "insuranceExpiryDate": "2026-10-11"
+  },
+  {
+    "id": "ven-006",
+    "name": "Wright Maintenance",
+    "contactInfo": "dispatch6@wright.com",
+    "serviceType": "cleaning",
+    "insured": false,
+    "insuranceExpiryDate": null
+  },
+  {
+    "id": "ven-007",
+    "name": "Hoffman Services",
+    "contactInfo": "dispatch7@hoffman.com",
+    "serviceType": "pest control",
+    "insured": true,
+    "insuranceExpiryDate": "2026-11-10"
+  },
+  {
+    "id": "ven-008",
+    "name": "Baker Solutions",
+    "contactInfo": "dispatch8@baker.com",
+    "serviceType": "HVAC",
+    "insured": true,
+    "insuranceExpiryDate": "2028-05-14"
+  },
+  {
+    "id": "ven-009",
+    "name": "Richards Services",
+    "contactInfo": "dispatch9@richards.com",
+    "serviceType": "plumbing",
+    "insured": true,
+    "insuranceExpiryDate": "2028-08-16"
+  },
+  {
+    "id": "ven-010",
+    "name": "Hurst Co.",
+    "contactInfo": "dispatch10@hurst.com",
+    "serviceType": "electrical",
+    "insured": true,
+    "insuranceExpiryDate": "2026-01-24"
+  },
+  {
+    "id": "ven-011",
+    "name": "Ross Services",
+    "contactInfo": "dispatch11@ross.com",
+    "serviceType": "landscaping",
+    "insured": true,
+    "insuranceExpiryDate": "2027-07-01"
+  },
+  {
+    "id": "ven-012",
+    "name": "Robinson Co.",
+    "contactInfo": "dispatch12@robinson.com",
+    "serviceType": "general contractor",
+    "insured": true,
+    "insuranceExpiryDate": "2028-06-09"
+  }
+]

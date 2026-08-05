@@ -1,0 +1,407 @@
+[
+  {
+    "id": "prop-001",
+    "propertyType": "office",
+    "address": "7533 Westheimer Rd, Houston, TX",
+    "squareFootage": 48823,
+    "ownerId": "own-006",
+    "numberOfFloors": 12,
+    "parkingSpaces": 144
+  },
+  {
+    "id": "prop-002",
+    "propertyType": "office",
+    "address": "3027 Heights Blvd, Houston, TX",
+    "squareFootage": 8473,
+    "ownerId": "own-017",
+    "numberOfFloors": 11,
+    "parkingSpaces": 162
+  },
+  {
+    "id": "prop-003",
+    "propertyType": "office",
+    "address": "3358 Post Oak Blvd, Houston, TX",
+    "squareFootage": 26004,
+    "ownerId": "own-017",
+    "numberOfFloors": 3,
+    "parkingSpaces": 286
+  },
+  {
+    "id": "prop-004",
+    "propertyType": "office",
+    "address": "109 Fannin St, Houston, TX",
+    "squareFootage": 22743,
+    "ownerId": "own-017",
+    "numberOfFloors": 8,
+    "parkingSpaces": 19
+  },
+  {
+    "id": "prop-005",
+    "propertyType": "office",
+    "address": "6047 Hempstead Rd, Houston, TX",
+    "squareFootage": 56004,
+    "ownerId": "own-004",
+    "numberOfFloors": 5,
+    "parkingSpaces": 132
+  },
+  {
+    "id": "prop-006",
+    "propertyType": "office",
+    "address": "4046 Hempstead Rd, Houston, TX",
+    "squareFootage": 38682,
+    "ownerId": "own-002",
+    "numberOfFloors": 2,
+    "parkingSpaces": 53
+  },
+  {
+    "id": "prop-007",
+    "propertyType": "office",
+    "address": "1233 Bellaire Blvd, Houston, TX",
+    "squareFootage": 36411,
+    "ownerId": "own-016",
+    "numberOfFloors": 3,
+    "parkingSpaces": 75
+  },
+  {
+    "id": "prop-008",
+    "propertyType": "office",
+    "address": "9107 Post Oak Blvd, Houston, TX",
+    "squareFootage": 18870,
+    "ownerId": "own-016",
+    "numberOfFloors": 9,
+    "parkingSpaces": 226
+  },
+  {
+    "id": "prop-009",
+    "propertyType": "office",
+    "address": "8935 Bellaire Blvd, Houston, TX",
+    "squareFootage": 49336,
+    "ownerId": "own-007",
+    "numberOfFloors": 12,
+    "parkingSpaces": 112
+  },
+  {
+    "id": "prop-010",
+    "propertyType": "office",
+    "address": "6637 Main St, Houston, TX",
+    "squareFootage": 44090,
+    "ownerId": "own-010",
+    "numberOfFloors": 6,
+    "parkingSpaces": 234
+  },
+  {
+    "id": "prop-011",
+    "propertyType": "office",
+    "address": "7497 Richmond Ave, Houston, TX",
+    "squareFootage": 17746,
+    "ownerId": "own-017",
+    "numberOfFloors": 4,
+    "parkingSpaces": 42
+  },
+  {
+    "id": "prop-012",
+    "propertyType": "office",
+    "address": "444 Fannin St, Houston, TX",
+    "squareFootage": 37801,
+    "ownerId": "own-011",
+    "numberOfFloors": 4,
+    "parkingSpaces": 122
+  },
+  {
+    "id": "prop-013",
+    "propertyType": "office",
+    "address": "1263 Gessner Rd, Houston, TX",
+    "squareFootage": 42859,
+    "ownerId": "own-001",
+    "numberOfFloors": 1,
+    "parkingSpaces": 127
+  },
+  {
+    "id": "prop-014",
+    "propertyType": "office",
+    "address": "614 Beltway 8 Frontage, Houston, TX",
+    "squareFootage": 23154,
+    "ownerId": "own-003",
+    "numberOfFloors": 2,
+    "parkingSpaces": 273
+  },
+  {
+    "id": "prop-015",
+    "propertyType": "office",
+    "address": "4662 Main St, Houston, TX",
+    "squareFootage": 33312,
+    "ownerId": "own-008",
+    "numberOfFloors": 4,
+    "parkingSpaces": 286
+  },
+  {
+    "id": "prop-016",
+    "propertyType": "retail",
+    "address": "9455 Fannin St, Houston, TX",
+    "squareFootage": 32476,
+    "ownerId": "own-005",
+    "storefrontType": "standalone",
+    "footTraffic": "medium"
+  },
+  {
+    "id": "prop-017",
+    "propertyType": "retail",
+    "address": "3219 Richmond Ave, Houston, TX",
+    "squareFootage": 7852,
+    "ownerId": "own-014",
+    "storefrontType": "street-front",
+    "footTraffic": "medium"
+  },
+  {
+    "id": "prop-018",
+    "propertyType": "retail",
+    "address": "6835 Yale St, Houston, TX",
+    "squareFootage": 58112,
+    "ownerId": "own-014",
+    "storefrontType": "strip mall",
+    "footTraffic": "high"
+  },
+  {
+    "id": "prop-019",
+    "propertyType": "retail",
+    "address": "1093 Studemont St, Houston, TX",
+    "squareFootage": 49224,
+    "ownerId": "own-004",
+    "storefrontType": "mall inline",
+    "footTraffic": "low"
+  },
+  {
+    "id": "prop-020",
+    "propertyType": "retail",
+    "address": "3239 Kirby Dr, Houston, TX",
+    "squareFootage": 36646,
+    "ownerId": "own-008",
+    "storefrontType": "street-front",
+    "footTraffic": "low"
+  },
+  {
+    "id": "prop-021",
+    "propertyType": "retail",
+    "address": "3106 Shepherd Dr, Houston, TX",
+    "squareFootage": 31818,
+    "ownerId": "own-014",
+    "storefrontType": "standalone",
+    "footTraffic": "low"
+  },
+  {
+    "id": "prop-022",
+    "propertyType": "retail",
+    "address": "9116 Richmond Ave, Houston, TX",
+    "squareFootage": 4815,
+    "ownerId": "own-015",
+    "storefrontType": "strip mall",
+    "footTraffic": "low"
+  },
+  {
+    "id": "prop-023",
+    "propertyType": "retail",
+    "address": "2824 Studemont St, Houston, TX",
+    "squareFootage": 33326,
+    "ownerId": "own-008",
+    "storefrontType": "street-front",
+    "footTraffic": "low"
+  },
+  {
+    "id": "prop-024",
+    "propertyType": "retail",
+    "address": "1060 Post Oak Blvd, Houston, TX",
+    "squareFootage": 26336,
+    "ownerId": "own-013",
+    "storefrontType": "strip mall",
+    "footTraffic": "medium"
+  },
+  {
+    "id": "prop-025",
+    "propertyType": "retail",
+    "address": "7554 Shepherd Dr, Houston, TX",
+    "squareFootage": 29222,
+    "ownerId": "own-009",
+    "storefrontType": "street-front",
+    "footTraffic": "low"
+  },
+  {
+    "id": "prop-026",
+    "propertyType": "retail",
+    "address": "4961 Kirby Dr, Houston, TX",
+    "squareFootage": 5332,
+    "ownerId": "own-007",
+    "storefrontType": "strip mall",
+    "footTraffic": "high"
+  },
+  {
+    "id": "prop-027",
+    "propertyType": "retail",
+    "address": "1036 Westheimer Rd, Houston, TX",
+    "squareFootage": 39784,
+    "ownerId": "own-011",
+    "storefrontType": "street-front",
+    "footTraffic": "high"
+  },
+  {
+    "id": "prop-028",
+    "propertyType": "retail",
+    "address": "2679 Westheimer Rd, Houston, TX",
+    "squareFootage": 34781,
+    "ownerId": "own-017",
+    "storefrontType": "strip mall",
+    "footTraffic": "low"
+  },
+  {
+    "id": "prop-029",
+    "propertyType": "retail",
+    "address": "9849 Richmond Ave, Houston, TX",
+    "squareFootage": 45750,
+    "ownerId": "own-003",
+    "storefrontType": "standalone",
+    "footTraffic": "medium"
+  },
+  {
+    "id": "prop-030",
+    "propertyType": "retail",
+    "address": "9433 Kirby Dr, Houston, TX",
+    "squareFootage": 39440,
+    "ownerId": "own-004",
+    "storefrontType": "strip mall",
+    "footTraffic": "high"
+  },
+  {
+    "id": "prop-031",
+    "propertyType": "industrial",
+    "address": "6968 Main St, Houston, TX",
+    "squareFootage": 39751,
+    "ownerId": "own-003",
+    "ceilingHeight": 28.7,
+    "loadingDocks": 11
+  },
+  {
+    "id": "prop-032",
+    "propertyType": "industrial",
+    "address": "3446 Main St, Houston, TX",
+    "squareFootage": 48436,
+    "ownerId": "own-009",
+    "ceilingHeight": 22.2,
+    "loadingDocks": 9
+  },
+  {
+    "id": "prop-033",
+    "propertyType": "industrial",
+    "address": "2244 Main St, Houston, TX",
+    "squareFootage": 43803,
+    "ownerId": "own-013",
+    "ceilingHeight": 21.8,
+    "loadingDocks": 11
+  },
+  {
+    "id": "prop-034",
+    "propertyType": "industrial",
+    "address": "252 Yale St, Houston, TX",
+    "squareFootage": 42208,
+    "ownerId": "own-003",
+    "ceilingHeight": 40.0,
+    "loadingDocks": 4
+  },
+  {
+    "id": "prop-035",
+    "propertyType": "industrial",
+    "address": "8908 Kirby Dr, Houston, TX",
+    "squareFootage": 34653,
+    "ownerId": "own-003",
+    "ceilingHeight": 20.9,
+    "loadingDocks": 12
+  },
+  {
+    "id": "prop-036",
+    "propertyType": "industrial",
+    "address": "4102 Washington Ave, Houston, TX",
+    "squareFootage": 20176,
+    "ownerId": "own-003",
+    "ceilingHeight": 18.1,
+    "loadingDocks": 18
+  },
+  {
+    "id": "prop-037",
+    "propertyType": "industrial",
+    "address": "8766 Westheimer Rd, Houston, TX",
+    "squareFootage": 45269,
+    "ownerId": "own-010",
+    "ceilingHeight": 35.2,
+    "loadingDocks": 10
+  },
+  {
+    "id": "prop-038",
+    "propertyType": "industrial",
+    "address": "2300 Shepherd Dr, Houston, TX",
+    "squareFootage": 9064,
+    "ownerId": "own-004",
+    "ceilingHeight": 37.1,
+    "loadingDocks": 18
+  },
+  {
+    "id": "prop-039",
+    "propertyType": "industrial",
+    "address": "4562 Shepherd Dr, Houston, TX",
+    "squareFootage": 41138,
+    "ownerId": "own-005",
+    "ceilingHeight": 19.5,
+    "loadingDocks": 11
+  },
+  {
+    "id": "prop-040",
+    "propertyType": "industrial",
+    "address": "4425 Heights Blvd, Houston, TX",
+    "squareFootage": 33516,
+    "ownerId": "own-007",
+    "ceilingHeight": 20.5,
+    "loadingDocks": 2
+  },
+  {
+    "id": "prop-041",
+    "propertyType": "industrial",
+    "address": "7039 Beltway 8 Frontage, Houston, TX",
+    "squareFootage": 19632,
+    "ownerId": "own-003",
+    "ceilingHeight": 15.1,
+    "loadingDocks": 11
+  },
+  {
+    "id": "prop-042",
+    "propertyType": "industrial",
+    "address": "4391 Post Oak Blvd, Houston, TX",
+    "squareFootage": 50077,
+    "ownerId": "own-005",
+    "ceilingHeight": 25.5,
+    "loadingDocks": 14
+  },
+  {
+    "id": "prop-043",
+    "propertyType": "industrial",
+    "address": "258 Richmond Ave, Houston, TX",
+    "squareFootage": 6431,
+    "ownerId": "own-018",
+    "ceilingHeight": 38.6,
+    "loadingDocks": 5
+  },
+  {
+    "id": "prop-044",
+    "propertyType": "industrial",
+    "address": "690 Beltway 8 Frontage, Houston, TX",
+    "squareFootage": 25696,
+    "ownerId": "own-018",
+    "ceilingHeight": 29.1,
+    "loadingDocks": 5
+  },
+  {
+    "id": "prop-045",
+    "propertyType": "industrial",
+    "address": "2188 Westheimer Rd, Houston, TX",
+    "squareFootage": 21702,
+    "ownerId": "own-014",
+    "ceilingHeight": 23.5,
+    "loadingDocks": 2
+  }
+]
