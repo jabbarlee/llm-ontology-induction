@@ -36,6 +36,7 @@ DOCUMENTS_DIR = Path("data/documents")
 MODEL = "gemini-3.1-flash-lite"  # gemini-2.0-flash has 0 free-tier quota as of Aug 2026 — confirmed via aistudio.google.com/rate-limit
 SLEEP_BETWEEN_CALLS = 4.5  # seconds — stay under free-tier RPM limits
 MAX_RETRIES = 3
+CSV_BATCH_SIZE = 15  # records per CSV file — avoids cramming 45+ rows into one response
 
 client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 
@@ -57,6 +58,42 @@ def load_instances():
 
 def index_by_id(records):
     return {r["id"]: r for r in records}
+
+
+def chunk(items, size):
+    for i in range(0, len(items), size):
+        yield items[i:i + size]
+
+
+class Stats:
+    """Tracks generated/skipped/failed counts per document type for the
+    end-of-run summary — the only way to know a mass run actually succeeded
+    without manually counting files."""
+    def __init__(self):
+        self.counts = {}
+
+    def record(self, doc_type, outcome):
+        self.counts.setdefault(doc_type, {"generated": 0, "skipped": 0, "failed": 0})
+        self.counts[doc_type][outcome] += 1
+
+    def print_summary(self):
+        print("\n" + "=" * 50)
+        print("SUMMARY")
+        print("=" * 50)
+        total_failed = 0
+        for doc_type, c in self.counts.items():
+            print(f"  {doc_type:12s} generated={c['generated']:3d}  "
+                  f"skipped={c['skipped']:3d}  failed={c['failed']:3d}")
+            total_failed += c["failed"]
+        if total_failed:
+            print(f"\n{total_failed} item(s) failed after {MAX_RETRIES} retries each — "
+                  f"re-run the same command to retry just those (already-generated "
+                  f"files are skipped automatically unless --force is passed).")
+        else:
+            print("\nAll items generated successfully.")
+
+
+stats = Stats()
 
 
 def call_gemini(prompt: str) -> str:
@@ -233,7 +270,7 @@ Output only the message exchange."""
 # Runners
 # ---------------------------------------------------------------------------
 
-def run_csv(data, limit):
+def run_csv(data, limit, force):
     out_dir = DOCUMENTS_DIR / "csv_exports"
     out_dir.mkdir(parents=True, exist_ok=True)
     owners = index_by_id(data["owners"])
@@ -242,46 +279,62 @@ def run_csv(data, limit):
     properties = index_by_id(data["properties"])
     vendors = index_by_id(data["vendors"])
 
-    prop_batch = data["properties"][:limit]
-    if prop_batch:
-        print(f"[csv] Property: {len(prop_batch)} records")
-        ids = [r["id"] for r in prop_batch]
-        resolved = resolve_property_batch(prop_batch, owners)
-        text = call_gemini(csv_prompt("Property", resolved, REAL_ATTR_NAMES["Property"], ids))
-        (out_dir / "properties_export.csv").write_text(text)
+    jobs = [
+        ("properties", "Property", data["properties"][:limit],
+         lambda batch: resolve_property_batch(batch, owners)),
+        ("leases", "Lease", data["leases"][:limit],
+         lambda batch: resolve_lease_batch(batch, owners, tenants, agents)),
+        ("maintenance_requests", "MaintenanceRequest", data["maintenance_requests"][:limit],
+         lambda batch: resolve_mr_batch(batch, tenants, properties, agents, vendors, owners)),
+    ]
 
-    lease_batch = data["leases"][:limit]
-    if lease_batch:
-        print(f"[csv] Lease: {len(lease_batch)} records")
-        ids = [r["id"] for r in lease_batch]
-        resolved = resolve_lease_batch(lease_batch, owners, tenants, agents)
-        text = call_gemini(csv_prompt("Lease", resolved, REAL_ATTR_NAMES["Lease"], ids))
-        (out_dir / "leases_export.csv").write_text(text)
+    for name, entity_type, records, resolver in jobs:
+        if not records:
+            continue
+        batches = list(chunk(records, CSV_BATCH_SIZE))
+        for i, batch in enumerate(batches, start=1):
+            out_file = out_dir / f"{name}_export_{i:02d}.csv"
+            if out_file.exists() and not force:
+                print(f"[csv] {out_file.name} already exists, skipping (use --force to regenerate)")
+                stats.record("csv", "skipped")
+                continue
+            print(f"[csv] {entity_type} batch {i}/{len(batches)}: {len(batch)} records -> {out_file.name}")
+            try:
+                ids = [r["id"] for r in batch]  # from RAW batch, before resolver strips 'id'
+                resolved = resolver(batch)
+                text = call_gemini(csv_prompt(entity_type, resolved, REAL_ATTR_NAMES[entity_type], ids))
+                out_file.write_text(text)
+                stats.record("csv", "generated")
+            except RuntimeError as e:
+                print(f"  FAILED: {out_file.name} — {e}")
+                stats.record("csv", "failed")
 
-    mr_batch = data["maintenance_requests"][:limit]
-    if mr_batch:
-        print(f"[csv] MaintenanceRequest: {len(mr_batch)} records")
-        ids = [r["id"] for r in mr_batch]
-        resolved = resolve_mr_batch(mr_batch, tenants, properties, agents, vendors, owners)
-        text = call_gemini(csv_prompt("MaintenanceRequest", resolved, REAL_ATTR_NAMES["MaintenanceRequest"], ids))
-        (out_dir / "maintenance_requests_export.csv").write_text(text)
 
-
-def run_lease_texts(data, limit):
+def run_lease_texts(data, limit, force):
     out_dir = DOCUMENTS_DIR / "lease_texts"
     out_dir.mkdir(parents=True, exist_ok=True)
     owners = index_by_id(data["owners"])
     tenants = index_by_id(data["tenants"])
     properties = index_by_id(data["properties"])
     for lease in data["leases"][:limit]:
+        out_file = out_dir / f"{lease['id']}.txt"
+        if out_file.exists() and not force:
+            print(f"[lease] {lease['id']} already exists, skipping")
+            stats.record("lease", "skipped")
+            continue
         print(f"[lease] {lease['id']}")
-        text = call_gemini(lease_prompt(
-            lease, owners[lease["ownerId"]], tenants[lease["tenantId"]],
-            properties[lease["propertyId"]]))
-        (out_dir / f"{lease['id']}.txt").write_text(text)
+        try:
+            text = call_gemini(lease_prompt(
+                lease, owners[lease["ownerId"]], tenants[lease["tenantId"]],
+                properties[lease["propertyId"]]))
+            out_file.write_text(text)
+            stats.record("lease", "generated")
+        except RuntimeError as e:
+            print(f"  FAILED: {lease['id']} — {e}")
+            stats.record("lease", "failed")
 
 
-def run_notes(data, limit):
+def run_notes(data, limit, force):
     out_dir = DOCUMENTS_DIR / "notes"
     out_dir.mkdir(parents=True, exist_ok=True)
     tenants = index_by_id(data["tenants"])
@@ -289,15 +342,25 @@ def run_notes(data, limit):
     agents = index_by_id(data["agents"])
     vendors = index_by_id(data["vendors"])
     for mr in data["maintenance_requests"][:limit]:
+        out_file = out_dir / f"{mr['id']}.txt"
+        if out_file.exists() and not force:
+            print(f"[notes] {mr['id']} already exists, skipping")
+            stats.record("notes", "skipped")
+            continue
         print(f"[notes] {mr['id']}")
-        vendor = vendors.get(mr["resolvingVendorId"]) if mr["resolvingVendorId"] else None
-        text = call_gemini(notes_prompt(
-            mr, tenants[mr["tenantId"]], properties[mr["propertyId"]],
-            agents[mr["assigningAgentId"]], vendor))
-        (out_dir / f"{mr['id']}.txt").write_text(text)
+        try:
+            vendor = vendors.get(mr["resolvingVendorId"]) if mr["resolvingVendorId"] else None
+            text = call_gemini(notes_prompt(
+                mr, tenants[mr["tenantId"]], properties[mr["propertyId"]],
+                agents[mr["assigningAgentId"]], vendor))
+            out_file.write_text(text)
+            stats.record("notes", "generated")
+        except RuntimeError as e:
+            print(f"  FAILED: {mr['id']} — {e}")
+            stats.record("notes", "failed")
 
 
-def run_messages(data, limit):
+def run_messages(data, limit, force):
     out_dir = DOCUMENTS_DIR / "messages"
     out_dir.mkdir(parents=True, exist_ok=True)
     tenants = index_by_id(data["tenants"])
@@ -305,12 +368,22 @@ def run_messages(data, limit):
     agents = index_by_id(data["agents"])
     vendors = index_by_id(data["vendors"])
     for mr in data["maintenance_requests"][:limit]:
+        out_file = out_dir / f"{mr['id']}.txt"
+        if out_file.exists() and not force:
+            print(f"[messages] {mr['id']} already exists, skipping")
+            stats.record("messages", "skipped")
+            continue
         print(f"[messages] {mr['id']}")
-        vendor = vendors.get(mr["resolvingVendorId"]) if mr["resolvingVendorId"] else None
-        text = call_gemini(message_prompt(
-            mr, tenants[mr["tenantId"]], properties[mr["propertyId"]],
-            agents[mr["assigningAgentId"]], vendor))
-        (out_dir / f"{mr['id']}.txt").write_text(text)
+        try:
+            vendor = vendors.get(mr["resolvingVendorId"]) if mr["resolvingVendorId"] else None
+            text = call_gemini(message_prompt(
+                mr, tenants[mr["tenantId"]], properties[mr["propertyId"]],
+                agents[mr["assigningAgentId"]], vendor))
+            out_file.write_text(text)
+            stats.record("messages", "generated")
+        except RuntimeError as e:
+            print(f"  FAILED: {mr['id']} — {e}")
+            stats.record("messages", "failed")
 
 
 RUNNERS = {"csv": run_csv, "lease": run_lease_texts, "notes": run_notes, "messages": run_messages}
@@ -321,7 +394,13 @@ def main():
     parser.add_argument("--types", default="csv,lease,notes,messages",
                          help="Comma-separated: csv,lease,notes,messages")
     parser.add_argument("--limit", type=int, default=3,
-                         help="Records per type — start small (default 3) and eyeball output first")
+                         help="Max records per type. Start with 3 and eyeball output "
+                              "before scaling up. Set higher than your total record "
+                              "count (e.g. 9999) to process everything.")
+    parser.add_argument("--force", action="store_true",
+                         help="Regenerate files even if they already exist. Without "
+                              "this flag, already-generated files are skipped — makes "
+                              "the script safely re-runnable after a partial failure.")
     args = parser.parse_args()
 
     data = load_instances()
@@ -330,10 +409,9 @@ def main():
         if t not in RUNNERS:
             print(f"Unknown type: {t}, skipping")
             continue
-        RUNNERS[t](data, args.limit)
+        RUNNERS[t](data, args.limit, args.force)
 
-    print("\nDone. Manually check output against the messiness checklist "
-          "before scaling up --limit.")
+    stats.print_summary()
 
 
 if __name__ == "__main__":
