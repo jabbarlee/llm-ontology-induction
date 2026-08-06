@@ -1,0 +1,16 @@
+CurrentState,UrgencyLevel,LogDate,CompletionDate,IssueSummary,BudgetEstimate,Resident,SiteAddress,Coordinator,Contractor,OwnerApproval
+resolved,high,2026-11-09,11/23/2026,"thermostat malfunction at 1060 Post Oak Blvd, Houston, TX.",3769.1,Elizabeth Fowler,"1060 Post Oak Blvd, Houston, TX",Darren Roberts,Rios Co.,Christopher Bernard
+open,low,03/03/2025,,,"drywall damage in lobby at 4046 Hempstead Rd, Houston, TX.",896,Tammy Allison,"4046 Hempstead Rd, Houston, TX",Melinda Cameron,,
+resolved,medium,May 2025,05/18/2025,"ant infestation near breakroom at 9107 Post Oak Blvd, Houston, TX.","$1,767.23",Mr. James Brown,"9107 Post Oak Blvd, Houston, TX",William Bowman,Hoffman Services,Davis Partners
+resolved,medium,2026-03-19,04/08/2026,"irrigation system broken at 7039 Beltway 8 Frontage, Houston, TX.","$3,608.32",Alexandra Le,"7039 Beltway 8 Frontage, Houston, TX",Nicholas Martin,Ross Services,Megan Mcclain
+resolved,high,2025-01-22,Feb 2025,"AC unit not cooling at 614 Beltway 8 Frontage, Houston, TX.","3,472.43",Tammy Allison,"614 Beltway 8 Frontage, Houston, TX",Darren Roberts,Baker Solutions,Megan Mcclain
+resolved,medium,08/23/2026,09/13/2026,"rodent activity in storage room at 109 Fannin St, Houston, TX.",1705.03,Edward Novak,"109 Fannin St, Houston, TX",Maria Lynch,Hoffman Services,Lindsey Roman
+in-progress,medium,2025-06-14,,,"heating not turning on at 4961 Kirby Dr, Houston, TX.","$672.37",Elizabeth Fowler,"4961 Kirby Dr, Houston, TX",Mark Diaz,Baker Solutions,
+resolved,medium,02/07/2025,02/10/2025,"windows need exterior cleaning at 9116 Richmond Ave, Houston, TX.","4,574.97",Daniel Ryan,"9116 Richmond Ave, Houston, TX",David Garcia,Wright Maintenance,Davis & Associates
+resolved,medium,Jan 2025,01/16/2025,"outlet not working at 9455 Fannin St, Houston, TX.",3111.85,Rebecca Henderson,"9455 Fannin St, Houston, TX",Sandra Montgomery,Hurst Co.,Robinson Group
+resolved,medium,02/22/2025,03/03/2025,"water heater failure at 109 Fannin St, Houston, TX.","2,680.14",Edward Novak,"109 Fannin St, Houston, TX",Mark Diaz,Foster Maintenance,Lindsey Roman
+resolved,medium,2026-10-08,10/14/2026,"toilet not flushing at 9433 Kirby Dr, Houston, TX.","221.77",Gerald Hensley,"9433 Kirby Dr, Houston, TX",Maria Lynch,Foster Maintenance,
+in-progress,low,2025-04-27,,,"drywall damage in lobby at 4662 Main St, Houston, TX.","5,056.36",Joshua Baker,"4662 Main St, Houston, TX",Nicholas Martin,Robinson Co.,Matthew Gardner
+resolved,low,2026-03-02,03/18/2026,"carpet stains in common area at 4046 Hempstead Rd, Houston, TX.","$4,247.20",Tammy Allison,"4046 Hempstead Rd, Houston, TX",Maria Lynch,Wright Maintenance,Walker Group
+in-progress,emergency,2025-05-20,,,"dead trees need removal at 1263 Gessner Rd, Houston, TX.","3,074.03",Tammy Allison,"1263 Gessner Rd, Houston, TX",Laura Bush,Ellis Co.,Allison Hill
+resolved,medium,10/17/2025,11/05/2025,"ant infestation near breakroom at 614 Beltway 8 Frontage, Houston, TX.",4932.27,Tammy Allison,"614 Beltway 8 Frontage, Houston, TX",Mark Diaz,Hoffman Services,Megan Mcclain

@@ -69,11 +69,15 @@ def chunk(items, size):
 
 
 def validate_csv_structure(text):
-    """Every row must have the same column count as the header. Catches
-    unquoted commas breaking column alignment — the prompt asks Gemini to
-    quote comma-containing fields, but that instruction isn't reliably
-    followed on every row, so this verifies it instead of trusting it."""
+    """Every non-blank row must have the same column count as the header.
+    Catches unquoted commas breaking column alignment — the prompt asks
+    Gemini to quote comma-containing fields, but that instruction isn't
+    reliably followed on every row, so this verifies it instead of trusting
+    it. Blank lines (e.g. a trailing newline, extremely common LLM output
+    behavior) are dropped before checking — they're not a structural error
+    and were previously causing false-positive rejections of valid CSV."""
     rows = list(csv.reader(io.StringIO(text)))
+    rows = [r for r in rows if r]  # drop blank lines
     if not rows:
         return False, "empty output"
     header_len = len(rows[0])
@@ -338,8 +342,11 @@ def run_csv(data, limit, force):
                         break
                     print(f"  CSV structure check failed (attempt {attempt}/{CSV_VALIDATION_RETRIES}): {reason}")
                 if text is None:
+                    debug_file = out_dir / f"{out_file.stem}.rejected.txt"
+                    debug_file.write_text(candidate)
                     raise RuntimeError(f"CSV never passed structure check after "
-                                        f"{CSV_VALIDATION_RETRIES} attempts: {reason}")
+                                        f"{CSV_VALIDATION_RETRIES} attempts: {reason} "
+                                        f"(last rejected attempt saved to {debug_file.name} for inspection)")
 
                 out_file.write_text(text)
                 stats.record("csv", "generated")
