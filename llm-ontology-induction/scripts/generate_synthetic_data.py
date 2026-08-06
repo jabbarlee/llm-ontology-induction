@@ -76,8 +76,7 @@ def call_gemini(prompt: str) -> str:
 # Prompt builders — mirrors step3_document_generation_prompts.md
 # ---------------------------------------------------------------------------
 
-def csv_prompt(entity_type, batch, attr_names):
-    ids = [r["id"] for r in batch]
+def csv_prompt(entity_type, batch, attr_names, ids):
     return f"""You are exporting records from an old, slightly inconsistent property
 management CRM system. Given the structured data below, output a realistic
 CSV export a property manager might pull for internal use.
@@ -88,15 +87,70 @@ Rules:
 - Format currency inconsistently across rows (e.g. "$4,300.00", "4300", "4,300").
 - Format dates inconsistently (MM/DD/YYYY, "Jan 2024", YYYY-MM-DD — mix them).
 - Leave at least 2 cells blank across the batch (not on ID-equivalent fields).
-- Do not include these internal IDs anywhere in the output: {ids}. Refer to
-  entities by name/address instead.
+- CRITICAL: do not include ANY internal record ID anywhere in the output —
+  this includes IDs of the records themselves ({ids}) AND any reference ID
+  inside a record's fields (e.g. an owner/agent/tenant/vendor/lease
+  reference). Every such field has already been resolved to a human-readable
+  name for you below — use that name, never the raw ID.
+- Proper CSV syntax still applies even while being messy: if a field's value
+  contains a comma (a formatted dollar amount, an address), wrap that field
+  in double quotes so the column count stays correct. Inconsistent
+  formatting must never break the file's column alignment.
 - Do not "clean up" or correct any source facts — reproduce them exactly,
   just formatted imperfectly.
 
-Source records:
+Source records (all reference IDs already resolved to names):
 {json.dumps(batch, indent=2)}
 
 Output only the CSV text, headers first."""
+
+
+def resolve_property_batch(properties, owners):
+    out = []
+    for p in properties:
+        r = dict(p)
+        r["ownerName"] = owners[p["ownerId"]]["name"]
+        del r["ownerId"], r["id"]
+        out.append(r)
+    return out
+
+
+def resolve_lease_batch(leases, owners, tenants, agents):
+    id_to_ref = {l["id"]: l for l in leases}
+    out = []
+    for l in leases:
+        r = dict(l)
+        r["ownerName"] = owners[l["ownerId"]]["name"]
+        r["tenantName"] = tenants[l["tenantId"]]["name"]
+        r["negotiatingAgentName"] = agents[l["negotiatingAgentId"]]["name"]
+        if l["amendmentLeaseId"]:
+            amendment = id_to_ref.get(l["amendmentLeaseId"])
+            r["amendmentSummary"] = (f"renews into a new term starting "
+                                      f"{amendment['startDate']}") if amendment else None
+        else:
+            r["amendmentSummary"] = None
+        for k in ("id", "ownerId", "tenantId", "propertyId", "negotiatingAgentId", "amendmentLeaseId"):
+            del r[k]
+        out.append(r)
+    return out
+
+
+def resolve_mr_batch(mrs, tenants, properties, agents, vendors, owners):
+    out = []
+    for mr in mrs:
+        r = dict(mr)
+        r["tenantName"] = tenants[mr["tenantId"]]["name"]
+        r["propertyAddress"] = properties[mr["propertyId"]]["address"]
+        r["assigningAgentName"] = agents[mr["assigningAgentId"]]["name"]
+        r["resolvingVendorName"] = vendors[mr["resolvingVendorId"]]["name"] if mr["resolvingVendorId"] else None
+        r["approvalNeededFromOwnerName"] = (
+            owners[mr["requiresApprovalOwnerId"]]["name"] if mr["requiresApprovalOwnerId"] else None
+        )
+        for k in ("id", "tenantId", "propertyId", "leaseId", "assigningAgentId",
+                  "resolvingVendorId", "requiresApprovalOwnerId"):
+            del r[k]
+        out.append(r)
+    return out
 
 
 def lease_prompt(lease, owner, tenant, prop):
@@ -182,14 +236,35 @@ Output only the message exchange."""
 def run_csv(data, limit):
     out_dir = DOCUMENTS_DIR / "csv_exports"
     out_dir.mkdir(parents=True, exist_ok=True)
-    for entity_type, key in [("Property", "properties"), ("Lease", "leases"),
-                              ("MaintenanceRequest", "maintenance_requests")]:
-        batch = data[key][:limit]
-        if not batch:
-            continue
-        print(f"[csv] {entity_type}: {len(batch)} records")
-        text = call_gemini(csv_prompt(entity_type, batch, REAL_ATTR_NAMES.get(entity_type, [])))
-        (out_dir / f"{key}_export.csv").write_text(text)
+    owners = index_by_id(data["owners"])
+    tenants = index_by_id(data["tenants"])
+    agents = index_by_id(data["agents"])
+    properties = index_by_id(data["properties"])
+    vendors = index_by_id(data["vendors"])
+
+    prop_batch = data["properties"][:limit]
+    if prop_batch:
+        print(f"[csv] Property: {len(prop_batch)} records")
+        ids = [r["id"] for r in prop_batch]
+        resolved = resolve_property_batch(prop_batch, owners)
+        text = call_gemini(csv_prompt("Property", resolved, REAL_ATTR_NAMES["Property"], ids))
+        (out_dir / "properties_export.csv").write_text(text)
+
+    lease_batch = data["leases"][:limit]
+    if lease_batch:
+        print(f"[csv] Lease: {len(lease_batch)} records")
+        ids = [r["id"] for r in lease_batch]
+        resolved = resolve_lease_batch(lease_batch, owners, tenants, agents)
+        text = call_gemini(csv_prompt("Lease", resolved, REAL_ATTR_NAMES["Lease"], ids))
+        (out_dir / "leases_export.csv").write_text(text)
+
+    mr_batch = data["maintenance_requests"][:limit]
+    if mr_batch:
+        print(f"[csv] MaintenanceRequest: {len(mr_batch)} records")
+        ids = [r["id"] for r in mr_batch]
+        resolved = resolve_mr_batch(mr_batch, tenants, properties, agents, vendors, owners)
+        text = call_gemini(csv_prompt("MaintenanceRequest", resolved, REAL_ATTR_NAMES["MaintenanceRequest"], ids))
+        (out_dir / "maintenance_requests_export.csv").write_text(text)
 
 
 def run_lease_texts(data, limit):

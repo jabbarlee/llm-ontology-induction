@@ -1,4 +1,4 @@
-Property_Address,Tenant_Name,Agent_Alias,Lease_Commencement,Expiration_Date,Monthly_Base_Rent,Rent_Hike_Strategy,Security_Funds_Held,Related_Amendment
-124 Maple St,Global Logistics LLC,agt-005,2022-04-01,04/01/2027,2072.72,none,31534.86,
-88 Sunset Blvd,Global Logistics LLC,agt-006,06/02/2024,Jun 2025,"42,801.60",CPI-indexed,28795.68,N/A
-492 Industrial Way,Apex Holdings,agt-005,Apr 2024,2027-04-16,19303.22,CPI-indexed,,"lease-004"
+Lease Commencement,Expiration Date,Monthly Base Rent,Increase Clause,Held Security Deposit,Property Owner,Tenant,Leasing Agent,Notes
+2022-04-01,04/01/2027,"$2,072.72",none,"31,534.86",Wagner & Associates,Mr. Philip Cannon,David Garcia,
+Jan 2024,2025-06-02,42801.6,CPI-indexed,28795.68,Lindsey Roman,Mr. Philip Cannon,Mark Diaz,No amendments
+2024-04-16,Apr 2027,"19,303.22",CPI-indexed,"25,839.74",Lindsey Roman,Edward Novak,David Garcia,
