@@ -25,6 +25,7 @@ import io
 import json
 import os
 import random
+import re
 import time
 from pathlib import Path
 
@@ -68,23 +69,49 @@ def chunk(items, size):
         yield items[i:i + size]
 
 
-def validate_csv_structure(text):
-    """Every non-blank row must have the same column count as the header.
-    Catches unquoted commas breaking column alignment — the prompt asks
-    Gemini to quote comma-containing fields, but that instruction isn't
-    reliably followed on every row, so this verifies it instead of trusting
-    it. Blank lines (e.g. a trailing newline, extremely common LLM output
-    behavior) are dropped before checking — they're not a structural error
-    and were previously causing false-positive rejections of valid CSV."""
-    rows = list(csv.reader(io.StringIO(text)))
-    rows = [r for r in rows if r]  # drop blank lines
-    if not rows:
-        return False, "empty output"
-    header_len = len(rows[0])
-    bad_rows = [i for i, r in enumerate(rows) if len(r) != header_len]
-    if bad_rows:
-        return False, f"column count mismatch on rows {bad_rows} (header has {header_len} cols)"
-    return True, None
+def json_to_csv(text):
+    """Parse Gemini's JSON response and serialize it to CSV using Python's
+    csv module, which quotes comma-containing fields correctly by
+    construction.
+
+    Previously Gemini was asked to hand-write CSV directly, but that put two
+    instructions in conflict — 'format messily' vs 'maintain valid CSV
+    syntax' — and on rows whose description embeds a comma-heavy address,
+    messiness won: fields went unquoted and columns split. Asking for JSON
+    removes the conflict entirely; the messiness now lives in the values and
+    column names, where it belongs, and delimiter correctness is Python's job.
+
+    Returns (csv_text, None) on success, or (None, reason) on failure."""
+    cleaned = text.strip()
+    # tolerate markdown fences even though the prompt asks for none
+    if cleaned.startswith("```"):
+        cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned)
+        cleaned = re.sub(r"\s*```$", "", cleaned)
+
+    try:
+        data = json.loads(cleaned)
+    except json.JSONDecodeError as e:
+        return None, f"response was not valid JSON: {e}"
+
+    if not isinstance(data, dict) or "columns" not in data or "rows" not in data:
+        return None, "JSON missing required 'columns' / 'rows' keys"
+
+    columns, rows = data["columns"], data["rows"]
+    if not isinstance(columns, list) or not isinstance(rows, list):
+        return None, "'columns' and 'rows' must both be lists"
+    if not columns:
+        return None, "'columns' is empty"
+
+    n = len(columns)
+    bad = [i for i, r in enumerate(rows) if not isinstance(r, list) or len(r) != n]
+    if bad:
+        return None, f"{len(bad)} row(s) have wrong element count (expected {n}): rows {bad[:5]}"
+
+    buf = io.StringIO()
+    writer = csv.writer(buf)
+    writer.writerow(columns)
+    writer.writerows(rows)
+    return buf.getvalue(), None
 
 
 class Stats:
@@ -136,32 +163,42 @@ def call_gemini(prompt: str) -> str:
 # ---------------------------------------------------------------------------
 
 def csv_prompt(entity_type, batch, attr_names, ids):
-    return f"""You are exporting records from an old, slightly inconsistent property
-management CRM system. Given the structured data below, output a realistic
-CSV export a property manager might pull for internal use.
+    return f"""You are simulating an export from an old, slightly inconsistent property
+management CRM system. Given the structured data below, produce the rows
+that such an export would contain.
+
+Return your answer as JSON with exactly this shape:
+{{
+  "columns": ["ColName1", "ColName2", ...],
+  "rows": [
+    ["value1", "value2", ...],
+    ...
+  ]
+}}
 
 Rules:
-- Do NOT use these exact field names in your header row: {attr_names}.
+- Do NOT use these exact field names as column names: {attr_names}.
   Invent realistic CRM-style column names instead.
+- Every row array MUST have exactly the same number of elements as the
+  "columns" array. Use an empty string "" for a blank cell — never omit an
+  element, never add an extra one.
 - Format currency inconsistently across rows (e.g. "$4,300.00", "4300", "4,300").
 - Format dates inconsistently (MM/DD/YYYY, "Jan 2024", YYYY-MM-DD — mix them).
-- Leave at least 2 cells blank across the batch (not on ID-equivalent fields).
+- Leave at least 2 cells blank (empty string) across the batch.
 - CRITICAL: do not include ANY internal record ID anywhere in the output —
   this includes IDs of the records themselves ({ids}) AND any reference ID
   inside a record's fields (e.g. an owner/agent/tenant/vendor/lease
   reference). Every such field has already been resolved to a human-readable
   name for you below — use that name, never the raw ID.
-- Proper CSV syntax still applies even while being messy: if a field's value
-  contains a comma (a formatted dollar amount, an address), wrap that field
-  in double quotes so the column count stays correct. Inconsistent
-  formatting must never break the file's column alignment.
 - Do not "clean up" or correct any source facts — reproduce them exactly,
   just formatted imperfectly.
+- Values may freely contain commas (addresses, formatted amounts) — you do
+  NOT need to escape or quote anything, since this is JSON, not CSV.
 
 Source records (all reference IDs already resolved to names):
 {json.dumps(batch, indent=2)}
 
-Output only the CSV text, headers first."""
+Output only the JSON object, no markdown fences, no commentary."""
 
 
 def resolve_property_batch(properties, owners):
@@ -336,15 +373,15 @@ def run_csv(data, limit, force):
                 text, reason = None, None
                 for attempt in range(1, CSV_VALIDATION_RETRIES + 1):
                     candidate = call_gemini(prompt)
-                    valid, reason = validate_csv_structure(candidate)
-                    if valid:
-                        text = candidate
+                    converted, reason = json_to_csv(candidate)
+                    if converted is not None:
+                        text = converted
                         break
-                    print(f"  CSV structure check failed (attempt {attempt}/{CSV_VALIDATION_RETRIES}): {reason}")
+                    print(f"  CSV conversion failed (attempt {attempt}/{CSV_VALIDATION_RETRIES}): {reason}")
                 if text is None:
                     debug_file = out_dir / f"{out_file.stem}.rejected.txt"
                     debug_file.write_text(candidate)
-                    raise RuntimeError(f"CSV never passed structure check after "
+                    raise RuntimeError(f"CSV never passed conversion after "
                                         f"{CSV_VALIDATION_RETRIES} attempts: {reason} "
                                         f"(last rejected attempt saved to {debug_file.name} for inspection)")
 
