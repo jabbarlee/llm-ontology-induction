@@ -20,6 +20,8 @@ Usage:
 """
 
 import argparse
+import csv
+import io
 import json
 import os
 import random
@@ -37,6 +39,7 @@ MODEL = "gemini-3.1-flash-lite"  # gemini-2.0-flash has 0 free-tier quota as of 
 SLEEP_BETWEEN_CALLS = 4.5  # seconds — stay under free-tier RPM limits
 MAX_RETRIES = 3
 CSV_BATCH_SIZE = 15  # records per CSV file — avoids cramming 45+ rows into one response
+CSV_VALIDATION_RETRIES = 3  # re-generate (not just re-prompt) if structure check fails
 
 client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 
@@ -63,6 +66,21 @@ def index_by_id(records):
 def chunk(items, size):
     for i in range(0, len(items), size):
         yield items[i:i + size]
+
+
+def validate_csv_structure(text):
+    """Every row must have the same column count as the header. Catches
+    unquoted commas breaking column alignment — the prompt asks Gemini to
+    quote comma-containing fields, but that instruction isn't reliably
+    followed on every row, so this verifies it instead of trusting it."""
+    rows = list(csv.reader(io.StringIO(text)))
+    if not rows:
+        return False, "empty output"
+    header_len = len(rows[0])
+    bad_rows = [i for i, r in enumerate(rows) if len(r) != header_len]
+    if bad_rows:
+        return False, f"column count mismatch on rows {bad_rows} (header has {header_len} cols)"
+    return True, None
 
 
 class Stats:
@@ -190,7 +208,10 @@ def resolve_mr_batch(mrs, tenants, properties, agents, vendors, owners):
     return out
 
 
-def lease_prompt(lease, owner, tenant, prop):
+def lease_prompt(lease, owner, tenant, prop, amendment_summary):
+    lease_for_prompt = {k: v for k, v in lease.items() if k != "amendmentLeaseId"}
+    if amendment_summary:
+        lease_for_prompt["amendmentSummary"] = amendment_summary
     return f"""You are drafting a commercial lease agreement document based on the
 structured facts below. Write it as realistic prose lease language — the
 kind a small commercial landlord's own template would produce, not a
@@ -204,12 +225,16 @@ Rules:
   facts in ordinary lease language instead.
 - Include the escalation and security deposit terms as an actual lease
   clause, not a data field.
+- If amendmentSummary is present, reference it only via the plain-language
+  description given — e.g. "this lease renews into a new term starting
+  [date]" — never invent or reference a record number, lease ID, or
+  document number of any kind, even one that sounds plausible.
 - Omit one minor, non-critical detail a real lease might leave implicit.
 - Do not include any internal record IDs anywhere in the text.
 - Keep the facts accurate — do not alter dates, dollar amounts, or names.
 
 Source records:
-Lease: {json.dumps(lease, indent=2)}
+Lease: {json.dumps(lease_for_prompt, indent=2)}
 Owner: {json.dumps(owner, indent=2)}
 Tenant: {json.dumps(tenant, indent=2)}
 Property: {json.dumps(prop, indent=2)}
@@ -302,7 +327,20 @@ def run_csv(data, limit, force):
             try:
                 ids = [r["id"] for r in batch]  # from RAW batch, before resolver strips 'id'
                 resolved = resolver(batch)
-                text = call_gemini(csv_prompt(entity_type, resolved, REAL_ATTR_NAMES[entity_type], ids))
+                prompt = csv_prompt(entity_type, resolved, REAL_ATTR_NAMES[entity_type], ids)
+
+                text, reason = None, None
+                for attempt in range(1, CSV_VALIDATION_RETRIES + 1):
+                    candidate = call_gemini(prompt)
+                    valid, reason = validate_csv_structure(candidate)
+                    if valid:
+                        text = candidate
+                        break
+                    print(f"  CSV structure check failed (attempt {attempt}/{CSV_VALIDATION_RETRIES}): {reason}")
+                if text is None:
+                    raise RuntimeError(f"CSV never passed structure check after "
+                                        f"{CSV_VALIDATION_RETRIES} attempts: {reason}")
+
                 out_file.write_text(text)
                 stats.record("csv", "generated")
             except RuntimeError as e:
@@ -316,6 +354,7 @@ def run_lease_texts(data, limit, force):
     owners = index_by_id(data["owners"])
     tenants = index_by_id(data["tenants"])
     properties = index_by_id(data["properties"])
+    leases_by_id = index_by_id(data["leases"])
     for lease in data["leases"][:limit]:
         out_file = out_dir / f"{lease['id']}.txt"
         if out_file.exists() and not force:
@@ -324,9 +363,14 @@ def run_lease_texts(data, limit, force):
             continue
         print(f"[lease] {lease['id']}")
         try:
+            amendment_summary = None
+            if lease["amendmentLeaseId"]:
+                amendment = leases_by_id.get(lease["amendmentLeaseId"])
+                if amendment:
+                    amendment_summary = f"renews into a new term starting {amendment['startDate']}"
             text = call_gemini(lease_prompt(
                 lease, owners[lease["ownerId"]], tenants[lease["tenantId"]],
-                properties[lease["propertyId"]]))
+                properties[lease["propertyId"]], amendment_summary))
             out_file.write_text(text)
             stats.record("lease", "generated")
         except RuntimeError as e:

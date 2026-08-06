@@ -1,16 +1,16 @@
-TicketState,UrgencyLevel,SubmissionDate,CompletionDate,IssueSummary,BudgetEstimate,Resident,PropertyLocation,AssignedRepresentative,ServicePartner,ApprovalEntity
-resolved,low,2025-09-01,09/02/2025,"rodent activity in storage room at 614 Beltway 8 Frontage, Houston, TX.",138.42,Tammy Allison,"614 Beltway 8 Frontage, Houston, TX",Sandra Montgomery,Hoffman Services,
-resolved,medium,05/03/2026,2026-05-15,"flickering lights at 8935 Bellaire Blvd, Houston, TX.",4486.71,Jonathan White,"8935 Bellaire Blvd, Houston, TX",Laura Bush,Hurst Co.,Johnson Holdings
-resolved,emergency,Nov 2026,11/21/2026,"drywall damage in lobby at 1036 Westheimer Rd, Houston, TX.",308.02,Thomas Ramos,"1036 Westheimer Rd, Houston, TX",Maria Lynch,Robinson Co.,
-resolved,medium,2026-12-31,01/03/2027,"AC unit not cooling at 8908 Kirby Dr, Houston, TX.",692.37,Shawn Arroyo,"8908 Kirby Dr, Houston, TX",Maria Lynch,Baker Solutions,
-open,low,07/16/2026,,,"breaker tripping repeatedly at 6047 Hempstead Rd, Houston, TX.",3816.81,Shawn Arroyo,"6047 Hempstead Rd, Houston, TX",Laura Bush,,Javier Johnson
-resolved,medium,2025-04-12,05/03/2025,"outlet not working at 4391 Post Oak Blvd, Houston, TX.",3652.29,April Nguyen,"4391 Post Oak Blvd, Houston, TX",William Bowman,Rocha Solutions,Robinson Group
-in-progress,low,2026-04-10,,,"rodent activity in storage room at 8908 Kirby Dr, Houston, TX.",2066.64,Shawn Arroyo,"8908 Kirby Dr, Houston, TX",Daniel Adams,Hoffman Services,Megan Mcclain
-in-progress,high,06/06/2025,,,"carpet stains in common area at 9116 Richmond Ave, Houston, TX.","2,277.09",Daniel Ryan,"9116 Richmond Ave, Houston, TX",Mark Diaz,Wright Maintenance,Davis & Associates
-in-progress,high,2025-05-14,,,"AC unit not cooling at 6047 Hempstead Rd, Houston, TX.","$2,267.25",Shawn Arroyo,"6047 Hempstead Rd, Houston, TX",Sandra Montgomery,Rios Co.,Javier Johnson
+Current_State,Urgency,Submission_Date,Completion_Date,Issue_Description,Projected_Budget,Occupant,Building_Location,Manager,Service_Provider,Ownership_Auth
+resolved,low,09/01/2025,09/02/2025,"rodent activity in storage room at 614 Beltway 8 Frontage, Houston, TX.",138.42,Tammy Allison,"614 Beltway 8 Frontage, Houston, TX",Sandra Montgomery,Hoffman Services,
+resolved,medium,2026-05-03,05/15/2026,"flickering lights at 8935 Bellaire Blvd, Houston, TX.",4486.71,Jonathan White,"8935 Bellaire Blvd, Houston, TX",Laura Bush,Hurst Co.,Johnson Holdings
+resolved,emergency,11/06/2026,Nov 2026,"drywall damage in lobby at 1036 Westheimer Rd, Houston, TX.",308.02,Thomas Ramos,"1036 Westheimer Rd, Houston, TX",Maria Lynch,Robinson Co.,
+resolved,medium,12/31/2026,01/03/2027,"AC unit not cooling at 8908 Kirby Dr, Houston, TX.","$692.37",Shawn Arroyo,"8908 Kirby Dr, Houston, TX",Maria Lynch,Baker Solutions,
+open,low,07/16/2026,,"breaker tripping repeatedly at 6047 Hempstead Rd, Houston, TX.","3,816.81",Shawn Arroyo,"6047 Hempstead Rd, Houston, TX",Laura Bush,,Javier Johnson
+resolved,medium,Apr 2025,05/03/2025,"outlet not working at 4391 Post Oak Blvd, Houston, TX.","3,652.29",April Nguyen,"4391 Post Oak Blvd, Houston, TX",William Bowman,Rocha Solutions,Robinson Group
+in-progress,low,04/10/2026,,"rodent activity in storage room at 8908 Kirby Dr, Houston, TX.",2066.64,Shawn Arroyo,"8908 Kirby Dr, Houston, TX",Daniel Adams,Hoffman Services,Megan Mcclain
+in-progress,high,06/06/2025,,"carpet stains in common area at 9116 Richmond Ave, Houston, TX.","2,277.09",Daniel Ryan,"9116 Richmond Ave, Houston, TX",Mark Diaz,Wright Maintenance,Davis & Associates
+in-progress,high,05/14/2025,,,"2267.25",Shawn Arroyo,"6047 Hempstead Rd, Houston, TX",Sandra Montgomery,Rios Co.,Javier Johnson
 resolved,medium,03/10/2026,03/20/2026,"door frame needs repair at 3446 Main St, Houston, TX.","5,247.96",Eric Carney,"3446 Main St, Houston, TX",Mark Diaz,Baker Maintenance,Robinson Partners
-resolved,low,2025-08-18,2025-08-30,"outlet not working at 3446 Main St, Houston, TX.","3,957.58",Eric Carney,"3446 Main St, Houston, TX",Sandra Montgomery,Rocha Solutions,Robinson Partners
-assigned,low,07/29/2026,,,"flickering lights at 9433 Kirby Dr, Houston, TX.",2603.22,Gerald Hensley,"9433 Kirby Dr, Houston, TX",Derek Clark,Rocha Solutions,Javier Johnson
-assigned,high,Dec 2025,,,"windows need exterior cleaning at 3446 Main St, Houston, TX.",1888.46,Eric Carney,"3446 Main St, Houston, TX",Valerie Gray,Wright Maintenance,Robinson Partners
-resolved,low,2025-02-01,02/18/2025,"leaking pipe under sink at 7533 Westheimer Rd, Houston, TX.",4458.77,Mr. Philip Cannon,"7533 Westheimer Rd, Houston, TX",William Bowman,Foster Maintenance,Wagner & Associates
-in-progress,medium,2026-08-05,,,"irrigation system broken at 444 Fannin St, Houston, TX.","4,343.5",Nicole Brown,"444 Fannin St, Houston, TX",Maria Lynch,Ellis Co.,Abigail Shaffer
+resolved,low,08/18/2025,08/30/2025,"outlet not working at 3446 Main St, Houston, TX.","3,957.58",Eric Carney,"3446 Main St, Houston, TX",Sandra Montgomery,Rocha Solutions,Robinson Partners
+assigned,low,07/29/2026,,"flickering lights at 9433 Kirby Dr, Houston, TX.","2,603.22",Gerald Hensley,"9433 Kirby Dr, Houston, TX",Derek Clark,Rocha Solutions,Javier Johnson
+assigned,high,12/14/2025,,,"1888.46",Eric Carney,"3446 Main St, Houston, TX",Valerie Gray,Wright Maintenance,Robinson Partners
+resolved,low,Feb 2025,02/18/2025,"leaking pipe under sink at 7533 Westheimer Rd, Houston, TX.","4,458.77",Mr. Philip Cannon,"7533 Westheimer Rd, Houston, TX",William Bowman,Foster Maintenance,Wagner & Associates
+in-progress,medium,08/05/2026,,"irrigation system broken at 444 Fannin St, Houston, TX.","4,343.50",Nicole Brown,"444 Fannin St, Houston, TX",Maria Lynch,Ellis Co.,Abigail Shaffer

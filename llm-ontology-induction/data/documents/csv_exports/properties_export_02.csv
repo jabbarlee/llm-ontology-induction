@@ -1,16 +1,16 @@
-Location,UnitSize_SqFt,Classification,BuildingStyle,TrafficDensity,PrimaryLeaseholder,MonthlyRevenue,LastInspectionDate
-"9455 Fannin St, Houston, TX",32476,retail,standalone,medium,Robinson Group,"$4,300.00",01/12/2024
-"3219 Richmond Ave, Houston, TX",7852,retail,street-front,medium,Rogers & Associates,3800,2023-12-05
-"6835 Yale St, Houston, TX",58112,retail,strip mall,high,Rogers & Associates,"5,100",Jan 2024
-"1093 Studemont St, Houston, TX",49224,retail,mall inline,low,Javier Johnson,"$2,950.00",02/15/2024
-"3239 Kirby Dr, Houston, TX",36646,retail,street-front,low,Matthew Gardner,4100,2024-01-10
-"3106 Shepherd Dr, Houston, TX",31818,retail,standalone,low,Rogers & Associates,"3,200",Feb 2024
-"9116 Richmond Ave, Houston, TX",4815,retail,strip mall,low,Davis & Associates,$2,100.00,01/20/2024
-"2824 Studemont St, Houston, TX",33326,retail,street-front,low,Matthew Gardner,3500,2023-11-30
-"1060 Post Oak Blvd, Houston, TX",26336,retail,strip mall,medium,Christopher Bernard,,"Mar 2024"
-"7554 Shepherd Dr, Houston, TX",29222,retail,street-front,low,Robinson Partners,$3,900.00,2024-02-01
-"4961 Kirby Dr, Houston, TX",5332,retail,strip mall,high,Johnson Holdings,"4,650",01/05/2024
-"1036 Westheimer Rd, Houston, TX",39784,retail,street-front,high,Abigail Shaffer,$5,200.00,2023-12-28
-"2679 Westheimer Rd, Houston, TX",34781,retail,strip mall,low,Lindsey Roman,3100,02/14/2024
-"9849 Richmond Ave, Houston, TX",45750,retail,standalone,medium,Megan Mcclain,$4,750.00,
-"9433 Kirby Dr, Houston, TX",39440,retail,strip mall,high,Javier Johnson,"5,500",2024-01-22
+Physical Location,Unit Size (SqFt),Category,Store Configuration,Traffic Rating,Account Holder,Last Rent Review,Monthly Rent
+"9455 Fannin St, Houston, TX",32476,retail,standalone,medium,Robinson Group,01/15/2024,"4,300.00"
+"3219 Richmond Ave, Houston, TX",7852,retail,street-front,medium,Rogers & Associates,Jan 2024,4300
+"6835 Yale St, Houston, TX",58112,retail,strip mall,high,Rogers & Associates,2024-02-12,"4,300"
+"1093 Studemont St, Houston, TX",49224,retail,mall inline,low,Javier Johnson,03/22/2024,5100.50
+"3239 Kirby Dr, Houston, TX",36646,retail,street-front,low,Matthew Gardner,Apr 2024,"5,200.00"
+"3106 Shepherd Dr, Houston, TX",31818,retail,standalone,low,Rogers & Associates,2024-04-05,4800
+"9116 Richmond Ave, Houston, TX",4815,retail,strip mall,low,Davis & Associates,05/11/2024,"4,950.00"
+"2824 Studemont St, Houston, TX",33326,retail,street-front,low,Matthew Gardner,May 2024,4750
+"1060 Post Oak Blvd, Houston, TX",26336,retail,strip mall,medium,Christopher Bernard,2024-06-01,"5,000.00"
+"7554 Shepherd Dr, Houston, TX",29222,retail,street-front,low,Robinson Partners,06/20/2024,4200
+"4961 Kirby Dr, Houston, TX",5332,retail,strip mall,high,Johnson Holdings,Jul 2024,"5,500.00"
+"1036 Westheimer Rd, Houston, TX",39784,retail,street-front,high,Abigail Shaffer,2024-08-14,5600
+"2679 Westheimer Rd, Houston, TX",34781,retail,strip mall,low,Lindsey Roman,08/29/2024,"5,100.00"
+"9849 Richmond Ave, Houston, TX",45750,retail,standalone,medium,Megan Mcclain,,4900
+"9433 Kirby Dr, Houston, TX",39440,retail,strip mall,high,Javier Johnson,Sep 2024,

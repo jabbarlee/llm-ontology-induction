@@ -1,16 +1,16 @@
-Property Owner,Occupant Name,Lease Agent,Base Monthly Fee,Increase Strategy,Holdback Funds,Commencement Date,Expiration Date,Memo Notes
-Allison Hill,Tammy Allison,Laura Bush,"$13,985.51",fixed percentage,38114.1,2029-08-28,08/28/2032,
-Megan Mcclain,Tammy Allison,Sandra Montgomery,13683.75,CPI-indexed,"40,400.15",2023-08-09,Aug 2025,"renews into a new term starting 2025-08-09"
-Megan Mcclain,Tammy Allison,Sandra Montgomery,"14,315.78",CPI-indexed,40400.15,2025-08-09,2026-08-09,
-Matthew Gardner,Joshua Baker,Sandra Montgomery,16227.9,CPI-indexed,"19,878.29",04/29/2024,2029-04-28,"renews into a new term starting 2029-04-28"
-Matthew Gardner,Joshua Baker,Sandra Montgomery,"$17,157.16",CPI-indexed,19878.29,Apr 2029,2031-04-28,
-Robinson Group,Rebecca Henderson,Sherri Edwards,2253.53,CPI-indexed,"14,840.34",2024-02-19,2029-02-19,
-Rogers & Associates,Thomas Ramos,Nicholas Martin,"11,435.13",CPI-indexed,22882.61,2023-03-28,03/28/2028,
+Lease_Owner,Occupant_Name,Broker_Rep,Mthly_Base,Escalation_Method,Sec_Dep,Effective_Date,Expiration_Date,Memo
+Allison Hill,Tammy Allison,Laura Bush,"13,985.51",fixed percentage,38114.1,2029-08-28,08/28/2032,
+Megan Mcclain,Tammy Allison,Sandra Montgomery,13683.75,CPI-indexed,"40,400.15",08/09/2023,2025-08-09,"renews into a new term starting 2025-08-09"
+Megan Mcclain,Tammy Allison,Sandra Montgomery,14315.78,CPI-indexed,"40,400.15",2025-08-09,08/09/2026,
+Matthew Gardner,Joshua Baker,Sandra Montgomery,"16,227.90",CPI-indexed,19878.29,04/29/2024,2029-04-28,"renews into a new term starting 2029-04-28"
+Matthew Gardner,Joshua Baker,Sandra Montgomery,17157.16,CPI-indexed,19878.29,2029-04-28,04/28/2031,
+Robinson Group,Rebecca Henderson,Sherri Edwards,2253.53,CPI-indexed,14840.34,2024-02-19,02/19/2029,
+Rogers & Associates,Thomas Ramos,Nicholas Martin,"11,435.13",CPI-indexed,22882.61,Mar 2023,03/28/2028,
 Rogers & Associates,Jerry Henderson,Crystal Johnson,41540.29,none,"24,967.32",2022-12-05,2027-12-05,
-Javier Johnson,Rebecca Henderson,Sandra Montgomery,"$39,274.61",fixed percentage,4162.24,2024-05-27,2026-05-27,
-Matthew Gardner,Carlos Walls,Mark Diaz,34336.42,CPI-indexed,"12,847.68",2024-02-16,02/16/2027,"renews into a new term starting 2027-02-16"
-Matthew Gardner,Carlos Walls,Mark Diaz,"37,166.83",CPI-indexed,12847.68,2027-02-16,2028-02-16,
-Davis & Associates,Daniel Ryan,Melinda Cameron,34432.03,fixed percentage,"10,572.51",2022-05-21,May 2023,"renews into a new term starting 2023-05-21"
-Davis & Associates,Daniel Ryan,Melinda Cameron,"$36,039.94",fixed percentage,10572.51,2023-05-21,05/21/2024,
-Matthew Gardner,Elizabeth Fowler,William Bowman,32076.99,CPI-indexed,"9,214.93",2023-03-23,2028-03-23,
-Christopher Bernard,Elizabeth Fowler,Derek Clark,"6,648.25",fixed percentage,41942.15,12/02/2022,2025-12-02,
+Javier Johnson,Rebecca Henderson,Sandra Montgomery,"39,274.61",fixed percentage,4162.24,05/27/2024,2026-05-27,
+Matthew Gardner,Carlos Walls,Mark Diaz,"34,336.42",CPI-indexed,12847.68,2024-02-16,02/16/2027,"renews into a new term starting 2027-02-16"
+Matthew Gardner,Carlos Walls,Mark Diaz,37166.83,CPI-indexed,"12,847.68",02/16/2027,2028-02-16,
+Davis & Associates,Daniel Ryan,Melinda Cameron,34432.03,fixed percentage,10572.51,2022-05-21,05/21/2023,"renews into a new term starting 2023-05-21"
+Davis & Associates,Daniel Ryan,Melinda Cameron,"36,039.94",fixed percentage,10572.51,May 2023,05/21/2024,
+Matthew Gardner,Elizabeth Fowler,William Bowman,32076.99,CPI-indexed,9214.93,2023-03-23,03/23/2028,
+Christopher Bernard,Elizabeth Fowler,Derek Clark,6648.25,fixed percentage,41942.15,2022-12-02,12/02/2025,

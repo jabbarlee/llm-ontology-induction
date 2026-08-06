@@ -1,16 +1,16 @@
-Lease Owner,Occupant Name,Primary Agent,Contract Start,Contract Expiry,Monthly Base Fee,Escalation Structure,Held Collateral,Notes
-Wagner & Associates,Mr. Philip Cannon,David Garcia,2022-04-01,2027-04-01,2072.72,none,"31,534.86",
-Lindsey Roman,Mr. Philip Cannon,Mark Diaz,06/02/2024,06/02/2025,"42,801.60",CPI-indexed,28795.68,
-Lindsey Roman,Edward Novak,David Garcia,2024-04-16,2027-04-16,19303.22,CPI-indexed,"25,839.74","renews into a new term starting 2027-04-16"
-Lindsey Roman,Edward Novak,David Garcia,Apr 2027,Apr 2030,21152.96,CPI-indexed,25839.74,
-Javier Johnson,Shawn Arroyo,William Bowman,2023-09-09,2028-09-09,25561.3,fixed percentage,15066.62,"renews into a new term starting 2028-09-09"
-Javier Johnson,Shawn Arroyo,William Bowman,2028-09-09,2031-09-09,27413.63,fixed percentage,"15,066.62",
-Walker Group,Tammy Allison,Maria Lynch,03/14/2023,03/14/2028,36130.62,none,9296.73,"renews into a new term starting 2028-03-14"
-Walker Group,Tammy Allison,Maria Lynch,2028-03-14,2031-03-14,38893.52,none,"9,296.73",
-Davis Partners,Jesse Mckay,Sherri Edwards,2023-04-27,2026-04-27,11659.55,fixed percentage,8336.22,"renews into a new term starting 2026-04-27"
-Davis Partners,Jesse Mckay,Sherri Edwards,Apr 2026,Apr 2028,"12,508.24",fixed percentage,8336.22,
-Davis Partners,Mr. James Brown,Daniel Adams,2023-02-03,2028-02-03,23258.22,fixed percentage,8345.57,
-Johnson Holdings,Jonathan White,Derek Clark,05/20/2024,05/20/2026,9563.13,none,"24,272.18","renews into a new term starting 2026-05-20"
-Johnson Holdings,Jonathan White,Derek Clark,2026-05-20,2027-05-20,10464.20,none,24272.18,
-Abigail Shaffer,Nicole Brown,Nicholas Martin,2023-10-12,2028-10-12,28344.05,none,"40,356.87",
-Allison Hill,Tammy Allison,Laura Bush,2024-08-30,2029-08-28,13145.24,fixed percentage,38114.1,
+Lease Owner,Tenant Name,Agent Name,Monthly Base Rate,Escalation Structure,Holding Amount,Commence Date,Expiry Date,Contract Notes
+"Wagner & Associates",Mr. Philip Cannon,David Garcia,2072.72,none,"31,534.86",04/01/2022,2027-04-01,
+"Lindsey Roman",Mr. Philip Cannon,Mark Diaz,"42,801.60",CPI-indexed,28795.68,06/02/2024,2025-06-02,
+"Lindsey Roman",Edward Novak,David Garcia,19303.22,CPI-indexed,"25,839.74",2024-04-16,04/16/2027,"renews into a new term starting 2027-04-16"
+"Lindsey Roman",Edward Novak,David Garcia,21152.96,CPI-indexed,25839.74,2027-04-16,04/16/2030,
+"Javier Johnson",Shawn Arroyo,William Bowman,"25,561.30",fixed percentage,15066.62,Sep 2023,2028-09-09,"renews into a new term starting 2028-09-09"
+"Javier Johnson",Shawn Arroyo,William Bowman,27413.63,fixed percentage,15066.62,2028-09-09,09/09/2031,
+"Walker Group",Tammy Allison,Maria Lynch,36130.62,none,"9,296.73",2023-03-14,03/14/2028,"renews into a new term starting 2028-03-14"
+"Walker Group",Tammy Allison,Maria Lynch,38893.52,none,"9,296.73",03/14/2028,2031-03-14,
+"Davis Partners",Jesse Mckay,Sherri Edwards,11659.55,fixed percentage,8336.22,2023-04-27,04/27/2026,"renews into a new term starting 2026-04-27"
+"Davis Partners",Jesse Mckay,Sherri Edwards,"12,508.24",fixed percentage,8336.22,04/27/2026,2028-04-27,
+"Davis Partners",Mr. James Brown,Daniel Adams,23258.22,fixed percentage,8345.57,2023-02-03,Feb 2028,
+"Johnson Holdings",Jonathan White,Derek Clark,9563.13,none,24272.18,05/20/2024,2026-05-20,"renews into a new term starting 2026-05-20"
+"Johnson Holdings",Jonathan White,Derek Clark,10464.20,none,"24,272.18",2026-05-20,05/20/2027,
+"Abigail Shaffer",Nicole Brown,Nicholas Martin,"28,344.05",none,40356.87,2023-10-12,Oct 2028,
+"Allison Hill",Tammy Allison,Laura Bush,13145.24,fixed percentage,38114.1,2024-08-30,2029-08-28,
