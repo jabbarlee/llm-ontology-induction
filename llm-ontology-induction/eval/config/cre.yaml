@@ -1,0 +1,49 @@
+# Domain pack — Commercial Real Estate (eval/PLAN.md §0 Layer 2).
+#
+# The one genuinely domain-bound input the core engine needs: the synonym
+# lexicon for M2 fuzzy matching. Everything in this file is data, not code —
+# schema_ir.py / matching.py / metrics.py must never hardcode any of these
+# strings (see eval/tests/test_harness.py::test_no_domain_leakage).
+
+domain: commercial_real_estate
+
+stopwords: [the, a, an, of, for, and]
+
+# Symmetric synonym lexicon. Each key's list entries are treated as
+# interchangeable with the key (and with each other) at M2 — a lexicon hit
+# scores 1.0 regardless of the fuzzy threshold below. Covers T3's three
+# explicit toy-fixture examples (Owner->Landlord, Tenant->Lessee,
+# Property->Premises) plus the additional CRE synonyms named in
+# schema/schema_notes.md and eval/PLAN.md §0.
+synonyms:
+  owner: [landlord, lessor, proprietor]
+  tenant: [lessee, renter, occupant]
+  property: [premises, asset, building, space]
+  agent: [broker, representative]
+  vendor: [contractor, service provider, supplier]
+  lease: [rental agreement, tenancy agreement]
+  maintenance request: [work order, service request, repair ticket, ticket]
+
+# --- Threshold freeze (eval/PLAN.md §7 — the p-hacking guard) -------------
+#
+# STATUS: PROVISIONAL, NOT FROZEN. The values below let the harness run
+# end-to-end and satisfy the Phase 3/4 acceptance checks in eval/PLAN.md §5
+# (e.g. "lease" must not match "least" despite scoring 80/100 on raw
+# token-set ratio — verified empirically: rapidfuzz.fuzz.token_set_ratio
+# degenerates to plain Levenshtein-ratio for single-token strings, so only a
+# threshold above 80 rejects it). They are NOT the result of the required
+# hand-labeled 60-80 pair exercise and MUST NOT be cited as final in the
+# paper. Once that exercise runs, overwrite these values, set frozen: true,
+# fill in frozen_date, and never change them again without re-running every
+# previously scored result (§7 rule 4).
+thresholds:
+  frozen: false
+  frozen_date: null
+  labeled_pairs_file: null   # e.g. eval/config/threshold_labels.csv once §7 runs
+  m2_token_set_ratio: 0.85   # PROVISIONAL — separates "lease"/"least" (0.80) from a match
+  m3_cosine_similarity: 0.55 # PROVISIONAL — not yet validated against hand labels
+
+embedding:
+  model_name: sentence-transformers/all-MiniLM-L6-v2
+  model_version: null        # pin exact HF revision hash once frozen
+  cache_path: eval/.cache/embeddings.json
