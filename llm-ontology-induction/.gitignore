@@ -2,4 +2,10 @@
 .env
 .env.local
 
+#Eval harness generated artifacts
+eval/.cache/
+__pycache__/
+*.pyc
+.pytest_cache/
 
+#Plans
