@@ -1,0 +1,183 @@
+{
+  "classes": [
+    {
+      "name": "Rental Agreement",
+      "parent": null,
+      "attributes": [
+        "endDate",
+        "escalationType",
+        "rentAmount",
+        "securityDeposit",
+        "startDate"
+      ]
+    },
+    {
+      "name": "IndustrialProperty",
+      "parent": "Premises",
+      "attributes": [
+        "ceilingHeight",
+        "loadingDocks"
+      ]
+    },
+    {
+      "name": "Work Order",
+      "parent": null,
+      "attributes": [
+        "dateReported",
+        "dateResolved",
+        "description",
+        "estimatedCost",
+        "priority",
+        "status"
+      ]
+    },
+    {
+      "name": "Landlord",
+      "parent": "Party",
+      "attributes": [
+        "ownerType",
+        "taxId"
+      ]
+    },
+    {
+      "name": "Lessee",
+      "parent": "Party",
+      "attributes": [
+        "businessName",
+        "industryType"
+      ]
+    },
+    {
+      "name": "Broker",
+      "parent": "Party",
+      "attributes": [
+        "brokerage",
+        "licenseNumber"
+      ]
+    },
+    {
+      "name": "Contractor",
+      "parent": "Party",
+      "attributes": [
+        "insuranceExpiryDate",
+        "insured",
+        "serviceType"
+      ]
+    },
+    {
+      "name": "Premises",
+      "parent": null,
+      "attributes": [
+        "address",
+        "squareFootage"
+      ]
+    },
+    {
+      "name": "RetailProperty",
+      "parent": "Premises",
+      "attributes": [
+        "footTraffic",
+        "storefrontType"
+      ]
+    },
+    {
+      "name": "Party",
+      "parent": null,
+      "attributes": [
+        "contactInfo",
+        "name"
+      ]
+    },
+    {
+      "name": "OfficeProperty",
+      "parent": "Premises",
+      "attributes": [
+        "numberOfFloors",
+        "parkingSpaces"
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "source": "Work Order",
+      "label": "requiresApproval",
+      "target": "Landlord"
+    },
+    {
+      "source": "Rental Agreement",
+      "label": "hasParty",
+      "target": "Landlord"
+    },
+    {
+      "source": "Broker",
+      "label": "lists",
+      "target": "Premises"
+    },
+    {
+      "source": "Work Order",
+      "label": "concerns",
+      "target": "Premises"
+    },
+    {
+      "source": "Broker",
+      "label": "assigns",
+      "target": "Work Order"
+    },
+    {
+      "source": "Broker",
+      "label": "represents",
+      "target": "Lessee"
+    },
+    {
+      "source": "Rental Agreement",
+      "label": "hasAmendment",
+      "target": "Rental Agreement"
+    },
+    {
+      "source": "Landlord",
+      "label": "engages",
+      "target": "Contractor"
+    },
+    {
+      "source": "Contractor",
+      "label": "resolves",
+      "target": "Work Order"
+    },
+    {
+      "source": "Lessee",
+      "label": "reports",
+      "target": "Work Order"
+    },
+    {
+      "source": "Rental Agreement",
+      "label": "covers",
+      "target": "Premises"
+    },
+    {
+      "source": "Landlord",
+      "label": "owns",
+      "target": "Premises"
+    },
+    {
+      "source": "Broker",
+      "label": "represents",
+      "target": "Landlord"
+    },
+    {
+      "source": "Broker",
+      "label": "negotiates",
+      "target": "Rental Agreement"
+    },
+    {
+      "source": "Rental Agreement",
+      "label": "hasParty",
+      "target": "Lessee"
+    }
+  ],
+  "metadata": {
+    "condition": "T3",
+    "model": "toy-fixture",
+    "run_id": "toy-T3",
+    "source_documents": []
+  }
+}
