@@ -52,7 +52,9 @@
 | `Lease -> hasAmendment -> Lease` | non-tax., self-referential | One Lease instance points to the instance that renews/supersedes it, rather than introducing a separate class. |
 | `MaintenanceRequest -> requiresApproval -> Owner` | non-tax. | Large repairs needing owner sign-off; also a genuinely implicit relationship in source text (e.g. "waiting on landlord to sign off"), useful for testing extraction. |
 
-**Totals:** 10 classes (2 taxonomic splits: Party x4, Property x3), 27 attributes, 15 non-taxonomic relations. Within every target range from the execution plan (10-15 classes, 25-40 attributes, 15-25 relations).
+**Totals:** 11 classes (2 taxonomic splits: Party -> 4 children, Property -> 3 children), 30 attributes, 15 non-taxonomic relations. Within every target range from the execution plan (10-15 classes, 25-40 attributes, 15-25 relations).
+
+*(Corrected 2026-08-07: this line previously read "10 classes ... 27 attributes" — a stale miscount caught while building the Step 4 evaluation harness, whose loader counts classes/attributes directly off `gold_schema.ttl` rather than off this summary. The attribute table above always listed 30 rows; the class list above always named 11 classes (Party, Owner, Tenant, Agent, Vendor, Property, OfficeProperty, RetailProperty, IndustrialProperty, Lease, MaintenanceRequest) — only this totals line was out of sync. See `eval/DECISIONS.md`'s 2026-08-07 "class/attribute count correction" addendum.)*
 
 ---
 
