@@ -1,0 +1,183 @@
+{
+  "classes": [
+    {
+      "name": "Lease",
+      "parent": null,
+      "attributes": [
+        "endDate",
+        "escalationType",
+        "rentAmount",
+        "securityDeposit",
+        "startDate"
+      ]
+    },
+    {
+      "name": "IndustrialProperty",
+      "parent": "Property",
+      "attributes": [
+        "ceilingHeight",
+        "loadingDocks"
+      ]
+    },
+    {
+      "name": "MaintenanceRequest",
+      "parent": null,
+      "attributes": [
+        "dateReported",
+        "dateResolved",
+        "description",
+        "estimatedCost",
+        "priority",
+        "status"
+      ]
+    },
+    {
+      "name": "Owner",
+      "parent": "Party",
+      "attributes": [
+        "ownerType",
+        "taxId"
+      ]
+    },
+    {
+      "name": "Tenant",
+      "parent": "Party",
+      "attributes": [
+        "businessName",
+        "industryType"
+      ]
+    },
+    {
+      "name": "Agent",
+      "parent": "Party",
+      "attributes": [
+        "brokerage",
+        "licenseNumber"
+      ]
+    },
+    {
+      "name": "Vendor",
+      "parent": "Party",
+      "attributes": [
+        "insuranceExpiryDate",
+        "insured",
+        "serviceType"
+      ]
+    },
+    {
+      "name": "Property",
+      "parent": null,
+      "attributes": [
+        "address",
+        "squareFootage"
+      ]
+    },
+    {
+      "name": "RetailProperty",
+      "parent": "Property",
+      "attributes": [
+        "footTraffic",
+        "storefrontType"
+      ]
+    },
+    {
+      "name": "Party",
+      "parent": null,
+      "attributes": [
+        "contactInfo",
+        "name"
+      ]
+    },
+    {
+      "name": "OfficeProperty",
+      "parent": "Property",
+      "attributes": [
+        "numberOfFloors",
+        "parkingSpaces"
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "source": "Owner",
+      "label": "requiresApproval",
+      "target": "MaintenanceRequest"
+    },
+    {
+      "source": "Owner",
+      "label": "hasParty",
+      "target": "Lease"
+    },
+    {
+      "source": "Property",
+      "label": "lists",
+      "target": "Agent"
+    },
+    {
+      "source": "Property",
+      "label": "concerns",
+      "target": "MaintenanceRequest"
+    },
+    {
+      "source": "MaintenanceRequest",
+      "label": "assigns",
+      "target": "Agent"
+    },
+    {
+      "source": "Tenant",
+      "label": "represents",
+      "target": "Agent"
+    },
+    {
+      "source": "Lease",
+      "label": "hasAmendment",
+      "target": "Lease"
+    },
+    {
+      "source": "Vendor",
+      "label": "engages",
+      "target": "Owner"
+    },
+    {
+      "source": "MaintenanceRequest",
+      "label": "resolves",
+      "target": "Vendor"
+    },
+    {
+      "source": "MaintenanceRequest",
+      "label": "reports",
+      "target": "Tenant"
+    },
+    {
+      "source": "Property",
+      "label": "covers",
+      "target": "Lease"
+    },
+    {
+      "source": "Property",
+      "label": "owns",
+      "target": "Owner"
+    },
+    {
+      "source": "Owner",
+      "label": "represents",
+      "target": "Agent"
+    },
+    {
+      "source": "Lease",
+      "label": "negotiates",
+      "target": "Agent"
+    },
+    {
+      "source": "Tenant",
+      "label": "hasParty",
+      "target": "Lease"
+    }
+  ],
+  "metadata": {
+    "condition": "T8",
+    "model": "toy-fixture",
+    "run_id": "toy-T8",
+    "source_documents": []
+  }
+}

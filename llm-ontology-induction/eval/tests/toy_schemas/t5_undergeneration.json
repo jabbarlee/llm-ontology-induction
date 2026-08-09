@@ -1,0 +1,74 @@
+{
+  "classes": [
+    {
+      "name": "Agent",
+      "parent": "Party",
+      "attributes": [
+        "brokerage",
+        "licenseNumber"
+      ]
+    },
+    {
+      "name": "IndustrialProperty",
+      "parent": "Property",
+      "attributes": [
+        "ceilingHeight",
+        "loadingDocks"
+      ]
+    },
+    {
+      "name": "Lease",
+      "parent": null,
+      "attributes": [
+        "endDate",
+        "escalationType",
+        "rentAmount",
+        "securityDeposit",
+        "startDate"
+      ]
+    },
+    {
+      "name": "MaintenanceRequest",
+      "parent": null,
+      "attributes": [
+        "dateReported",
+        "dateResolved",
+        "description",
+        "estimatedCost",
+        "priority",
+        "status"
+      ]
+    },
+    {
+      "name": "OfficeProperty",
+      "parent": "Property",
+      "attributes": [
+        "numberOfFloors",
+        "parkingSpaces"
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "source": "Agent",
+      "label": "assigns",
+      "target": "MaintenanceRequest"
+    },
+    {
+      "source": "Lease",
+      "label": "hasAmendment",
+      "target": "Lease"
+    },
+    {
+      "source": "Agent",
+      "label": "negotiates",
+      "target": "Lease"
+    }
+  ],
+  "metadata": {
+    "condition": "T5",
+    "model": "toy-fixture",
+    "run_id": "toy-T5",
+    "source_documents": []
+  }
+}

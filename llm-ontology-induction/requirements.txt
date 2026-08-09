@@ -1,0 +1,10 @@
+rdflib>=7.0
+rapidfuzz>=3.0
+inflect>=7.0
+sentence-transformers>=3.0
+scipy>=1.11
+PyYAML>=6.0
+pytest>=8.0
+python-dotenv
+google-genai
+Faker
