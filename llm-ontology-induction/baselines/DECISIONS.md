@@ -323,3 +323,211 @@ Instance data also leaked into the *attribute* layer — `Megan Mcclain`,
 This is the predictable cost of D3b: lowercasing for tagging also makes some
 person and company names tag `NOUN` rather than `PROPN`. It is reported, not
 patched, per D4.
+
+---
+---
+
+# B3 Baseline — Design Decisions
+
+Frozen decisions for **B3**, the single-shot LLM schema-induction baseline
+(`baselines/single_shot.py` + `baselines/model_clients.py` +
+`baselines/prompts/b3_extraction_prompt.md`).
+
+B3 gives a model batches of raw documents under one frozen prompt, asks once for a
+schema, and merges the per-batch answers with nothing cleverer than exact-string
+deduplication. Its scientific purpose is to measure **what an LLM recovers with no
+staged decomposition and no intelligent consolidation** — the thing P1's extra
+machinery has to beat to be worth having. That purpose is destroyed if gold-schema
+vocabulary reaches the models, or if B3 quietly does P1's consolidation work, so the
+rules below are constraints on the method, not notes about it.
+
+**Decision IDs are `B3-` prefixed** so that bare `D1`–`D7` references in B1's code
+and docstrings keep pointing unambiguously at B1's decisions above.
+
+Everything here was fixed **before B3 was ever run against a model**. No B3 model
+call of any kind — not a smoke test, not a dummy prompt — was made before these
+decisions were recorded.
+
+---
+
+## B3-D1 — Five frozen models: two tiers × two vendors, plus open weights
+
+One model cannot separate "LLMs do this well" from "*this* LLM does this well". The
+grid varies vendor and capability tier independently, so a difference in the results
+can be attributed to one or the other.
+
+| | Anthropic | OpenAI |
+|---|---|---|
+| **Frontier** | Claude Fable 5 | GPT-5.6 Sol |
+| **Budget** | Claude Haiku 4.5 | GPT-5.6 Luna (`reasoning_effort="low"`) |
+
+Plus **qwen3:8b**, open-weight, as a fifth condition — the only one a reader can
+reproduce without a vendor account, and the floor the paid tiers must justify
+themselves against.
+
+**Decision:** these five, frozen. Four run through AWS Bedrock (two request-body
+shapes, one invocation path); the open-weight model runs through Groq (B3-D1c). The
+exact provider identifier for each is what lands in `metadata.model` — results name
+the artifact that produced them, never a friendly alias that could later be
+repointed.
+
+### B3-D1a — Luna runs at `reasoning_effort="low"`, always
+
+The budget tier is only a controlled comparison if both budget models are actually
+comparable. On the Artificial Analysis Intelligence Index, Luna at low reasoning
+effort scores **33** against Haiku 4.5's **30** — the closest available match.
+
+**Decision:** every Luna call carries `reasoning_effort="low"`. Default or higher
+effort settings are *not* capability-matched: they would put a stronger model in the
+budget cell and turn a vendor comparison into a reasoning-budget comparison.
+
+Enforced, not just documented: `ModelSpec` is a frozen dataclass, and
+`test_single_shot.py::test_luna_always_carries_low_reasoning_effort` asserts on the
+actual request body.
+
+### B3-D1b — Budget estimate (order of magnitude, before the first call)
+
+Corpus ≈ **35,500 tokens** across 192 documents; 10 documents per batch (B3-D2) gives
+**20 batches per model, 100 calls across the five conditions**.
+
+| Quantity | Per batch | Per model (20 batches) |
+|---|---|---|
+| Input (documents + prompt) | ≈ 1,775 + ≈ 600 ≈ **2,400** | ≈ **48,000** (0.048 MTok) |
+| Output (schema JSON) | ≈ 800 | ≈ **16,000** (0.016 MTok) |
+
+Both reasoning conditions (Luna, qwen3) bill or consume additional hidden reasoning
+tokens not counted above; Groq's free tier makes qwen3's share zero either way.
+
+Across the plausible price range for the tiers involved, a full five-model sweep is
+**low single-digit dollars**, and a `--limit 2` smoke test is fractions of a cent.
+`# TODO: confirm exact per-model $/MTok before quoting a figure in the paper` —
+the token arithmetic above is real; the dollar conversion is not yet.
+
+### B3-D1c — Local/open-weight model moved from on-device Ollama to Groq's free tier
+
+Tested qwen3:8b via Ollama directly on an M3 MacBook, 8GB unified memory —
+confirmed infeasible (severe memory pressure). Pivoted to Groq's free,
+no-credit-card API tier serving the same qwen3:8b model on dedicated
+inference hardware. Preserves the open-weight + zero-cost properties this
+condition exists to test; only "physically local" is dropped. Corpus size
+(~35,500 tokens total) is trivially within Groq's free-tier limits.
+
+## B3-D2 — Fixed batch size of 10, uniform across all five models
+
+The corpus is too small to need batching for context reasons and too large to fit one
+call comfortably at every tier. The number matters less than its uniformity.
+
+**Decision:** `BATCH_SIZE = 10`, applied identically to all five models. Documents are
+ordered deterministically (subdirectories in fixed order, filenames sorted within
+each) and batched once from that order.
+
+Cloud models have context windows that would swallow the whole corpus at once. Giving
+them larger batches for that reason is the tempting mistake: it would hand every cloud
+model more cross-document evidence per call than the open-weight model ever sees, and
+any resulting difference would be unattributable — better model, or better view of the
+corpus? Uniform batches keep the task shape identical, which is the entire point of
+the comparison.
+
+Enforced structurally: `batch_documents()` takes no `ModelSpec`, so there is no
+parameter through which one model could receive different batches from another
+(`test_batching_cannot_depend_on_the_model`).
+
+## B3-D3 — Frozen sampling settings
+
+| Setting | Value | Basis |
+|---|---|---|
+| `TEMPERATURE` | `0.0` | Schema induction has no use for sampling diversity; near-zero makes a re-run reproducible enough to debug |
+| `TOP_P` | `1.0` | Neutral — with temperature at 0 it does nothing, and leaving it explicit stops a provider default from varying between backends |
+| `MAX_OUTPUT_TOKENS` | `8192` | Comfortably above the largest plausible per-batch schema; a truncated response is a lost batch |
+| `MAX_RETRIES` | `5`, exponential backoff with jitter | Throttling is transient; a schema that silently omits a throttled batch is not |
+| `reasoning_effort` | unset except Luna | B3-D1a |
+
+Identical for all five conditions and defined once as module constants, never as
+per-call arguments — a per-call temperature is a knob, and a knob on a frozen baseline
+eventually gets turned.
+
+**Known open item:** reasoning-tuned models have historically rejected any non-default
+temperature. `ModelSpec.supports_temperature` exists so a model that refuses `0.0` can
+omit it in one visible place rather than by special-casing the sampling settings; if
+that flag has to be flipped for Sol or Luna, the change gets recorded here and every
+affected number re-run.
+
+## B3-D4 — Consolidation across batches is naive, deliberately
+
+Each batch is answered independently, so the same entity arrives under several
+wordings: `Owner` from one batch, `owner` from another, `Landlord` from a third. A
+smarter merge could obviously resolve all three.
+
+**Decision:** merge on an **exact string key, case- and whitespace-normalized, and
+nothing else**. `Owner` and `owner` merge. `Owner` and `Landlord` do not. No LLM call,
+no fuzzy matching, no embedding similarity, no synonym lexicon.
+
+**Why, since a better method is right there:** cross-wording consolidation is P1's
+Stage 6 — the dedicated novelty stage the pipeline exists to justify. If B3 does that
+job too, then B3-vs-P1 no longer measures what staged consolidation buys; it measures
+two implementations of the same idea, and the paper's central comparison collapses.
+Failing `test_distinct_wordings_are_never_merged` would not mean B3 got worse — it
+would mean B3 stopped being the baseline the paper claims it is.
+
+The merge key is specifically **not** `eval.matching.normalize()`. The harness's
+normalizer also singularizes and splits camelCase, which would fold `Invoice`,
+`Invoices` and `invoiceRecord` together — smarter matching, and worse, it would make
+B3's *output* partly a function of the harness that *scores* it. The producer does not
+borrow the scorer's brain.
+
+Expect this to cost B3 precision: the same entity emitted under three wordings is one
+true positive and two false positives. That cost is the measurement, not a defect.
+
+## B3-D5 — Output contract, identical to B1's
+
+Same JSON contract as B1 (`eval/PLAN.md` §2, `eval/schema_ir.py::parse_induced_schema`):
+`classes` (`name`, `parent`, `attributes`), `relations` (`source`, `label`, `target`),
+`metadata` (`condition`, `model`, `run_id`, `source_documents`), with
+`metadata.condition = "B3"` and `metadata.model` set to the exact frozen provider
+identifier of whichever model produced the file.
+
+Two rules inherited verbatim from B1 and worth restating because a model makes them
+easier to break than a statistical method does:
+
+- **No pre-cleaning** (Critical Rule 5). Names are emitted with the casing, spacing and
+  pluralization the model returned. The harness normalizes at score time; the producer
+  never tidies. Case/whitespace collapsing happens *only* inside the dedup key, never
+  on an emitted string.
+- **`parent` is `null`** unless a model volunteered hierarchy in its own response
+  (Critical Rule 6). No taxonomy-inference logic exists in B3. Unlike B1 (D6), a
+  nonzero taxonomy score here is *not* a bug — it means a model produced hierarchy
+  unprompted, which is itself a finding.
+
+One further rule is specific to B3: **no gold-schema vocabulary in the modules or in
+the prompt** (Critical Rule 1). A gold term in the prompt would make all five models
+oracles handed the answer key. The prompt is the likeliest place for this to slip in
+by accident, so the leakage guard scans its full text, not just its code — and because
+`eval.matching.normalize()` singularizes, ordinary prompt English collides with gold
+relation labels: the prompt cannot say "list" (gold `lists`), "properties" (gold
+`Property`), or "covers"/"reports"/"concerns". It says "array", "attributes",
+"links" instead. Enforced by `test_no_domain_vocabulary_leakage`, which is itself
+checked against a planted term so it cannot pass vacuously.
+
+---
+
+## Expected result shape (a prediction, not a target)
+
+Recorded **before** the first B3 call so the outcome can be checked against the
+prediction rather than rationalized after it:
+
+- **Class F1 well above B1's 0.323–0.387**, at every matching level. If an LLM reading
+  the documents does not beat C-value term frequency, something is wrong with the
+  harness or the prompt, not with the finding.
+- **Precision limited by B3-D4**, visibly: the same entity under multiple wordings,
+  one match and the rest false positives. The clearest single argument for a
+  consolidation stage.
+- **Taxonomy F1 low but plausibly nonzero** — unlike B1's structural zero, a model may
+  volunteer an is-a link the prompt permits but never requests.
+- **Relation F1 above B1's 0.000**, but bounded by the harness's endpoint
+  conditioning: a relation only counts if both endpoints matched.
+- **Frontier > budget within each vendor**, and **qwen3 at or below the budget tier**.
+  A budget model beating a frontier model from the same vendor is a bug signal worth
+  investigating before it is reported.
+
+If class F1 comes back near-perfect at M1, suspect vocabulary leakage into the prompt
+(Critical Rule 1) before celebrating.
