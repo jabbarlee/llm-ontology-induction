@@ -1,0 +1,175 @@
+{
+  "run_id": "2026-08-10T01:06:25Z-a6db",
+  "model": "statistical-tfidf-cvalue",
+  "condition": "B1",
+  "results": [
+    {
+      "level": "M1",
+      "classes_matched": [
+        {
+          "gold": "Property",
+          "induced": "property",
+          "score": 1.0
+        },
+        {
+          "gold": "Owner",
+          "induced": "owner",
+          "score": 1.0
+        },
+        {
+          "gold": "Party",
+          "induced": "parties",
+          "score": 1.0
+        },
+        {
+          "gold": "Lease",
+          "induced": "lease",
+          "score": 1.0
+        },
+        {
+          "gold": "Tenant",
+          "induced": "Tenant",
+          "score": 1.0
+        }
+      ],
+      "classes_unmatched_gold": [
+        "OfficeProperty",
+        "Vendor",
+        "IndustrialProperty",
+        "Agent",
+        "RetailProperty",
+        "MaintenanceRequest"
+      ],
+      "classes_unmatched_induced": [
+        "AM",
+        "Landlord",
+        "Lessee",
+        "agreement",
+        "premises",
+        "payment",
+        "term",
+        "Commercial Lease Agreement",
+        "sum",
+        "Date",
+        "EOW",
+        "Urgency",
+        "office",
+        "amount",
+        "terms"
+      ]
+    },
+    {
+      "level": "M2",
+      "classes_matched": [
+        {
+          "gold": "Property",
+          "induced": "premises",
+          "score": 1.0
+        },
+        {
+          "gold": "Owner",
+          "induced": "owner",
+          "score": 1.0
+        },
+        {
+          "gold": "Party",
+          "induced": "parties",
+          "score": 1.0
+        },
+        {
+          "gold": "Lease",
+          "induced": "lease",
+          "score": 1.0
+        },
+        {
+          "gold": "Tenant",
+          "induced": "Lessee",
+          "score": 1.0
+        }
+      ],
+      "classes_unmatched_gold": [
+        "OfficeProperty",
+        "Vendor",
+        "IndustrialProperty",
+        "Agent",
+        "RetailProperty",
+        "MaintenanceRequest"
+      ],
+      "classes_unmatched_induced": [
+        "AM",
+        "Tenant",
+        "Landlord",
+        "agreement",
+        "property",
+        "payment",
+        "term",
+        "Commercial Lease Agreement",
+        "sum",
+        "Date",
+        "EOW",
+        "Urgency",
+        "office",
+        "amount",
+        "terms"
+      ]
+    },
+    {
+      "level": "M3",
+      "classes_matched": [
+        {
+          "gold": "OfficeProperty",
+          "induced": "office",
+          "score": 0.6574707291768159
+        },
+        {
+          "gold": "Property",
+          "induced": "property",
+          "score": 1.0
+        },
+        {
+          "gold": "Owner",
+          "induced": "owner",
+          "score": 1.0
+        },
+        {
+          "gold": "Party",
+          "induced": "parties",
+          "score": 1.0
+        },
+        {
+          "gold": "Lease",
+          "induced": "lease",
+          "score": 1.0
+        },
+        {
+          "gold": "Tenant",
+          "induced": "Tenant",
+          "score": 1.0
+        }
+      ],
+      "classes_unmatched_gold": [
+        "Vendor",
+        "IndustrialProperty",
+        "Agent",
+        "RetailProperty",
+        "MaintenanceRequest"
+      ],
+      "classes_unmatched_induced": [
+        "AM",
+        "Landlord",
+        "Lessee",
+        "agreement",
+        "premises",
+        "payment",
+        "term",
+        "Commercial Lease Agreement",
+        "sum",
+        "Date",
+        "EOW",
+        "Urgency",
+        "amount",
+        "terms"
+      ]
+    }
+  ]
+}
