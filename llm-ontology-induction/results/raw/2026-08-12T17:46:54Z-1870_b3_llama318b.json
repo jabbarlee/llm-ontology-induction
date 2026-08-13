@@ -1,0 +1,117 @@
+{
+  "classes": [
+    {
+      "name": "Lease",
+      "parent": null,
+      "attributes": [
+        "Lease_Owner",
+        "Occupant_Name",
+        "Broker_Rep",
+        "Mthly_Base",
+        "Escalation_Method",
+        "Sec_Dep",
+        "Effective_Date",
+        "Expiration_Date",
+        "Memo"
+      ]
+    },
+    {
+      "name": "Tenant",
+      "parent": null,
+      "attributes": [
+        "Tenant_Name",
+        "Agent_Name",
+        "Monthly_Base_Rate",
+        "Escalation_Structure",
+        "Holding_Amount",
+        "Commence_Date",
+        "Expiry_Date",
+        "Contract_Notes"
+      ]
+    },
+    {
+      "name": "Landlord",
+      "parent": null,
+      "attributes": [
+        "Lease_Owner",
+        "Agent_Name",
+        "Monthly_Base_Rate",
+        "Escalation_Structure",
+        "Holding_Amount",
+        "Commence_Date",
+        "Expiry_Date",
+        "Contract_Notes"
+      ]
+    },
+    {
+      "name": "Broker",
+      "parent": null,
+      "attributes": [
+        "Broker_Rep",
+        "Agent_Name",
+        "Monthly_Base_Rate",
+        "Escalation_Structure",
+        "Holding_Amount",
+        "Commence_Date",
+        "Expiry_Date",
+        "Contract_Notes"
+      ]
+    },
+    {
+      "name": "Office",
+      "parent": null,
+      "attributes": [
+        "Location",
+        "Use",
+        "Utility_Payments"
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "source": "Tenant",
+      "label": "occupies",
+      "target": "Office"
+    },
+    {
+      "source": "Landlord",
+      "label": "leases",
+      "target": "Office"
+    },
+    {
+      "source": "Broker",
+      "label": "represents",
+      "target": "Tenant"
+    },
+    {
+      "source": "Broker",
+      "label": "represents",
+      "target": "Landlord"
+    },
+    {
+      "source": "Tenant",
+      "label": "pays",
+      "target": "Landlord"
+    },
+    {
+      "source": "Landlord",
+      "label": "holds",
+      "target": "Tenant"
+    }
+  ],
+  "metadata": {
+    "condition": "B3",
+    "model": "llama-3.1-8b-instant",
+    "run_id": "2026-08-12T17:46:54Z-1870",
+    "source_documents": [
+      "csv_exports/leases_export_01.csv",
+      "lease_texts/lease-001.txt",
+      "notes/mr-001.txt",
+      "messages/mr-001.txt",
+      "csv_exports/leases_export_02.csv",
+      "lease_texts/lease-002.txt",
+      "notes/mr-002.txt",
+      "messages/mr-002.txt"
+    ]
+  }
+}
