@@ -644,8 +644,16 @@ def test_the_prompt_leakage_check_actually_catches_a_planted_term():
 
     Without this, a bug in normalization or tokenization would make the guard
     quietly approve any prompt at all.
+
+    Plants a *raw* gold-vocabulary term -- as it would actually appear if typed
+    into a prompt -- rather than an already-normalized one. eval.matching.normalize
+    is not a fixed point (normalize("address") == "addres", itself unequal to
+    normalize("addres") == "addre"), and leaks_in_text normalizes its whole input
+    exactly once; feeding it an already-normalized planted term would silently
+    double-normalize just that one token and could miss a real hit for reasons
+    that have nothing to do with the leakage check itself.
     """
-    planted = sorted(_gold_terms())[0]
+    planted = sorted(_gold_vocabulary())[0]
     assert leaks_in_text(f"Extract entities such as {planted} from the documents.")
     assert not leaks_in_text("Extract the recurring kinds of entity you find.")
 
