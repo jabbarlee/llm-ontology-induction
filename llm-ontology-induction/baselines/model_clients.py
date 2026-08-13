@@ -71,28 +71,28 @@ class ModelSpec:
 MODELS: dict[str, ModelSpec] = {
     "fable5": ModelSpec(
         key="fable5",
-        model_id="TODO_BEDROCK_MODEL_ID_FABLE_5",
+        model_id="anthropic.claude-fable-5",
         backend="bedrock",
         tier="frontier",
         family="anthropic",
     ),
     "haiku45": ModelSpec(
         key="haiku45",
-        model_id="TODO_BEDROCK_MODEL_ID_HAIKU_4_5",
+        model_id="anthropic.claude-haiku-4-5-20251001-v1:0",
         backend="bedrock",
         tier="budget",
         family="anthropic",
     ),
     "sol": ModelSpec(
         key="sol",
-        model_id="TODO_BEDROCK_MODEL_ID_GPT_5_6_SOL",
+        model_id="openai.gpt-5.6-sol",
         backend="bedrock",
         tier="frontier",
         family="openai",
     ),
     "luna": ModelSpec(
         key="luna",
-        model_id="TODO_BEDROCK_MODEL_ID_GPT_5_6_LUNA",
+        model_id="openai.gpt-5.6-luna",
         backend="bedrock",
         tier="budget",
         family="openai",
@@ -100,10 +100,12 @@ MODELS: dict[str, ModelSpec] = {
         # Any other value makes this condition a different experiment.
         reasoning_effort="low",
     ),
-    "qwen3": ModelSpec(
-        key="qwen3",
-        # TODO: confirm Groq's exact catalog string for the qwen3 8B checkpoint.
-        model_id="TODO_GROQ_MODEL_ID_QWEN3_8B",
+    "llama318b": ModelSpec(
+        key="llama318b",
+        # Confirmed against Groq's catalog directly (not a Bedrock-console lookup,
+        # so it carries no TODO): swapped in for qwen3:8b, which Groq does not serve
+        # at that weight class (see B3-D1c).
+        model_id="llama-3.1-8b-instant",
         backend="groq",
         tier="open-weight",
     ),

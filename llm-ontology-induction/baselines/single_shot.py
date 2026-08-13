@@ -23,7 +23,7 @@ baselines/tests/test_single_shot.py::test_no_domain_vocabulary_leakage.
 
 Usage:
     python -m baselines.single_shot --model haiku45 --dry-run
-    python -m baselines.single_shot --model qwen3
+    python -m baselines.single_shot --model llama318b
 """
 
 from __future__ import annotations
@@ -146,12 +146,15 @@ _FENCE = re.compile(r"```[a-zA-Z0-9_-]*\n(.*?)```", re.DOTALL)
 
 
 def strip_reasoning(text: str) -> str:
-    """Remove a reasoning model's <think> block.
+    """Remove a reasoning model's <think> block, if present.
 
-    The open-weight condition is a reasoning model and emits these inline. Both
-    shapes occur in practice: a matched pair, and a bare closing tag when the
-    opening one is suppressed by the server, so the tail after the last </think>
-    is taken in that case.
+    None of the five frozen models is currently a reasoning model that emits these
+    (llama-3.1-8b-instant, the open-weight condition, does not), but this stays
+    defensive rather than model-specific: Groq and Bedrock both host reasoning
+    models, a future swap could reintroduce one, and a no-op strip on plain text
+    costs nothing. Both shapes are handled: a matched pair, and a bare closing tag
+    when the opening one is suppressed by the server, so the tail after the last
+    </think> is taken in that case.
     """
     cleaned = _THINK_BLOCK.sub("", text)
     if "<think" not in cleaned.lower():

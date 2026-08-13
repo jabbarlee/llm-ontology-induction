@@ -219,7 +219,8 @@ def test_parses_through_preamble_and_trailing_commentary():
 
 
 def test_parses_through_a_reasoning_block_without_taking_its_contents():
-    """The open-weight condition is a reasoning model (B3-D1c).
+    """Defensive, not model-specific: none of the five frozen models currently
+    emits a <think> block, but the parser must not be fooled if one ever does.
 
     The <think> block here contains its own JSON object with a `classes` key --
     a parser that merely searched for the first brace would return the model's
@@ -451,7 +452,7 @@ def test_output_metadata_names_the_condition_and_the_exact_model():
 
 
 def test_output_is_json_serializable():
-    spec = mc.MODELS["qwen3"]
+    spec = mc.MODELS["llama318b"]
     output = ss.build_output(ss.merge_batches([_SCHEMA]), [], "run-1", spec)
     assert json.loads(json.dumps(output)) == output
 
@@ -461,7 +462,7 @@ def test_output_is_json_serializable():
 # ---------------------------------------------------------------------------
 
 def test_registry_holds_exactly_the_five_frozen_conditions():
-    assert set(mc.MODELS) == {"fable5", "haiku45", "sol", "luna", "qwen3"}
+    assert set(mc.MODELS) == {"fable5", "haiku45", "sol", "luna", "llama318b"}
     backends = [spec.backend for spec in mc.MODELS.values()]
     assert backends.count("bedrock") == 4
     assert backends.count("groq") == 1
@@ -554,7 +555,7 @@ def test_one_unparseable_batch_is_recorded_and_skipped(monkeypatch):
     monkeypatch.setattr(mc, "invoke", lambda spec, prompt: next(responses))
 
     batches = ss.batch_documents(_docs(20), 10)
-    schemas, records = ss.run_batches(mc.MODELS["qwen3"], batches, ss.DOCUMENTS_PLACEHOLDER)
+    schemas, records = ss.run_batches(mc.MODELS["llama318b"], batches, ss.DOCUMENTS_PLACEHOLDER)
 
     assert len(schemas) == 1
     assert "parse_error" in records[1]
