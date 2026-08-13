@@ -79,8 +79,9 @@ def corpus(tmp_path):
 # ---------------------------------------------------------------------------
 
 def test_batch_size_is_the_frozen_value():
-    """B3-D2. If this changes, every previously reported B3 number is stale."""
-    assert ss.BATCH_SIZE == 10
+    """B3-D2 (revised 2026-08-12, was 10). If this changes, every previously
+    reported B3 number is stale."""
+    assert ss.BATCH_SIZE == 7
 
 
 def test_batching_cannot_depend_on_the_model():
@@ -121,12 +122,16 @@ def test_documents_are_read_whole_and_in_a_deterministic_order(corpus):
 
     assert sources == [
         "csv_exports/a.csv",
-        "csv_exports/b.csv",
         "lease_texts/t1.txt",
-        "lease_texts/t2.txt",
         "notes/n1.txt",
         "messages/m1.txt",
-    ], "subdirectory order is fixed and filenames sort within each"
+        "csv_exports/b.csv",
+        "lease_texts/t2.txt",
+    ], (
+        "round-robin across subdirectories (revised B3-D2, 2026-08-12): one "
+        "document per subdirectory per round, subdirectories in _SUBDIRS order, "
+        "filenames sorted within each"
+    )
 
     text = dict(documents)["csv_exports/a.csv"]
     assert text == "col one,col two\nvalue in a.csv\n", "raw bytes, untouched"

@@ -44,7 +44,13 @@ from baselines.model_clients import MODELS, ModelSpec
 # cloud models bigger batches because their context windows allow it would make
 # each model solve a differently-shaped task, which is the one thing this
 # comparison cannot tolerate (Critical Rule 7).
-BATCH_SIZE = 10
+#
+# Revised B3-D2, 2026-08-12: was 10. Batch 1 under the old sequential document
+# order (10 of 12 csv_exports/ files back to back) requested ~6,566 input
+# tokens against Groq's 6000 TPM cap on llama-3.1-8b-instant -- over budget
+# before a single output token was reserved. 7 gives headroom on top of the
+# interleaving fix below. See DECISIONS.md B3-D2 for the full per-batch table.
+BATCH_SIZE = 7
 
 CONDITION = "B3"
 
@@ -69,21 +75,29 @@ class ResponseParseError(ValueError):
 def load_documents(
     root: Path = _CORPUS_ROOT, limit: int | None = None
 ) -> list[tuple[str, str]]:
-    """Every document as (repo-relative path, raw text), in a deterministic order.
+    """Every document as (repo-relative path, raw text), interleaved round-robin
+    across subdirectories, in a deterministic order.
 
     Deliberately *not* B1's load_corpus(): that one sentence-splits prose and
     flattens CSV rows into pseudo-sentences, which is preprocessing B1's statistics
     need. B3's premise is that the model reads the mess exactly as it lies, so files
     are handed over verbatim.
 
-    Order is fixed (subdirectories in _SUBDIRS order, filenames sorted within each)
-    because batch membership is derived from it, and batches must be identical
-    across all five models (Critical Rule 7).
+    Order is fixed and deterministic, but round-robin rather than one subdirectory
+    fully drained before the next (revised B3-D2, 2026-08-12): csv_exports/ runs
+    far denser per file than lease_texts/notes/messages, and draining it first
+    packed an entire subdirectory's worth of dense CSV into the earliest batches --
+    which is exactly what blew batch 1 through Groq's free-tier TPM cap. One
+    document per subdirectory per round (subdirectories still visited in _SUBDIRS
+    order; filenames still sort within each) spreads that density out instead.
+    Batch membership is derived from this order, and it must stay identical across
+    all five models (Critical Rule 7).
     """
-    documents: list[tuple[str, str]] = []
+    per_subdir: list[list[tuple[str, str]]] = []
     for subdir in _SUBDIRS:
         directory = root / subdir
         if not directory.is_dir():
+            per_subdir.append([])
             continue
         paths = sorted(
             p
@@ -92,8 +106,17 @@ def load_documents(
         )
         # Filter before capping: `--limit 2` means two documents, not two
         # directory entries of which some unreadable stray may be one.
-        for path in (paths[:limit] if limit else paths):
-            documents.append((f"{subdir}/{path.name}", path.read_text(encoding="utf-8")))
+        capped = paths[:limit] if limit else paths
+        per_subdir.append(
+            [(f"{subdir}/{path.name}", path.read_text(encoding="utf-8")) for path in capped]
+        )
+
+    documents: list[tuple[str, str]] = []
+    rounds = max((len(docs) for docs in per_subdir), default=0)
+    for round_index in range(rounds):
+        for docs in per_subdir:
+            if round_index < len(docs):
+                documents.append(docs[round_index])
     return documents
 
 

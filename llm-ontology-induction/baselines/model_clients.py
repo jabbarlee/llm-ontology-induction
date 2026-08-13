@@ -38,7 +38,12 @@ load_dotenv()
 # --- Frozen sampling settings (B3-D3) -------------------------------------
 TEMPERATURE = 0.0
 TOP_P = 1.0
-MAX_OUTPUT_TOKENS = 8192
+# Revised B3-D3, 2026-08-12: was 8192. Groq's free tier appears to reserve
+# max_completion_tokens against its per-minute token cap regardless of actual
+# usage (llama-3.1-8b-instant: 6000 TPM) -- 8192 alone left no room for input.
+# 2048 is still ~2.5x the ~800-token real output size for a batch's schema
+# JSON. See DECISIONS.md B3-D3 for the arithmetic.
+MAX_OUTPUT_TOKENS = 2048
 
 MAX_RETRIES = 5
 RETRY_BASE_DELAY = 2.0  # seconds; doubled per attempt with jitter
