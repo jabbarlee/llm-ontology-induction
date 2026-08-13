@@ -361,9 +361,9 @@ can be attributed to one or the other.
 | **Frontier** | Claude Fable 5 | GPT-5.6 Sol |
 | **Budget** | Claude Haiku 4.5 | GPT-5.6 Luna (`reasoning_effort="low"`) |
 
-Plus **qwen3:8b**, open-weight, as a fifth condition — the only one a reader can
-reproduce without a vendor account, and the floor the paid tiers must justify
-themselves against.
+Plus **llama-3.1-8b-instant**, open-weight, as a fifth condition — the only one a
+reader can reproduce without a vendor account, and the floor the paid tiers must
+justify themselves against.
 
 **Decision:** these five, frozen. Four run through AWS Bedrock (two request-body
 shapes, one invocation path); the open-weight model runs through Groq (B3-D1c). The
@@ -387,46 +387,125 @@ actual request body.
 
 ### B3-D1b — Budget estimate (order of magnitude, before the first call)
 
-Corpus ≈ **35,500 tokens** across 192 documents; 10 documents per batch (B3-D2) gives
-**20 batches per model, 100 calls across the five conditions**.
+**Corrected 2026-08-12:** corpus is ≈ **40,600 tokens** (≈142,000 chars across 192
+documents), not the ≈35,500 first estimated — measured directly by reading every file
+in `data/documents/` rather than approximated, once the Groq TPM failure below made it
+worth checking precisely. The original figure was a same-order-of-magnitude
+approximation, ~14% low; corrected here rather than left standing as a known-wrong
+number.
 
-| Quantity | Per batch | Per model (20 batches) |
+At the now-revised `BATCH_SIZE = 7` (B3-D2), the corpus splits into **28 batches per
+model, 140 calls across the five conditions**.
+
+| Quantity | Per batch | Per model (28 batches) |
 |---|---|---|
-| Input (documents + prompt) | ≈ 1,775 + ≈ 600 ≈ **2,400** | ≈ **48,000** (0.048 MTok) |
-| Output (schema JSON) | ≈ 800 | ≈ **16,000** (0.016 MTok) |
+| Input (documents + prompt) | ≈ 1,525 docs + 645 fixed prompt ≈ **2,170** avg (ranges ~1,950–3,300 across the 27 full batches, see B3-D2's table) | ≈ **60,800** (0.061 MTok) |
+| Output (schema JSON) | ≈ 800 | ≈ **22,400** (0.022 MTok) |
 
-Both reasoning conditions (Luna, qwen3) bill or consume additional hidden reasoning
-tokens not counted above; Groq's free tier makes qwen3's share zero either way.
+Luna is the only reasoning-budgeted condition and bills hidden reasoning tokens not
+counted above. The open-weight condition (llama-3.1-8b-instant) is not a reasoning
+model, so it carries none of that hidden cost, and Groq's free tier makes its share
+zero regardless.
 
 Across the plausible price range for the tiers involved, a full five-model sweep is
 **low single-digit dollars**, and a `--limit 2` smoke test is fractions of a cent.
 `# TODO: confirm exact per-model $/MTok before quoting a figure in the paper` —
 the token arithmetic above is real; the dollar conversion is not yet.
 
-### B3-D1c — Local/open-weight model moved from on-device Ollama to Groq's free tier
+### B3-D1c — Local/open-weight model moved from on-device Ollama to Groq's free tier,
+and from qwen3:8b to llama-3.1-8b-instant
 
 Tested qwen3:8b via Ollama directly on an M3 MacBook, 8GB unified memory —
 confirmed infeasible (severe memory pressure). Pivoted to Groq's free,
-no-credit-card API tier serving the same qwen3:8b model on dedicated
-inference hardware. Preserves the open-weight + zero-cost properties this
-condition exists to test; only "physically local" is dropped. Corpus size
-(~35,500 tokens total) is trivially within Groq's free-tier limits.
+no-credit-card API tier.
 
-## B3-D2 — Fixed batch size of 10, uniform across all five models
+Groq's own catalog does not serve qwen3 at the 8B weight class tested locally
+(only a 27B variant was available), so the open-weight condition itself changed:
+it now runs **llama-3.1-8b-instant** (Groq's exact catalog ID:
+`llama-3.1-8b-instant`) — genuinely 8B, open-weight, and free on Groq's tier, same
+as the model this condition was originally scoped around.
+`# TODO: record the fuller rationale for the qwen3 -> llama-3.1-8b-instant swap
+(closest available size match vs. only 8B open-weight option on Groq) in the
+paper's methods section.`
+
+Preserves the open-weight + zero-cost properties this condition exists to test;
+"physically local" was already dropped by the Groq pivot, and the model identity
+changed alongside it. One consequence worth naming: unlike qwen3, llama-3.1-8b-instant
+is not a reasoning model — it never emits `<think>` blocks and carries no hidden
+reasoning-token cost (see the note in B3-D1b). Corpus size (~40,600 tokens total, per
+B3-D1b's corrected figure) is trivially within Groq's free-tier *daily* limits; the
+*per-minute* limit is a separate, tighter constraint that did bind — see B3-D2 and
+B3-D3.
+
+## B3-D2 — Fixed batch size of 7, documents interleaved round-robin across subdirectories, uniform across all five models
+
+*Revised 2026-08-12. Was `BATCH_SIZE = 10`, documents ordered by draining one
+subdirectory fully before the next. Both changed together — see the failure and the
+measurements below.*
 
 The corpus is too small to need batching for context reasons and too large to fit one
 call comfortably at every tier. The number matters less than its uniformity.
 
-**Decision:** `BATCH_SIZE = 10`, applied identically to all five models. Documents are
-ordered deterministically (subdirectories in fixed order, filenames sorted within
-each) and batched once from that order.
+**What broke the original decision:** the first real call (`llama318b`, `--limit 2`)
+hit Groq's free-tier rate limit for `llama-3.1-8b-instant` — a hard **6,000
+tokens/minute** cap, the tightest of the five conditions' limits by a wide margin.
+Two compounding causes:
+
+1. `csv_exports/` documents run far denser per file (~1,930 chars avg) than
+   `lease_texts/`/`notes/`/`messages/` (~1,413 / ~184 / ~559 chars avg). Draining
+   `csv_exports/` before moving on packed 10 of its 12 files into batch 1 alone:
+   22,980 chars, ≈6,566 estimated input tokens — over the entire 6,000 TPM ceiling
+   before a single output token was even reserved. No amount of output-budget tuning
+   (B3-D3) rescues a batch whose *input alone* exceeds the cap.
+2. At `BATCH_SIZE = 10`, batches 2–6 (still CSV/lease-heavy under the old order) were
+   only marginally under the cap even after B3-D3's output-budget fix — not enough
+   margin to trust against a schema-JSON response bigger than the ~800-token estimate.
+
+**Decision:** two changes together, because interleaving alone did not leave enough
+margin on its own (measured — see below):
+
+- **Interleave, not drain-then-advance.** `load_documents()` takes one document per
+  subdirectory per round (subdirectories still visited in `_SUBDIRS` order; filenames
+  still sort within each subdirectory) instead of exhausting one subdirectory before
+  starting the next. This spreads the dense `csv_exports/` files across many batches
+  instead of clustering them in the first one or two.
+- **`BATCH_SIZE = 7`**, down from 10, applied identically to all five models — extra
+  margin on top of interleaving, not instead of it.
+
+Together these give **28 batches** (was 20) at 7 documents each (final batch 3, since
+192 is not a multiple of 7). Measured via dry-run (no API calls) against the tightest
+of the five conditions' rate limits:
+
+| Batch | Docs | Chars | Est. input tokens | + 2,048 reserved output | Margin vs. 6,000 TPM |
+|---|---|---|---|---|---|
+| 1 | 7 | 9,889 | 2,827 | 4,875 | 1,125 |
+| 2 | 7 | 8,764 | 2,505 | 4,553 | 1,447 |
+| **3** | 7 | 11,528 | 3,295 | 5,343 | **657 — tightest of the 28** |
+| 4 | 7 | 9,587 | 2,740 | 4,788 | 1,212 |
+| 5 | 7 | 10,424 | 2,979 | 5,027 | 973 |
+| 6 | 7 | 9,485 | 2,711 | 4,759 | 1,241 |
+| 7 | 7 | 8,847 | 2,529 | 4,577 | 1,423 |
+| 8–23 | 7 | 6,807–8,441 | 1,946–2,413 | 3,994–4,461 | 1,539–2,006 |
+| 24–27 | 7 | 4,825–5,565 | 1,379–1,591 | 3,427–3,639 | 2,361–2,573 |
+| 28 | 3 | 3,621 | 1,035 | 3,083 | 2,917 |
+
+Every batch clears the 6,000 TPM cap. Batch 3 (`notes/mr-004`, `messages/mr-004`,
+`csv_exports/maintenance_requests_export_01`, `lease_texts/lease-005`,
+`notes/mr-005`, `messages/mr-005`, `csv_exports/maintenance_requests_export_02`) is
+the tightest at **657 tokens of margin (≈11%)** — it happens to catch two of the
+densest individual CSV files in one round. That margin is real but not large, and it
+rests on a single calibration point (chars-per-token measured from one actual Groq
+error response, not a real tokenizer run against every batch); if a live run 413s on
+batch 3 specifically, that is the one to look at first, and the fallback is dropping
+`BATCH_SIZE` further rather than re-deriving the ratio from more guesswork.
 
 Cloud models have context windows that would swallow the whole corpus at once. Giving
 them larger batches for that reason is the tempting mistake: it would hand every cloud
 model more cross-document evidence per call than the open-weight model ever sees, and
 any resulting difference would be unattributable — better model, or better view of the
 corpus? Uniform batches keep the task shape identical, which is the entire point of
-the comparison.
+the comparison. That reasoning is why the fix is a *smaller, uniform* batch size
+rather than a Groq-only exception.
 
 Enforced structurally: `batch_documents()` takes no `ModelSpec`, so there is no
 parameter through which one model could receive different batches from another
@@ -434,11 +513,13 @@ parameter through which one model could receive different batches from another
 
 ## B3-D3 — Frozen sampling settings
 
+*`MAX_OUTPUT_TOKENS` revised 2026-08-12. Was `8192`.*
+
 | Setting | Value | Basis |
 |---|---|---|
 | `TEMPERATURE` | `0.0` | Schema induction has no use for sampling diversity; near-zero makes a re-run reproducible enough to debug |
 | `TOP_P` | `1.0` | Neutral — with temperature at 0 it does nothing, and leaving it explicit stops a provider default from varying between backends |
-| `MAX_OUTPUT_TOKENS` | `8192` | Comfortably above the largest plausible per-batch schema; a truncated response is a lost batch |
+| `MAX_OUTPUT_TOKENS` | `2048` | Was `8192`, chosen only to sit comfortably above the largest plausible schema. That reasoning missed a real cost: Groq's free tier appears to reserve the full `max_completion_tokens` against its per-minute cap regardless of what the model actually generates, not just count the tokens produced. The first real call confirmed this exactly — a request reporting `Requested 11186` decomposed as ≈2,994 measured input tokens + 8,192 reserved output, to the token. Against a 6,000 TPM ceiling (`llama-3.1-8b-instant`, the tightest of the five conditions' limits), that left less input budget than the batch needed even before B3-D2's batching fix. `2048` is still ≈2.5x the ~800-token estimate for a batch's schema JSON (B3-D1b) — real headroom against truncation, not a bare minimum — while freeing ~6,100 tokens of previously-wasted reserved capacity on every single call. |
 | `MAX_RETRIES` | `5`, exponential backoff with jitter | Throttling is transient; a schema that silently omits a throttled batch is not |
 | `reasoning_effort` | unset except Luna | B3-D1a |
 
@@ -525,9 +606,9 @@ prediction rather than rationalized after it:
   volunteer an is-a link the prompt permits but never requests.
 - **Relation F1 above B1's 0.000**, but bounded by the harness's endpoint
   conditioning: a relation only counts if both endpoints matched.
-- **Frontier > budget within each vendor**, and **qwen3 at or below the budget tier**.
-  A budget model beating a frontier model from the same vendor is a bug signal worth
-  investigating before it is reported.
+- **Frontier > budget within each vendor**, and **llama-3.1-8b-instant at or below
+  the budget tier**. A budget model beating a frontier model from the same vendor is
+  a bug signal worth investigating before it is reported.
 
 If class F1 comes back near-perfect at M1, suspect vocabulary leakage into the prompt
 (Critical Rule 1) before celebrating.
