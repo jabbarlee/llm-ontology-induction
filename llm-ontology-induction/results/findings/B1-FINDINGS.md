@@ -100,23 +100,3 @@ gold classes (verified: `grep -c "a owl:Class"` on `gold_schema.ttl` = 11).
   an already-matched parent class, and class-matching not improving at M2
   (see above). Worth a one-line note in Results so this doesn't read as a
   contradiction.
-
----
-
-## B3 — Single-shot LLM baseline
-
-*(not yet run — fill in after scoring, same structure as above: scores
-table, what worked, what didn't + why, open questions)*
-
----
-
-## P1 — Full multi-stage pipeline
-
-*(not yet run — fill in after scoring, same structure as above)*
-
----
-
-## Cross-condition comparisons
-
-*(fill in once at least B1 + B3 are both scored — this is where the actual
-"our pipeline wins because X" paper narrative starts taking shape)*
