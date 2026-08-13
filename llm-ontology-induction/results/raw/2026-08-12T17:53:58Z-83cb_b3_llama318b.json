@@ -1,0 +1,2137 @@
+{
+  "classes": [
+    {
+      "name": "Lease",
+      "parent": null,
+      "attributes": [
+        "Lease_Owner",
+        "Occupant_Name",
+        "Broker_Rep",
+        "Mthly_Base",
+        "Escalation_Method",
+        "Sec_Dep",
+        "Effective_Date",
+        "Expiration_Date",
+        "Memo",
+        "Lease Begins",
+        "Lease Terminates",
+        "Monthly Due",
+        "Increase Logic",
+        "Held Deposit",
+        "Landlord",
+        "Lessee",
+        "Lead Agent",
+        "Notes",
+        "tenant",
+        "lease term",
+        "monthly payment",
+        "annual adjustments",
+        "initial funds",
+        "property condition",
+        "Rental Space",
+        "Term",
+        "Payment Adjustments",
+        "Held Funds",
+        "Performance Guarantee",
+        "rent",
+        "adjustments",
+        "damages",
+        "utility costs",
+        "monthly_payment",
+        "adjustment_frequency",
+        "adjustment_method",
+        "start date",
+        "end date",
+        "escalation",
+        "performance assurance",
+        "start_date",
+        "end_date",
+        "terms",
+        "Premises",
+        "Payment",
+        "Security",
+        "base_payment",
+        "adjustment_terms"
+      ]
+    },
+    {
+      "name": "Tenant",
+      "parent": "Lessee",
+      "attributes": [
+        "Tenant_Name",
+        "Agent_Name",
+        "Monthly_Base_Rate",
+        "Escalation_Structure",
+        "Holding_Amount",
+        "Commence_Date",
+        "Expiry_Date",
+        "Contract_Notes",
+        "Tenant Entity",
+        "Lead Broker",
+        "Notes",
+        "Name",
+        "Address",
+        "business name",
+        "property address",
+        "monthly payment",
+        "percentage increase",
+        "good-faith deposit",
+        "term",
+        "Contact Information",
+        "role",
+        "responsibilities",
+        "lease term",
+        "rent",
+        "lease_term",
+        "monthly_payment",
+        "annual_adjustment",
+        "initial_payment",
+        "guarantee",
+        "business_name",
+        "purpose_of_use",
+        "payment_adjustments",
+        "guarantee_amount",
+        "guarantee_return",
+        "representative",
+        "payment obligations",
+        "use of premises",
+        "security funds",
+        "payment obligation",
+        "lease_start_date",
+        "lease_end_date",
+        "security_deposit",
+        "representing",
+        "business",
+        "email",
+        "phone number",
+        "payment amount",
+        "good-faith fund",
+        "business_type",
+        "adjustment_rate",
+        "property",
+        "location",
+        "security_funds",
+        "good_faith_deposit",
+        "obligations",
+        "payment",
+        "security deposit",
+        "contact_email"
+      ]
+    },
+    {
+      "name": "Landlord",
+      "parent": "Person",
+      "attributes": [
+        "Lease_Owner",
+        "Agent_Name",
+        "Monthly_Base_Rate",
+        "Escalation_Structure",
+        "Holding_Amount",
+        "Commence_Date",
+        "Expiry_Date",
+        "Contract_Notes",
+        "Property Owner",
+        "Notes",
+        "Name",
+        "Address",
+        "property address",
+        "monthly payment",
+        "percentage increase",
+        "good-faith deposit",
+        "term",
+        "Contact Information",
+        "role",
+        "responsibilities",
+        "lease_term",
+        "monthly_payment",
+        "annual_adjustment",
+        "initial_payment",
+        "guarantee",
+        "contact_info",
+        "payment_adjustments",
+        "guarantee_amount",
+        "guarantee_return",
+        "payment obligations",
+        "property maintenance",
+        "notice and dispute resolution",
+        "payment obligation",
+        "email",
+        "phone number",
+        "security_deposit",
+        "adjustment_rate",
+        "property",
+        "location",
+        "rent",
+        "security_funds",
+        "good_faith_deposit",
+        "obligations",
+        "payment",
+        "security deposit",
+        "contact_email"
+      ]
+    },
+    {
+      "name": "Broker",
+      "parent": null,
+      "attributes": [
+        "Broker_Rep",
+        "Agent_Name",
+        "Monthly_Base_Rate",
+        "Escalation_Structure",
+        "Holding_Amount",
+        "Commence_Date",
+        "Expiry_Date",
+        "Contract_Notes"
+      ]
+    },
+    {
+      "name": "Office",
+      "parent": null,
+      "attributes": [
+        "Location",
+        "Use",
+        "Utility_Payments",
+        "asset class",
+        "net rentable area",
+        "level count",
+        "car slots",
+        "portfolio owner",
+        "last audit",
+        "monthly revenue",
+        "space",
+        "condition",
+        "issues"
+      ]
+    },
+    {
+      "name": "Contractor",
+      "parent": null,
+      "attributes": [
+        "Contractor Name",
+        "Notes",
+        "Name",
+        "Address",
+        "contact information",
+        "price",
+        "completion_date"
+      ]
+    },
+    {
+      "name": "Client",
+      "parent": null,
+      "attributes": [
+        "Client Name",
+        "Notes",
+        "Name",
+        "contact_info",
+        "contact_email"
+      ]
+    },
+    {
+      "name": "Premises",
+      "parent": "Commercial Lease Agreement",
+      "attributes": [
+        "Address",
+        "Notes",
+        "location",
+        "condition",
+        "utilities",
+        "retail business",
+        "size",
+        "ceiling height",
+        "loading docks"
+      ]
+    },
+    {
+      "name": "Payment",
+      "parent": "Commercial Lease Agreement",
+      "attributes": [
+        "Monthly Payment",
+        "Escalation Method",
+        "Holdback Amount",
+        "Notes",
+        "amount",
+        "method",
+        "status",
+        "frequency",
+        "adjustments",
+        "security funds",
+        "date",
+        "Schedule"
+      ]
+    },
+    {
+      "name": "MaintenanceRequest",
+      "parent": null,
+      "attributes": [
+        "CurrentState",
+        "Urgency",
+        "EntryDate",
+        "CompletionDate",
+        "IssueSummary",
+        "BudgetedAmount",
+        "Leaseholder",
+        "Location",
+        "ManagerName",
+        "Contractor",
+        "OwnerApproval"
+      ]
+    },
+    {
+      "name": "Issue",
+      "parent": null,
+      "attributes": [
+        "Description",
+        "Location",
+        "status",
+        "priority",
+        "estimated_cost",
+        "owner_approval_status"
+      ]
+    },
+    {
+      "name": "Owner",
+      "parent": null,
+      "attributes": [
+        "Name",
+        "Address",
+        "contact information",
+        "contact_info",
+        "company"
+      ]
+    },
+    {
+      "name": "Property",
+      "parent": null,
+      "attributes": [
+        "address",
+        "square feet",
+        "condition",
+        "Premises",
+        "Unit SF",
+        "Asset Class",
+        "Clear Height",
+        "Dock Count",
+        "Property Owner",
+        "Maint. Last Performed",
+        "Current Rent",
+        "size",
+        "purpose_of_use",
+        "lease_term",
+        "monthly_payment",
+        "payment_adjustments",
+        "guarantee_amount",
+        "guarantee_return",
+        "location",
+        "type",
+        "maintenance requirements",
+        "security_deposit",
+        "adjustment_rate",
+        "maintenance_responsibilities",
+        "use",
+        "description"
+      ]
+    },
+    {
+      "name": "Maintenance Request",
+      "parent": null,
+      "attributes": [
+        "status",
+        "urgency",
+        "entry date",
+        "completion date",
+        "task summary",
+        "budget estimate",
+        "occupant",
+        "property address",
+        "account rep",
+        "contractor",
+        "owner approval",
+        "Job Status",
+        "Severity Level",
+        "Report Date",
+        "Resolution Date",
+        "Issue Summary",
+        "Budget Est",
+        "Tenant Name",
+        "Service Location",
+        "Agent In-Charge",
+        "Vendor"
+      ]
+    },
+    {
+      "name": "Account Rep",
+      "parent": null,
+      "attributes": [
+        "name",
+        "contact information"
+      ]
+    },
+    {
+      "name": "Lease Agreement",
+      "parent": null,
+      "attributes": [
+        "Landlord",
+        "Tenant",
+        "Premises",
+        "Term",
+        "Payment",
+        "Payment Adjustments",
+        "Security",
+        "Utility Accounts",
+        "Guarantee",
+        "rent",
+        "payment structure",
+        "damages"
+      ]
+    },
+    {
+      "name": "Service Request",
+      "parent": null,
+      "attributes": [
+        "Issue",
+        "Location",
+        "Status",
+        "Priority",
+        "Budget",
+        "Vendor",
+        "Owner Approval"
+      ]
+    },
+    {
+      "name": "Vendor",
+      "parent": null,
+      "attributes": [
+        "Name",
+        "Contact Information",
+        "Services Provided",
+        "Job Cost",
+        "contact_info",
+        "quote",
+        "services_offered"
+      ]
+    },
+    {
+      "name": "Service Location",
+      "parent": null,
+      "attributes": [
+        "Address",
+        "Description"
+      ]
+    },
+    {
+      "name": "retail",
+      "parent": null,
+      "attributes": [
+        "physical location",
+        "unit size (sqft)",
+        "category",
+        "store configuration",
+        "traffic rating",
+        "account holder",
+        "last rent review",
+        "monthly rent"
+      ]
+    },
+    {
+      "name": "Plumbing Fix",
+      "parent": null,
+      "attributes": [
+        "Location",
+        "Status",
+        "Cost",
+        "Vendor"
+      ]
+    },
+    {
+      "name": "Restroom",
+      "parent": "Plumbing Fix",
+      "attributes": [
+        "Status",
+        "Location"
+      ]
+    },
+    {
+      "name": "Office Space",
+      "parent": "Rental Space",
+      "attributes": [
+        "Location",
+        "Use"
+      ]
+    },
+    {
+      "name": "Carpet",
+      "parent": null,
+      "attributes": [
+        "stains",
+        "location",
+        "invoice",
+        "cost"
+      ]
+    },
+    {
+      "name": "Tree",
+      "parent": null,
+      "attributes": [
+        "location",
+        "condition",
+        "removal",
+        "cost"
+      ]
+    },
+    {
+      "name": "Person",
+      "parent": null,
+      "attributes": [
+        "name",
+        "role",
+        "Contact",
+        "contact_info"
+      ]
+    },
+    {
+      "name": "Job",
+      "parent": null,
+      "attributes": [
+        "location",
+        "size",
+        "services_required",
+        "quote",
+        "status",
+        "invoice",
+        "description",
+        "cost",
+        "completion_date",
+        "owner",
+        "technician",
+        "company",
+        "owner_signoff"
+      ]
+    },
+    {
+      "name": "Invoice",
+      "parent": "Contract",
+      "attributes": [
+        "amount",
+        "description",
+        "status",
+        "due_date",
+        "Payment Terms",
+        "Due Date"
+      ]
+    },
+    {
+      "name": "Task",
+      "parent": null,
+      "attributes": [
+        "description",
+        "status",
+        "deadline",
+        "due_date"
+      ]
+    },
+    {
+      "name": "Ant Problem",
+      "parent": null,
+      "attributes": [
+        "Location",
+        "Severity",
+        "Status"
+      ]
+    },
+    {
+      "name": "HVAC Repair",
+      "parent": null,
+      "attributes": [
+        "Location",
+        "Cost",
+        "Status"
+      ]
+    },
+    {
+      "name": "Lighting Issue",
+      "parent": null,
+      "attributes": [
+        "Location",
+        "Severity",
+        "Status",
+        "resolution"
+      ]
+    },
+    {
+      "name": "Team",
+      "parent": null,
+      "attributes": [
+        "Name",
+        "Location",
+        "contact_info"
+      ]
+    },
+    {
+      "name": "Commercial Lease Agreement",
+      "parent": null,
+      "attributes": [
+        "parties",
+        "rental period",
+        "monthly payment",
+        "annual payment adjustments",
+        "initial funds held",
+        "purpose of use",
+        "notice and dispute resolution",
+        "term",
+        "premises",
+        "lessee",
+        "landlord",
+        "rent",
+        "adjustments",
+        "security deposit",
+        "notice"
+      ]
+    },
+    {
+      "name": "Maintenance",
+      "parent": "Property",
+      "attributes": [
+        "type",
+        "frequency",
+        "cost",
+        "responsibility"
+      ]
+    },
+    {
+      "name": "Notice",
+      "parent": "Commercial Lease Agreement",
+      "attributes": [
+        "method",
+        "frequency",
+        "content",
+        "type"
+      ]
+    },
+    {
+      "name": "Dispute",
+      "parent": "Commercial Lease Agreement",
+      "attributes": [
+        "type",
+        "resolution method",
+        "responsibility"
+      ]
+    },
+    {
+      "name": "Retail Business",
+      "parent": "Tenant",
+      "attributes": [
+        "type",
+        "location",
+        "size",
+        "equipment",
+        "staffing"
+      ]
+    },
+    {
+      "name": "Medical Business",
+      "parent": "Retail Business",
+      "attributes": [
+        "type",
+        "specialization",
+        "equipment",
+        "staffing"
+      ]
+    },
+    {
+      "name": "Irrigation Blowout",
+      "parent": null,
+      "attributes": [
+        "location",
+        "cost",
+        "urgency"
+      ]
+    },
+    {
+      "name": "Landscaping",
+      "parent": null,
+      "attributes": [
+        "condition"
+      ]
+    },
+    {
+      "name": "Retail Space",
+      "parent": "Property",
+      "attributes": [
+        "location",
+        "size",
+        "use"
+      ]
+    },
+    {
+      "name": "Contract",
+      "parent": null,
+      "attributes": [
+        "type",
+        "duration",
+        "payment_terms"
+      ]
+    },
+    {
+      "name": "Employee",
+      "parent": null,
+      "attributes": [
+        "name",
+        "role",
+        "availability"
+      ]
+    },
+    {
+      "name": "Equipment",
+      "parent": null,
+      "attributes": [
+        "type",
+        "status",
+        "location"
+      ]
+    },
+    {
+      "name": "Agreement",
+      "parent": null,
+      "attributes": [
+        "parties",
+        "terms",
+        "conditions",
+        "execution"
+      ]
+    },
+    {
+      "name": "Outlet",
+      "parent": null,
+      "attributes": [
+        "location",
+        "status",
+        "repair_cost",
+        "repair_status"
+      ]
+    },
+    {
+      "name": "Business",
+      "parent": null,
+      "attributes": [
+        "type",
+        "location"
+      ]
+    },
+    {
+      "name": "Quote",
+      "parent": null,
+      "attributes": [
+        "amount",
+        "urgency"
+      ]
+    },
+    {
+      "name": "Meeting",
+      "parent": null,
+      "attributes": [
+        "date",
+        "time",
+        "location"
+      ]
+    },
+    {
+      "name": "Work Order",
+      "parent": null,
+      "attributes": [
+        "Issue",
+        "Location",
+        "Plumber",
+        "Status",
+        "Invoice",
+        "Payment"
+      ]
+    },
+    {
+      "name": "Location",
+      "parent": null,
+      "attributes": [
+        "Address",
+        "Type"
+      ]
+    },
+    {
+      "name": "Adjustment",
+      "parent": "Commercial Lease Agreement",
+      "attributes": [
+        "type",
+        "amount",
+        "frequency"
+      ]
+    },
+    {
+      "name": "Security Deposit",
+      "parent": "Commercial Lease Agreement",
+      "attributes": [
+        "amount",
+        "purpose"
+      ]
+    },
+    {
+      "name": "Mouse Issue",
+      "parent": null,
+      "attributes": [
+        "location",
+        "resolution"
+      ]
+    },
+    {
+      "name": "Warehouse",
+      "parent": "Property",
+      "attributes": [
+        "location",
+        "size",
+        "use",
+        "capacity"
+      ]
+    },
+    {
+      "name": "Industrial Property",
+      "parent": "Property",
+      "attributes": [
+        "location",
+        "size",
+        "use"
+      ]
+    },
+    {
+      "name": "work_order",
+      "parent": "issue",
+      "attributes": [
+        "quote",
+        "status",
+        "owner_approval_status"
+      ]
+    },
+    {
+      "name": "electrician",
+      "parent": null,
+      "attributes": [
+        "name",
+        "contact_info"
+      ]
+    },
+    {
+      "name": "Technician",
+      "parent": null,
+      "attributes": [
+        "name",
+        "company"
+      ]
+    },
+    {
+      "name": "storefront",
+      "parent": null,
+      "attributes": [
+        "location",
+        "issue",
+        "repair_status",
+        "repair_cost",
+        "repair_company"
+      ]
+    },
+    {
+      "name": "window",
+      "parent": "storefront",
+      "attributes": [
+        "location",
+        "cleaning_status",
+        "cleaning_company",
+        "cleaning_cost",
+        "cost",
+        "status",
+        "person_responsible"
+      ]
+    },
+    {
+      "name": "pipe",
+      "parent": null,
+      "attributes": [
+        "location",
+        "leak_status",
+        "repair_status",
+        "repair_cost",
+        "repair_company"
+      ]
+    },
+    {
+      "name": "irrigation",
+      "parent": null,
+      "attributes": [
+        "location",
+        "issue",
+        "repair_status",
+        "repair_cost",
+        "repair_company",
+        "cost",
+        "status",
+        "person_responsible"
+      ]
+    },
+    {
+      "name": "Plumbing",
+      "parent": null,
+      "attributes": [
+        "location",
+        "cost",
+        "status",
+        "person_responsible"
+      ]
+    },
+    {
+      "name": "Light",
+      "parent": null,
+      "attributes": [
+        "location",
+        "cost",
+        "status",
+        "person_responsible"
+      ]
+    },
+    {
+      "name": "Company",
+      "parent": null,
+      "attributes": [
+        "name",
+        "location",
+        "contact_info"
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "source": "Tenant",
+      "label": "occupies",
+      "target": "Office"
+    },
+    {
+      "source": "Landlord",
+      "label": "leases",
+      "target": "Office"
+    },
+    {
+      "source": "Broker",
+      "label": "represents",
+      "target": "Tenant"
+    },
+    {
+      "source": "Broker",
+      "label": "represents",
+      "target": "Landlord"
+    },
+    {
+      "source": "Tenant",
+      "label": "pays",
+      "target": "Landlord"
+    },
+    {
+      "source": "Landlord",
+      "label": "holds",
+      "target": "Tenant"
+    },
+    {
+      "source": "Landlord",
+      "label": "leases",
+      "target": "Premises"
+    },
+    {
+      "source": "Tenant",
+      "label": "occupies",
+      "target": "Premises"
+    },
+    {
+      "source": "Landlord",
+      "label": "collects",
+      "target": "Payment"
+    },
+    {
+      "source": "Tenant",
+      "label": "makes",
+      "target": "Payment"
+    },
+    {
+      "source": "Contractor",
+      "label": "performs",
+      "target": "Premises"
+    },
+    {
+      "source": "Client",
+      "label": "visits",
+      "target": "Premises"
+    },
+    {
+      "source": "Landlord",
+      "label": "represents",
+      "target": "Tenant"
+    },
+    {
+      "source": "Tenant",
+      "label": "represents",
+      "target": "Landlord"
+    },
+    {
+      "source": "MaintenanceRequest",
+      "label": "has",
+      "target": "Issue"
+    },
+    {
+      "source": "MaintenanceRequest",
+      "label": "is assigned to",
+      "target": "Contractor"
+    },
+    {
+      "source": "MaintenanceRequest",
+      "label": "is approved by",
+      "target": "Owner"
+    },
+    {
+      "source": "Landlord",
+      "label": "leases to",
+      "target": "Tenant"
+    },
+    {
+      "source": "Tenant",
+      "label": "occupies",
+      "target": "Location"
+    },
+    {
+      "source": "Contractor",
+      "label": "performs work for",
+      "target": "MaintenanceRequest"
+    },
+    {
+      "source": "Owner",
+      "label": "approves",
+      "target": "MaintenanceRequest"
+    },
+    {
+      "source": "Landlord",
+      "label": "leases",
+      "target": "Tenant"
+    },
+    {
+      "source": "Tenant",
+      "label": "leases",
+      "target": "Landlord"
+    },
+    {
+      "source": "Tenant",
+      "label": "occupies",
+      "target": "Property"
+    },
+    {
+      "source": "Landlord",
+      "label": "leases",
+      "target": "Property"
+    },
+    {
+      "source": "Contractor",
+      "label": "performs",
+      "target": "Maintenance Request"
+    },
+    {
+      "source": "Account Rep",
+      "label": "approves",
+      "target": "Maintenance Request"
+    },
+    {
+      "source": "Owner",
+      "label": "approves",
+      "target": "Maintenance Request"
+    },
+    {
+      "source": "Maintenance Request",
+      "label": "has",
+      "target": "Service Request"
+    },
+    {
+      "source": "Service Request",
+      "label": "is assigned to",
+      "target": "Vendor"
+    },
+    {
+      "source": "Service Request",
+      "label": "is located at",
+      "target": "Service Location"
+    },
+    {
+      "source": "Lease Agreement",
+      "label": "is between",
+      "target": "Landlord"
+    },
+    {
+      "source": "Lease Agreement",
+      "label": "is between",
+      "target": "Tenant"
+    },
+    {
+      "source": "Lease Agreement",
+      "label": "covers",
+      "target": "Premises"
+    },
+    {
+      "source": "Landlord",
+      "label": "owns",
+      "target": "Premises"
+    },
+    {
+      "source": "lease",
+      "label": "has",
+      "target": "office"
+    },
+    {
+      "source": "lease",
+      "label": "is located at",
+      "target": "office"
+    },
+    {
+      "source": "lease",
+      "label": "has",
+      "target": "tenant"
+    },
+    {
+      "source": "lease",
+      "label": "has",
+      "target": "landlord"
+    },
+    {
+      "source": "lease",
+      "label": "has",
+      "target": "lease term"
+    },
+    {
+      "source": "lease",
+      "label": "has",
+      "target": "monthly payment"
+    },
+    {
+      "source": "lease",
+      "label": "has",
+      "target": "annual adjustments"
+    },
+    {
+      "source": "lease",
+      "label": "has",
+      "target": "initial funds"
+    },
+    {
+      "source": "lease",
+      "label": "has",
+      "target": "property condition"
+    },
+    {
+      "source": "office",
+      "label": "has",
+      "target": "location"
+    },
+    {
+      "source": "office",
+      "label": "has",
+      "target": "asset class"
+    },
+    {
+      "source": "office",
+      "label": "has",
+      "target": "net rentable area"
+    },
+    {
+      "source": "office",
+      "label": "has",
+      "target": "level count"
+    },
+    {
+      "source": "office",
+      "label": "has",
+      "target": "car slots"
+    },
+    {
+      "source": "office",
+      "label": "has",
+      "target": "portfolio owner"
+    },
+    {
+      "source": "office",
+      "label": "has",
+      "target": "last audit"
+    },
+    {
+      "source": "office",
+      "label": "has",
+      "target": "monthly revenue"
+    },
+    {
+      "source": "retail",
+      "label": "has",
+      "target": "physical location"
+    },
+    {
+      "source": "retail",
+      "label": "has",
+      "target": "unit size (sqft)"
+    },
+    {
+      "source": "retail",
+      "label": "has",
+      "target": "category"
+    },
+    {
+      "source": "retail",
+      "label": "has",
+      "target": "store configuration"
+    },
+    {
+      "source": "retail",
+      "label": "has",
+      "target": "traffic rating"
+    },
+    {
+      "source": "retail",
+      "label": "has",
+      "target": "account holder"
+    },
+    {
+      "source": "retail",
+      "label": "has",
+      "target": "last rent review"
+    },
+    {
+      "source": "retail",
+      "label": "has",
+      "target": "monthly rent"
+    },
+    {
+      "source": "Plumbing Fix",
+      "label": "is located at",
+      "target": "Location"
+    },
+    {
+      "source": "Restroom",
+      "label": "is a part of",
+      "target": "Plumbing Fix"
+    },
+    {
+      "source": "Property",
+      "label": "is owned by",
+      "target": "Property Owner"
+    },
+    {
+      "source": "Lease",
+      "label": "is between",
+      "target": "Landlord"
+    },
+    {
+      "source": "Lease",
+      "label": "is between",
+      "target": "Tenant"
+    },
+    {
+      "source": "Office Space",
+      "label": "is used for",
+      "target": "Client"
+    },
+    {
+      "source": "Vendor",
+      "label": "is hired by",
+      "target": "Property Owner"
+    },
+    {
+      "source": "Client",
+      "label": "visits",
+      "target": "Office Space"
+    },
+    {
+      "source": "Tenant",
+      "label": "leases",
+      "target": "Office"
+    },
+    {
+      "source": "Landlord",
+      "label": "charges",
+      "target": "Tenant"
+    },
+    {
+      "source": "Landlord",
+      "label": "approves",
+      "target": "Tenant"
+    },
+    {
+      "source": "Tenant",
+      "label": "requests",
+      "target": "Landlord"
+    },
+    {
+      "source": "Landlord",
+      "label": "removes",
+      "target": "Tree"
+    },
+    {
+      "source": "Tenant",
+      "label": "leases",
+      "target": "Lease"
+    },
+    {
+      "source": "Landlord",
+      "label": "leases",
+      "target": "Lease"
+    },
+    {
+      "source": "Tenant",
+      "label": "leases",
+      "target": "Property"
+    },
+    {
+      "source": "Tenant",
+      "label": "hires",
+      "target": "Vendor"
+    },
+    {
+      "source": "Vendor",
+      "label": "provides",
+      "target": "Job"
+    },
+    {
+      "source": "Tenant",
+      "label": "requests",
+      "target": "Job"
+    },
+    {
+      "source": "Landlord",
+      "label": "receives",
+      "target": "Payment"
+    },
+    {
+      "source": "Landlord",
+      "label": "holds",
+      "target": "Invoice"
+    },
+    {
+      "source": "Tenant",
+      "label": "pays",
+      "target": "Invoice"
+    },
+    {
+      "source": "Task",
+      "label": "assigned_to",
+      "target": "Person"
+    },
+    {
+      "source": "Task",
+      "label": "completed_by",
+      "target": "Person"
+    },
+    {
+      "source": "Lease",
+      "label": "has_property",
+      "target": "Property"
+    },
+    {
+      "source": "Invoice",
+      "label": "relates_to",
+      "target": "Task"
+    },
+    {
+      "source": "Invoice",
+      "label": "relates_to",
+      "target": "Lease"
+    },
+    {
+      "source": "Ant Problem",
+      "label": "reported by",
+      "target": "Person"
+    },
+    {
+      "source": "Person",
+      "label": "sent request to",
+      "target": "Person"
+    },
+    {
+      "source": "Person",
+      "label": "received response from",
+      "target": "Person"
+    },
+    {
+      "source": "Lease Agreement",
+      "label": "between",
+      "target": "Person"
+    },
+    {
+      "source": "Lease Agreement",
+      "label": "regarding",
+      "target": "Premises"
+    },
+    {
+      "source": "HVAC Repair",
+      "label": "performed by",
+      "target": "Team"
+    },
+    {
+      "source": "Lighting Issue",
+      "label": "reported by",
+      "target": "Person"
+    },
+    {
+      "source": "Lighting Issue",
+      "label": "being worked on by",
+      "target": "Team"
+    },
+    {
+      "source": "Person",
+      "label": "has team",
+      "target": "Team"
+    },
+    {
+      "source": "Landlord",
+      "label": "owns",
+      "target": "Property"
+    },
+    {
+      "source": "Tenant",
+      "label": "uses",
+      "target": "Retail Business"
+    },
+    {
+      "source": "Retail Business",
+      "label": "operates in",
+      "target": "Property"
+    },
+    {
+      "source": "Tenant",
+      "label": "maintains",
+      "target": "Property"
+    },
+    {
+      "source": "Landlord",
+      "label": "notifies",
+      "target": "Tenant"
+    },
+    {
+      "source": "Tenant",
+      "label": "notifies",
+      "target": "Landlord"
+    },
+    {
+      "source": "Tenant",
+      "label": "pays",
+      "target": "Payment"
+    },
+    {
+      "source": "Tenant",
+      "label": "provides",
+      "target": "Security Funds"
+    },
+    {
+      "source": "Landlord",
+      "label": "holds",
+      "target": "Security Funds"
+    },
+    {
+      "source": "Irrigation Blowout",
+      "label": "needs",
+      "target": "Landscaping"
+    },
+    {
+      "source": "Landscaping",
+      "label": "is affected by",
+      "target": "Irrigation Blowout"
+    },
+    {
+      "source": "Tenant",
+      "label": "signs",
+      "target": "Lease Agreement"
+    },
+    {
+      "source": "Landlord",
+      "label": "enters into",
+      "target": "Lease Agreement"
+    },
+    {
+      "source": "Retail Space",
+      "label": "is located in",
+      "target": "Property"
+    },
+    {
+      "source": "Tenant",
+      "label": "occupies",
+      "target": "Retail Space"
+    },
+    {
+      "source": "Landlord",
+      "label": "provides",
+      "target": "Retail Space"
+    },
+    {
+      "source": "Employee",
+      "label": "assigned_to",
+      "target": "Task"
+    },
+    {
+      "source": "Task",
+      "label": "dependent_on",
+      "target": "Equipment"
+    },
+    {
+      "source": "Contract",
+      "label": "signed_by",
+      "target": "Landlord"
+    },
+    {
+      "source": "Contract",
+      "label": "signed_by",
+      "target": "Tenant"
+    },
+    {
+      "source": "Invoice",
+      "label": "paid_by",
+      "target": "Payment"
+    },
+    {
+      "source": "Task",
+      "label": "completed_by",
+      "target": "Employee"
+    },
+    {
+      "source": "Equipment",
+      "label": "located_at",
+      "target": "Property"
+    },
+    {
+      "source": "Landlord",
+      "label": "enters into",
+      "target": "Lease"
+    },
+    {
+      "source": "Tenant",
+      "label": "enters into",
+      "target": "Lease"
+    },
+    {
+      "source": "Tenant",
+      "label": "agrees to pay",
+      "target": "Landlord"
+    },
+    {
+      "source": "Tenant",
+      "label": "provides",
+      "target": "good-faith fund"
+    },
+    {
+      "source": "Landlord",
+      "label": "holds",
+      "target": "good-faith fund"
+    },
+    {
+      "source": "Tenant",
+      "label": "uses",
+      "target": "Premises"
+    },
+    {
+      "source": "Landlord",
+      "label": "agrees to",
+      "target": "Premises"
+    },
+    {
+      "source": "Tenant",
+      "label": "requests",
+      "target": "window cleaning"
+    },
+    {
+      "source": "Landlord",
+      "label": "approves",
+      "target": "window cleaning"
+    },
+    {
+      "source": "Landlord",
+      "label": "collects",
+      "target": "security_deposit"
+    },
+    {
+      "source": "Tenant",
+      "label": "operates",
+      "target": "Business"
+    },
+    {
+      "source": "Business",
+      "label": "located_in",
+      "target": "Property"
+    },
+    {
+      "source": "Office",
+      "label": "has",
+      "target": "Outlet"
+    },
+    {
+      "source": "Landlord",
+      "label": "collects",
+      "target": "security_funds"
+    },
+    {
+      "source": "Tenant",
+      "label": "requests",
+      "target": "Quote"
+    },
+    {
+      "source": "Landlord",
+      "label": "provides",
+      "target": "Quote"
+    },
+    {
+      "source": "Tenant",
+      "label": "meets",
+      "target": "Meeting"
+    },
+    {
+      "source": "Client",
+      "label": "visits",
+      "target": "Property"
+    },
+    {
+      "source": "Landlord",
+      "label": "agrees_to",
+      "target": "Tenant"
+    },
+    {
+      "source": "Tenant",
+      "label": "agrees_to",
+      "target": "Landlord"
+    },
+    {
+      "source": "Tenant",
+      "label": "is_responsible_for",
+      "target": "Property"
+    },
+    {
+      "source": "Landlord",
+      "label": "provides_security_deposit_to",
+      "target": "Tenant"
+    },
+    {
+      "source": "Tenant",
+      "label": "provides_security_deposit_to",
+      "target": "Landlord"
+    },
+    {
+      "source": "Landlord",
+      "label": "requests",
+      "target": "Tenant"
+    },
+    {
+      "source": "Landlord",
+      "label": "invoices",
+      "target": "Tenant"
+    },
+    {
+      "source": "Tenant",
+      "label": "receives",
+      "target": "Invoice"
+    },
+    {
+      "source": "Landlord",
+      "label": "assigns",
+      "target": "Job"
+    },
+    {
+      "source": "Lease",
+      "label": "includes",
+      "target": "Work Order"
+    },
+    {
+      "source": "Work Order",
+      "label": "involves",
+      "target": "Plumber"
+    },
+    {
+      "source": "Work Order",
+      "label": "has",
+      "target": "Invoice"
+    },
+    {
+      "source": "Invoice",
+      "label": "is",
+      "target": "Payment"
+    },
+    {
+      "source": "Lease",
+      "label": "between",
+      "target": "Landlord"
+    },
+    {
+      "source": "Lease",
+      "label": "between",
+      "target": "Tenant"
+    },
+    {
+      "source": "Work Order",
+      "label": "at",
+      "target": "Location"
+    },
+    {
+      "source": "Person",
+      "label": "is",
+      "target": "Landlord"
+    },
+    {
+      "source": "Person",
+      "label": "is",
+      "target": "Tenant"
+    },
+    {
+      "source": "Person",
+      "label": "is",
+      "target": "Plumber"
+    },
+    {
+      "source": "Tenant",
+      "label": "leases",
+      "target": "Premises"
+    },
+    {
+      "source": "Tenant",
+      "label": "agrees to pay",
+      "target": "Rent"
+    },
+    {
+      "source": "Landlord",
+      "label": "agrees to provide",
+      "target": "Premises"
+    },
+    {
+      "source": "Tenant",
+      "label": "provides",
+      "target": "Security Deposit"
+    },
+    {
+      "source": "Landlord",
+      "label": "holds",
+      "target": "Security Deposit"
+    },
+    {
+      "source": "Tenant",
+      "label": "maintains",
+      "target": "Premises"
+    },
+    {
+      "source": "Hoffman Services",
+      "label": "resolves",
+      "target": "Mouse Issue"
+    },
+    {
+      "source": "Hurst Co.",
+      "label": "resolves",
+      "target": "Lighting Issue"
+    },
+    {
+      "source": "Contractor",
+      "label": "fixes",
+      "target": "Property"
+    },
+    {
+      "source": "Client",
+      "label": "requests",
+      "target": "Contractor"
+    },
+    {
+      "source": "Contractor",
+      "label": "charges",
+      "target": "Client"
+    },
+    {
+      "source": "Lease",
+      "label": "applies_to",
+      "target": "Property"
+    },
+    {
+      "source": "Warehouse",
+      "label": "is_used_for",
+      "target": "Warehouse-Logistics Operations"
+    },
+    {
+      "source": "Retail Space",
+      "label": "is_used_for",
+      "target": "Retail-Related Business Operations"
+    },
+    {
+      "source": "Industrial Property",
+      "label": "is_occupied_by",
+      "target": "Tenant"
+    },
+    {
+      "source": "electrician",
+      "label": "fix",
+      "target": "issue"
+    },
+    {
+      "source": "owner",
+      "label": "approve",
+      "target": "work_order"
+    },
+    {
+      "source": "team",
+      "label": "handle",
+      "target": "issue"
+    },
+    {
+      "source": "property",
+      "label": "have",
+      "target": "issue"
+    },
+    {
+      "source": "electrician",
+      "label": "quote",
+      "target": "work_order"
+    },
+    {
+      "source": "owner",
+      "label": "sign_off",
+      "target": "work_order"
+    },
+    {
+      "source": "Technician",
+      "label": "is heading to",
+      "target": "Job"
+    },
+    {
+      "source": "Technician",
+      "label": "is working on",
+      "target": "Job"
+    },
+    {
+      "source": "Technician",
+      "label": "finished",
+      "target": "Job"
+    },
+    {
+      "source": "Job",
+      "label": "needs",
+      "target": "Technician"
+    },
+    {
+      "source": "Job",
+      "label": "has",
+      "target": "Quote"
+    },
+    {
+      "source": "Job",
+      "label": "has",
+      "target": "Invoice"
+    },
+    {
+      "source": "Job",
+      "label": "is waiting on",
+      "target": "Owner"
+    },
+    {
+      "source": "Owner",
+      "label": "is waiting on",
+      "target": "Technician"
+    },
+    {
+      "source": "Warehouse",
+      "label": "is affected by",
+      "target": "Job"
+    },
+    {
+      "source": "storefront",
+      "label": "has",
+      "target": "window"
+    },
+    {
+      "source": "storefront",
+      "label": "has",
+      "target": "pipe"
+    },
+    {
+      "source": "storefront",
+      "label": "has",
+      "target": "irrigation"
+    },
+    {
+      "source": "window",
+      "label": "needs",
+      "target": "cleaning"
+    },
+    {
+      "source": "pipe",
+      "label": "needs",
+      "target": "repair"
+    },
+    {
+      "source": "irrigation",
+      "label": "needs",
+      "target": "repair"
+    },
+    {
+      "source": "job",
+      "label": "requires",
+      "target": "owner_signoff"
+    },
+    {
+      "source": "job",
+      "label": "handled_by",
+      "target": "company"
+    },
+    {
+      "source": "Plumbing",
+      "label": "fixed",
+      "target": "Plumbing"
+    },
+    {
+      "source": "Irrigation",
+      "label": "busted",
+      "target": "Irrigation"
+    },
+    {
+      "source": "Window",
+      "label": "cleaned",
+      "target": "Window"
+    },
+    {
+      "source": "Light",
+      "label": "flickering",
+      "target": "Light"
+    },
+    {
+      "source": "Person",
+      "label": "responsible",
+      "target": "Plumbing"
+    },
+    {
+      "source": "Person",
+      "label": "responsible",
+      "target": "Irrigation"
+    },
+    {
+      "source": "Person",
+      "label": "responsible",
+      "target": "Window"
+    },
+    {
+      "source": "Person",
+      "label": "responsible",
+      "target": "Light"
+    },
+    {
+      "source": "Company",
+      "label": "provided",
+      "target": "Plumbing"
+    },
+    {
+      "source": "Company",
+      "label": "provided",
+      "target": "Irrigation"
+    },
+    {
+      "source": "Company",
+      "label": "provided",
+      "target": "Window"
+    },
+    {
+      "source": "Company",
+      "label": "provided",
+      "target": "Light"
+    }
+  ],
+  "metadata": {
+    "condition": "B3",
+    "model": "llama-3.1-8b-instant",
+    "run_id": "2026-08-12T17:53:58Z-83cb",
+    "source_documents": [
+      "csv_exports/leases_export_01.csv",
+      "lease_texts/lease-001.txt",
+      "notes/mr-001.txt",
+      "messages/mr-001.txt",
+      "csv_exports/leases_export_02.csv",
+      "lease_texts/lease-002.txt",
+      "notes/mr-002.txt",
+      "messages/mr-002.txt",
+      "csv_exports/leases_export_03.csv",
+      "lease_texts/lease-003.txt",
+      "notes/mr-003.txt",
+      "messages/mr-003.txt",
+      "csv_exports/leases_export_04.csv",
+      "lease_texts/lease-004.txt",
+      "notes/mr-004.txt",
+      "messages/mr-004.txt",
+      "csv_exports/maintenance_requests_export_01.csv",
+      "lease_texts/lease-005.txt",
+      "notes/mr-005.txt",
+      "messages/mr-005.txt",
+      "csv_exports/maintenance_requests_export_02.csv",
+      "lease_texts/lease-006.txt",
+      "notes/mr-006.txt",
+      "messages/mr-006.txt",
+      "csv_exports/maintenance_requests_export_03.csv",
+      "lease_texts/lease-007.txt",
+      "notes/mr-007.txt",
+      "messages/mr-007.txt",
+      "csv_exports/maintenance_requests_export_04.csv",
+      "lease_texts/lease-008.txt",
+      "notes/mr-008.txt",
+      "messages/mr-008.txt",
+      "csv_exports/maintenance_requests_export_05.csv",
+      "lease_texts/lease-009.txt",
+      "notes/mr-009.txt",
+      "messages/mr-009.txt",
+      "csv_exports/properties_export_01.csv",
+      "lease_texts/lease-010.txt",
+      "notes/mr-010.txt",
+      "messages/mr-010.txt",
+      "csv_exports/properties_export_02.csv",
+      "lease_texts/lease-011.txt",
+      "notes/mr-011.txt",
+      "messages/mr-011.txt",
+      "csv_exports/properties_export_03.csv",
+      "lease_texts/lease-012.txt",
+      "notes/mr-012.txt",
+      "messages/mr-012.txt",
+      "lease_texts/lease-013.txt",
+      "notes/mr-013.txt",
+      "messages/mr-013.txt",
+      "lease_texts/lease-014.txt",
+      "notes/mr-014.txt",
+      "messages/mr-014.txt",
+      "lease_texts/lease-015.txt",
+      "notes/mr-015.txt",
+      "messages/mr-015.txt",
+      "lease_texts/lease-016.txt",
+      "notes/mr-016.txt",
+      "messages/mr-016.txt",
+      "lease_texts/lease-017.txt",
+      "notes/mr-017.txt",
+      "messages/mr-017.txt",
+      "lease_texts/lease-018.txt",
+      "notes/mr-018.txt",
+      "messages/mr-018.txt",
+      "lease_texts/lease-019.txt",
+      "notes/mr-019.txt",
+      "messages/mr-019.txt",
+      "lease_texts/lease-020.txt",
+      "notes/mr-020.txt",
+      "messages/mr-020.txt",
+      "lease_texts/lease-021.txt",
+      "notes/mr-021.txt",
+      "messages/mr-021.txt",
+      "lease_texts/lease-022.txt",
+      "notes/mr-022.txt",
+      "messages/mr-022.txt",
+      "lease_texts/lease-023.txt",
+      "notes/mr-023.txt",
+      "messages/mr-023.txt",
+      "lease_texts/lease-024.txt",
+      "notes/mr-024.txt",
+      "messages/mr-024.txt",
+      "lease_texts/lease-025.txt",
+      "notes/mr-025.txt",
+      "messages/mr-025.txt",
+      "lease_texts/lease-026.txt",
+      "notes/mr-026.txt",
+      "messages/mr-026.txt",
+      "lease_texts/lease-027.txt",
+      "notes/mr-027.txt",
+      "messages/mr-027.txt",
+      "lease_texts/lease-028.txt",
+      "notes/mr-028.txt",
+      "messages/mr-028.txt",
+      "lease_texts/lease-029.txt",
+      "notes/mr-029.txt",
+      "messages/mr-029.txt",
+      "lease_texts/lease-030.txt",
+      "notes/mr-030.txt",
+      "messages/mr-030.txt",
+      "lease_texts/lease-031.txt",
+      "notes/mr-031.txt",
+      "messages/mr-031.txt",
+      "lease_texts/lease-032.txt",
+      "notes/mr-032.txt",
+      "messages/mr-032.txt",
+      "lease_texts/lease-033.txt",
+      "notes/mr-033.txt",
+      "messages/mr-033.txt",
+      "lease_texts/lease-034.txt",
+      "notes/mr-034.txt",
+      "messages/mr-034.txt",
+      "lease_texts/lease-035.txt",
+      "notes/mr-035.txt",
+      "messages/mr-035.txt",
+      "lease_texts/lease-036.txt",
+      "notes/mr-036.txt",
+      "messages/mr-036.txt",
+      "lease_texts/lease-037.txt",
+      "notes/mr-037.txt",
+      "messages/mr-037.txt",
+      "lease_texts/lease-038.txt",
+      "notes/mr-038.txt",
+      "messages/mr-038.txt",
+      "lease_texts/lease-039.txt",
+      "notes/mr-039.txt",
+      "messages/mr-039.txt",
+      "lease_texts/lease-040.txt",
+      "notes/mr-040.txt",
+      "messages/mr-040.txt",
+      "lease_texts/lease-041.txt",
+      "notes/mr-041.txt",
+      "messages/mr-041.txt",
+      "lease_texts/lease-042.txt",
+      "notes/mr-042.txt",
+      "messages/mr-042.txt",
+      "lease_texts/lease-043.txt",
+      "notes/mr-043.txt",
+      "messages/mr-043.txt",
+      "lease_texts/lease-044.txt",
+      "notes/mr-044.txt",
+      "messages/mr-044.txt",
+      "lease_texts/lease-045.txt",
+      "notes/mr-045.txt",
+      "messages/mr-045.txt",
+      "lease_texts/lease-046.txt",
+      "notes/mr-046.txt",
+      "messages/mr-046.txt",
+      "lease_texts/lease-047.txt",
+      "notes/mr-047.txt",
+      "messages/mr-047.txt",
+      "lease_texts/lease-048.txt",
+      "notes/mr-048.txt",
+      "messages/mr-048.txt",
+      "lease_texts/lease-049.txt",
+      "notes/mr-049.txt",
+      "messages/mr-049.txt",
+      "lease_texts/lease-050.txt",
+      "notes/mr-050.txt",
+      "messages/mr-050.txt",
+      "notes/mr-051.txt",
+      "messages/mr-051.txt",
+      "notes/mr-052.txt",
+      "messages/mr-052.txt",
+      "notes/mr-053.txt",
+      "messages/mr-053.txt",
+      "notes/mr-054.txt",
+      "messages/mr-054.txt",
+      "notes/mr-055.txt",
+      "messages/mr-055.txt",
+      "notes/mr-056.txt",
+      "messages/mr-056.txt",
+      "notes/mr-057.txt",
+      "messages/mr-057.txt",
+      "notes/mr-058.txt",
+      "messages/mr-058.txt",
+      "notes/mr-059.txt",
+      "messages/mr-059.txt",
+      "notes/mr-060.txt",
+      "messages/mr-060.txt",
+      "notes/mr-061.txt",
+      "messages/mr-061.txt",
+      "notes/mr-062.txt",
+      "messages/mr-062.txt",
+      "notes/mr-063.txt",
+      "messages/mr-063.txt",
+      "notes/mr-064.txt",
+      "messages/mr-064.txt",
+      "notes/mr-065.txt",
+      "messages/mr-065.txt"
+    ]
+  }
+}

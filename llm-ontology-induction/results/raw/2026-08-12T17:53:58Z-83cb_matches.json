@@ -1,0 +1,340 @@
+{
+  "run_id": "2026-08-12T17:53:58Z-83cb",
+  "model": "llama-3.1-8b-instant",
+  "condition": "B3",
+  "results": [
+    {
+      "level": "M1",
+      "classes_matched": [
+        {
+          "gold": "IndustrialProperty",
+          "induced": "Industrial Property",
+          "score": 1.0
+        },
+        {
+          "gold": "Owner",
+          "induced": "Owner",
+          "score": 1.0
+        },
+        {
+          "gold": "Lease",
+          "induced": "Lease",
+          "score": 1.0
+        },
+        {
+          "gold": "Vendor",
+          "induced": "Vendor",
+          "score": 1.0
+        },
+        {
+          "gold": "MaintenanceRequest",
+          "induced": "MaintenanceRequest",
+          "score": 1.0
+        },
+        {
+          "gold": "Property",
+          "induced": "Property",
+          "score": 1.0
+        },
+        {
+          "gold": "Tenant",
+          "induced": "Tenant",
+          "score": 1.0
+        }
+      ],
+      "classes_unmatched_gold": [
+        "Party",
+        "OfficeProperty",
+        "RetailProperty",
+        "Agent"
+      ],
+      "classes_unmatched_induced": [
+        "Landlord",
+        "Broker",
+        "Office",
+        "Contractor",
+        "Client",
+        "Premises",
+        "Payment",
+        "Issue",
+        "Maintenance Request",
+        "Account Rep",
+        "Lease Agreement",
+        "Service Request",
+        "Service Location",
+        "retail",
+        "Plumbing Fix",
+        "Restroom",
+        "Office Space",
+        "Carpet",
+        "Tree",
+        "Person",
+        "Job",
+        "Invoice",
+        "Task",
+        "Ant Problem",
+        "HVAC Repair",
+        "Lighting Issue",
+        "Team",
+        "Commercial Lease Agreement",
+        "Maintenance",
+        "Notice",
+        "Dispute",
+        "Retail Business",
+        "Medical Business",
+        "Irrigation Blowout",
+        "Landscaping",
+        "Retail Space",
+        "Contract",
+        "Employee",
+        "Equipment",
+        "Agreement",
+        "Outlet",
+        "Business",
+        "Quote",
+        "Meeting",
+        "Work Order",
+        "Location",
+        "Adjustment",
+        "Security Deposit",
+        "Mouse Issue",
+        "Warehouse",
+        "work_order",
+        "electrician",
+        "Technician",
+        "storefront",
+        "window",
+        "pipe",
+        "irrigation",
+        "Plumbing",
+        "Light",
+        "Company"
+      ]
+    },
+    {
+      "level": "M2",
+      "classes_matched": [
+        {
+          "gold": "IndustrialProperty",
+          "induced": "Industrial Property",
+          "score": 1.0
+        },
+        {
+          "gold": "Owner",
+          "induced": "Landlord",
+          "score": 1.0
+        },
+        {
+          "gold": "Lease",
+          "induced": "Lease",
+          "score": 1.0
+        },
+        {
+          "gold": "Vendor",
+          "induced": "Contractor",
+          "score": 1.0
+        },
+        {
+          "gold": "MaintenanceRequest",
+          "induced": "MaintenanceRequest",
+          "score": 1.0
+        },
+        {
+          "gold": "Agent",
+          "induced": "Broker",
+          "score": 1.0
+        },
+        {
+          "gold": "Property",
+          "induced": "Premises",
+          "score": 1.0
+        },
+        {
+          "gold": "Tenant",
+          "induced": "Tenant",
+          "score": 1.0
+        }
+      ],
+      "classes_unmatched_gold": [
+        "Party",
+        "OfficeProperty",
+        "RetailProperty"
+      ],
+      "classes_unmatched_induced": [
+        "Office",
+        "Client",
+        "Payment",
+        "Issue",
+        "Owner",
+        "Property",
+        "Maintenance Request",
+        "Account Rep",
+        "Lease Agreement",
+        "Service Request",
+        "Vendor",
+        "Service Location",
+        "retail",
+        "Plumbing Fix",
+        "Restroom",
+        "Office Space",
+        "Carpet",
+        "Tree",
+        "Person",
+        "Job",
+        "Invoice",
+        "Task",
+        "Ant Problem",
+        "HVAC Repair",
+        "Lighting Issue",
+        "Team",
+        "Commercial Lease Agreement",
+        "Maintenance",
+        "Notice",
+        "Dispute",
+        "Retail Business",
+        "Medical Business",
+        "Irrigation Blowout",
+        "Landscaping",
+        "Retail Space",
+        "Contract",
+        "Employee",
+        "Equipment",
+        "Agreement",
+        "Outlet",
+        "Business",
+        "Quote",
+        "Meeting",
+        "Work Order",
+        "Location",
+        "Adjustment",
+        "Security Deposit",
+        "Mouse Issue",
+        "Warehouse",
+        "work_order",
+        "electrician",
+        "Technician",
+        "storefront",
+        "window",
+        "pipe",
+        "irrigation",
+        "Plumbing",
+        "Light",
+        "Company"
+      ]
+    },
+    {
+      "level": "M3",
+      "classes_matched": [
+        {
+          "gold": "IndustrialProperty",
+          "induced": "Industrial Property",
+          "score": 1.0
+        },
+        {
+          "gold": "Owner",
+          "induced": "Owner",
+          "score": 1.0
+        },
+        {
+          "gold": "Lease",
+          "induced": "Lease",
+          "score": 1.0
+        },
+        {
+          "gold": "Vendor",
+          "induced": "Vendor",
+          "score": 1.0
+        },
+        {
+          "gold": "OfficeProperty",
+          "induced": "Office",
+          "score": 0.6574707291768159
+        },
+        {
+          "gold": "MaintenanceRequest",
+          "induced": "MaintenanceRequest",
+          "score": 1.0
+        },
+        {
+          "gold": "RetailProperty",
+          "induced": "retail",
+          "score": 0.729642307862163
+        },
+        {
+          "gold": "Property",
+          "induced": "Property",
+          "score": 1.0
+        },
+        {
+          "gold": "Tenant",
+          "induced": "Tenant",
+          "score": 1.0
+        }
+      ],
+      "classes_unmatched_gold": [
+        "Party",
+        "Agent"
+      ],
+      "classes_unmatched_induced": [
+        "Landlord",
+        "Broker",
+        "Contractor",
+        "Client",
+        "Premises",
+        "Payment",
+        "Issue",
+        "Maintenance Request",
+        "Account Rep",
+        "Lease Agreement",
+        "Service Request",
+        "Service Location",
+        "Plumbing Fix",
+        "Restroom",
+        "Office Space",
+        "Carpet",
+        "Tree",
+        "Person",
+        "Job",
+        "Invoice",
+        "Task",
+        "Ant Problem",
+        "HVAC Repair",
+        "Lighting Issue",
+        "Team",
+        "Commercial Lease Agreement",
+        "Maintenance",
+        "Notice",
+        "Dispute",
+        "Retail Business",
+        "Medical Business",
+        "Irrigation Blowout",
+        "Landscaping",
+        "Retail Space",
+        "Contract",
+        "Employee",
+        "Equipment",
+        "Agreement",
+        "Outlet",
+        "Business",
+        "Quote",
+        "Meeting",
+        "Work Order",
+        "Location",
+        "Adjustment",
+        "Security Deposit",
+        "Mouse Issue",
+        "Warehouse",
+        "work_order",
+        "electrician",
+        "Technician",
+        "storefront",
+        "window",
+        "pipe",
+        "irrigation",
+        "Plumbing",
+        "Light",
+        "Company"
+      ]
+    }
+  ]
+}
