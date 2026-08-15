@@ -1,11 +1,15 @@
 """
-B3 baseline -- single-shot LLM schema induction (baselines/DECISIONS.md, B3-D1..D5).
+B3 baseline -- single-shot LLM schema induction (baselines/DECISIONS.md, B3-D1..D6).
 
-Reads the corpus as whole documents, groups them into fixed-size batches identical
-for every model (B3-D2), sends each batch to one model under one frozen prompt
-(B3-D1), merges the per-batch schemas by exact-string deduplication only (B3-D4),
-and emits a single induced-schema JSON matching the contract in
-eval/schema_ir.py::parse_induced_schema (eval/PLAN.md §2).
+Reads the corpus as whole documents, sends **all of them in one call** to one model
+under one frozen prompt (B3-D1, B3-D2), and emits a single induced-schema JSON
+matching the contract in eval/schema_ir.py::parse_induced_schema (eval/PLAN.md §2).
+
+Whole-corpus is the current shape as of the 2026-08-14 rework. Batching still exists,
+labelled legacy throughout, for exactly one reason: the 2026-08-12 Groq run was made
+at `--batch-size 7` and must stay reproducible (B3-D6). That old shape is what the
+merge step below was written for -- under whole-corpus there is one schema to merge
+and B3-D4 becomes a no-op, which relaxes nothing about the rule.
 
 Two rules here are load-bearing for the paper rather than for the code:
 
@@ -22,8 +26,9 @@ prompt. Enforced by
 baselines/tests/test_single_shot.py::test_no_domain_vocabulary_leakage.
 
 Usage:
-    python -m baselines.single_shot --model haiku45 --dry-run
-    python -m baselines.single_shot --model llama318b
+    python -m baselines.b3_single_shot.single_shot --model haiku45 --dry-run
+    python -m baselines.b3_single_shot.single_shot --model llama318b_bedrock
+    python -m baselines.b3_single_shot.single_shot --model llama318b_groq --batch-size 7
 """
 
 from __future__ import annotations
@@ -36,31 +41,37 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
-from baselines import model_clients as mc
-from baselines.model_clients import MODELS, ModelSpec
+from baselines.b3_single_shot import model_clients as mc
+from baselines.b3_single_shot.model_clients import MODELS, ModelSpec
 
-# --- Frozen run settings (B3-D2) -----------------------------------------
-# Uniform across all five models, including the open-weight one: giving the
-# cloud models bigger batches because their context windows allow it would make
-# each model solve a differently-shaped task, which is the one thing this
-# comparison cannot tolerate (Critical Rule 7).
+# --- Legacy run setting (B3-D2, superseded 2026-08-14) --------------------
+# NOT the current shape. Whole-corpus is (see the module docstring). This value
+# survives only so `--batch-size 7` reproduces the 2026-08-12 Groq run exactly,
+# because that run is now the batched arm of a same-model comparison (B3-D6)
+# rather than a discarded first attempt.
 #
-# Revised B3-D2, 2026-08-12: was 10. Batch 1 under the old sequential document
-# order (10 of 12 csv_exports/ files back to back) requested ~6,566 input
-# tokens against Groq's 6000 TPM cap on llama-3.1-8b-instant -- over budget
-# before a single output token was reserved. 7 gives headroom on top of the
-# interleaving fix below. See DECISIONS.md B3-D2 for the full per-batch table.
-BATCH_SIZE = 7
+# Its history, since the number looks arbitrary otherwise: it was 10, cut to 7 on
+# 2026-08-12 after batch 1 under the old sequential document order (10 of 12
+# csv_exports/ files back to back) requested ~6,566 input tokens against Groq's
+# 6,000 TPM cap on llama-3.1-8b-instant -- over budget before a single output
+# token was reserved. Both that cap and this number are Groq free-tier artifacts,
+# which is why neither constrains the Bedrock conditions.
+LEGACY_BATCH_SIZE = 7
 
 CONDITION = "B3"
 
-_REPO_ROOT = Path(__file__).resolve().parents[1]
+# The two call shapes, as recorded in metadata.batching.
+WHOLE = "whole"
+BATCHED = "batched"
+
+_REPO_ROOT = Path(__file__).resolve().parents[2]
 _CORPUS_ROOT = _REPO_ROOT / "data" / "documents"
 _SUBDIRS = ("csv_exports", "lease_texts", "notes", "messages")
 _READABLE_SUFFIXES = (".csv", ".txt")
 DEFAULT_OUT_DIR = _REPO_ROOT / "results" / "raw"
 
-PROMPT_PATH = _REPO_ROOT / "baselines" / "prompts" / "b3_extraction_prompt.md"
+_MODULE_ROOT = _REPO_ROOT / "baselines" / "b3_single_shot"
+PROMPT_PATH = _MODULE_ROOT / "prompts" / "b3_extraction_prompt.md"
 DOCUMENTS_PLACEHOLDER = "{{DOCUMENTS}}"
 
 
@@ -91,7 +102,7 @@ def load_documents(
     document per subdirectory per round (subdirectories still visited in _SUBDIRS
     order; filenames still sort within each) spreads that density out instead.
     Batch membership is derived from this order, and it must stay identical across
-    all five models (Critical Rule 7).
+    every model (Critical Rule 7).
     """
     per_subdir: list[list[tuple[str, str]]] = []
     for subdir in _SUBDIRS:
@@ -121,11 +132,20 @@ def load_documents(
 
 
 def batch_documents(
-    documents: list[tuple[str, str]], size: int = BATCH_SIZE
+    documents: list[tuple[str, str]], size: int = LEGACY_BATCH_SIZE
 ) -> list[list[tuple[str, str]]]:
-    """Split into fixed-size batches. A function of the document order alone -- it
-    takes no ModelSpec, so it is structurally incapable of batching one model
-    differently from another (Critical Rule 7)."""
+    """LEGACY (B3-D2, superseded 2026-08-14). Split into fixed-size batches.
+
+    Reachable only via an explicit `--batch-size`, and kept for one purpose:
+    reproducing the 2026-08-12 Groq run, which B3-D6 retains as the batched arm of a
+    same-model batched-vs-whole-corpus comparison. New runs go through the
+    whole-corpus path and never call this.
+
+    Still a function of the document order alone -- it takes no ModelSpec, so it is
+    structurally incapable of batching one model differently from another (Critical
+    Rule 7). That guarantee is load-bearing for the legacy arm too: the comparison
+    only works if the batched shape is the same for whoever runs it.
+    """
     if size < 1:
         raise ValueError(f"batch size must be >= 1, got {size}")
     return [documents[i : i + size] for i in range(0, len(documents), size)]
@@ -142,21 +162,21 @@ def load_prompt_template(path: Path = PROMPT_PATH) -> str:
     return template
 
 
-def format_documents(batch: list[tuple[str, str]]) -> str:
+def format_documents(documents: list[tuple[str, str]]) -> str:
     return "\n\n".join(
-        f"--- document: {source} ---\n{text.strip()}" for source, text in batch
+        f"--- document: {source} ---\n{text.strip()}" for source, text in documents
     )
 
 
-def render_prompt(template: str, batch: list[tuple[str, str]]) -> str:
-    """Substitute the batch's documents into the frozen template.
+def render_prompt(template: str, documents: list[tuple[str, str]]) -> str:
+    """Substitute one call's documents into the frozen template.
 
     str.replace, not str.format: the template contains a JSON output example, and
     str.format would try to read its braces as fields. Interpolation touches the
     documents block and nothing else -- the instruction text is byte-identical for
-    every batch and every model (Critical Rule 2).
+    every call, every call shape and every model (Critical Rule 2).
     """
-    return template.replace(DOCUMENTS_PLACEHOLDER, format_documents(batch))
+    return template.replace(DOCUMENTS_PLACEHOLDER, format_documents(documents))
 
 
 # ---------------------------------------------------------------------------
@@ -171,7 +191,7 @@ _FENCE = re.compile(r"```[a-zA-Z0-9_-]*\n(.*?)```", re.DOTALL)
 def strip_reasoning(text: str) -> str:
     """Remove a reasoning model's <think> block, if present.
 
-    None of the five frozen models is currently a reasoning model that emits these
+    None of the six frozen conditions is currently a reasoning model that emits these
     (llama-3.1-8b-instant, the open-weight condition, does not), but this stays
     defensive rather than model-specific: Groq and Bedrock both host reasoning
     models, a future swap could reintroduce one, and a no-op strip on plain text
@@ -342,8 +362,26 @@ def merge_batches(batch_schemas: list[dict]) -> dict:
 # ---------------------------------------------------------------------------
 
 def build_output(
-    merged: dict, sources: list[str], run_id: str, spec: ModelSpec
+    merged: dict,
+    sources: list[str],
+    run_id: str,
+    spec: ModelSpec,
+    batching: str = WHOLE,
+    batch_size: int | None = None,
+    usage: list[dict] | None = None,
 ) -> dict:
+    """Assemble the emitted schema (B3-D5).
+
+    `batching`, `batch_size` and `usage` were added 2026-08-14. Two runs of the same
+    model in the two call shapes are otherwise indistinguishable from their output
+    alone, and B3-D6 exists precisely to compare them -- a result file that cannot
+    say which shape produced it is not usable evidence. `usage` carries the stop
+    reason and completion-token count per call, which is what B3-D3's decision rule
+    needs to say whether any run reached its output cap.
+
+    Additive and contract-safe: parse_induced_schema ignores metadata entirely and
+    load_induced_metadata is a bare `data.get("metadata", {})`.
+    """
     return {
         "classes": merged["classes"],
         "relations": merged["relations"],
@@ -352,6 +390,9 @@ def build_output(
             "model": spec.model_id,
             "run_id": run_id,
             "source_documents": sources,
+            "batching": batching,
+            "batch_size": batch_size,
+            "usage": usage or [],
         },
     }
 
@@ -365,54 +406,109 @@ def _run_id() -> str:
 # Orchestration
 # ---------------------------------------------------------------------------
 
-def run_batches(
-    spec: ModelSpec, batches: list[list[tuple[str, str]]], template: str
-) -> tuple[list[dict], list[dict]]:
-    """Call `spec` once per batch. Returns (per-batch schemas, raw records).
+def run_calls(
+    spec: ModelSpec,
+    calls: list[list[tuple[str, str]]],
+    template: str,
+    raw_records: list[dict],
+) -> list[dict]:
+    """Call `spec` once per element of `calls`. Returns the parsed schemas.
 
-    A batch that fails to parse is recorded in the raw log with its error and
-    skipped, so one unusable response cannot abort a run that has already been paid
-    for -- but the count of skipped batches is surfaced by main() and belongs in any
-    reported result.
+    Under the current whole-corpus shape `calls` holds exactly one element; under the
+    legacy batched shape it holds one per batch.
+
+    `raw_records` is filled in place, and is owned by the caller on purpose: when this
+    raises, the caller still has every response recorded so far and can write the log
+    before the run dies. A response that was paid for must reach disk whether or not
+    it turned out to be usable.
+
+    An unparseable response is recorded and skipped **only when there is more than one
+    call**, so one bad batch cannot throw away 27 good ones already paid for. With a
+    single call there is nothing left to salvage: skipping would write out an empty
+    schema and report it as a completed run, which is the one failure mode that
+    corrupts a reported number without leaving a trace. So it raises instead.
     """
     schemas: list[dict] = []
-    raw_records: list[dict] = []
+    single = len(calls) == 1
 
-    for index, batch in enumerate(batches, start=1):
-        prompt = render_prompt(template, batch)
-        sources = [source for source, _text in batch]
-        print(f"  batch {index}/{len(batches)} ({len(batch)} documents)...")
+    for index, documents in enumerate(calls, start=1):
+        prompt = render_prompt(template, documents)
+        sources = [source for source, _text in documents]
+        label = "whole corpus" if single else f"batch {index}/{len(calls)}"
+        print(f"  {label} ({len(documents)} documents, {len(prompt)} chars)...")
 
-        response = mc.invoke(spec, prompt)
-        record = {
+        record: dict = {
             "batch": index,
             "source_documents": sources,
             "prompt_chars": len(prompt),
-            "response": response,
         }
         try:
-            schema = parse_response(response)
+            completion = mc.invoke(spec, prompt)
+        except mc.ModelResponseError as exc:
+            # Fatal either way -- neither a cut-off schema nor a refusal is ever
+            # merged -- but whatever text came back is kept so the run log shows
+            # what actually happened, and the two causes are recorded as what they
+            # are rather than collapsed into one generic failure.
+            label = "refused" if isinstance(exc, mc.RefusalError) else "truncated"
+            record["response"] = exc.text
+            record["stop_reason"] = label
+            record["completion_tokens"] = exc.completion_tokens
+            record["error"] = str(exc)
+            raw_records.append(record)
+            raise
+
+        record["response"] = completion.text
+        record["stop_reason"] = completion.stop_reason
+        record["completion_tokens"] = completion.completion_tokens
+        print(
+            f"    stop_reason={completion.stop_reason!r} "
+            f"completion_tokens={completion.completion_tokens} "
+            f"(cap {spec.max_output_tokens})"
+        )
+
+        try:
+            schema = parse_response(completion.text)
         except ResponseParseError as exc:
             record["parse_error"] = str(exc)
-            print(f"    UNPARSEABLE: {exc}")
-        else:
-            schemas.append(schema)
-            record["parsed_classes"] = len(schema.get("classes") or [])
-            record["parsed_relations"] = len(schema.get("relations") or [])
+            raw_records.append(record)
+            if single:
+                raise
+            print("    UNPARSEABLE -- skipped; see the raw log")
+            continue
+
+        schemas.append(schema)
+        record["parsed_classes"] = len(schema.get("classes") or [])
+        record["parsed_relations"] = len(schema.get("relations") or [])
         raw_records.append(record)
 
-    return schemas, raw_records
+    return schemas
 
 
-def _dry_run(spec: ModelSpec, batches: list[list[tuple[str, str]]], template: str) -> None:
-    """Render every prompt and print the first one. Makes no API call."""
-    print(f"DRY RUN -- no API calls. model={spec.key} ({spec.model_id})\n")
-    for index, batch in enumerate(batches, start=1):
-        prompt = render_prompt(template, batch)
-        sources = ", ".join(source for source, _text in batch)
-        print(f"batch {index}: {len(batch)} documents, {len(prompt)} chars -- {sources}")
-    print("\n--- rendered prompt, batch 1 ---\n")
-    print(render_prompt(template, batches[0]))
+def _dry_run(spec: ModelSpec, calls: list[list[tuple[str, str]]], template: str) -> None:
+    """Render every prompt and print a sample. Makes no API call, spends nothing."""
+    print(f"DRY RUN -- no API calls. model={spec.key} ({spec.model_id})")
+    print(f"output cap: {spec.max_output_tokens} tokens\n")
+    for index, documents in enumerate(calls, start=1):
+        prompt = render_prompt(template, documents)
+        # ~3.5 chars/token, the ratio calibrated in B3-D2 against a real provider
+        # token count. An estimate, and labelled as one -- this model family does not
+        # support Bedrock's count-tokens API, so there is no exact figure to be had
+        # without spending a call.
+        print(
+            f"call {index}: {len(documents)} documents, {len(prompt)} chars, "
+            f"~{round(len(prompt) / 3.5)} est input tokens"
+        )
+
+    prompt = render_prompt(template, calls[0])
+    print(f"\n--- rendered prompt, call 1 ({len(prompt)} chars) ---\n")
+    if len(prompt) > 4000:
+        # The whole-corpus prompt is ~152,000 chars; printing it whole buries the
+        # numbers above, which are the point of a dry run.
+        print(prompt[:2000])
+        print(f"\n[... {len(prompt) - 4000} chars elided ...]\n")
+        print(prompt[-2000:])
+    else:
+        print(prompt)
 
 
 def main(argv: list[str] | None = None) -> None:
@@ -420,7 +516,16 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--model", required=True, choices=sorted(MODELS))
     parser.add_argument("--corpus", type=Path, default=_CORPUS_ROOT)
     parser.add_argument("--out-dir", type=Path, default=DEFAULT_OUT_DIR)
-    parser.add_argument("--batch-size", type=int, default=BATCH_SIZE)
+    parser.add_argument(
+        "--batch-size",
+        type=int,
+        default=None,
+        help=(
+            "LEGACY. Omit for the current whole-corpus shape (one call). Pass 7 to "
+            "reproduce the 2026-08-12 Groq run, which B3-D6 keeps as the batched arm "
+            "of a same-model comparison. Any other value is neither shape."
+        ),
+    )
     parser.add_argument(
         "--limit",
         type=int,
@@ -439,46 +544,84 @@ def main(argv: list[str] | None = None) -> None:
     documents = load_documents(args.corpus, limit=args.limit)
     if not documents:
         raise SystemExit(f"no documents under {args.corpus}")
-    batches = batch_documents(documents, args.batch_size)
-    print(
-        f"corpus: {len(documents)} documents -> {len(batches)} batches "
-        f"of {args.batch_size}"
-    )
+
+    # The one place the call shape is decided. Nothing downstream branches on it, and
+    # nothing about it reaches build_request_body -- so the two shapes send the same
+    # body for the same model, and the only difference between them is how many
+    # documents ride in it (Critical Rule 7 / B3-D6).
+    if args.batch_size is None:
+        calls = [documents]
+        batching = WHOLE
+        print(f"corpus: {len(documents)} documents -> 1 whole-corpus call")
+    else:
+        calls = batch_documents(documents, args.batch_size)
+        batching = BATCHED
+        print(
+            f"corpus: {len(documents)} documents -> {len(calls)} batches "
+            f"of {args.batch_size} (LEGACY shape)"
+        )
 
     if args.dry_run:
-        _dry_run(spec, batches, template)
+        _dry_run(spec, calls, template)
         return
 
-    if args.batch_size != BATCH_SIZE:
+    if batching == BATCHED and args.batch_size != LEGACY_BATCH_SIZE:
         print(
-            f"WARNING: --batch-size {args.batch_size} differs from the frozen "
-            f"B3-D2 value ({BATCH_SIZE}); this run is not comparable to the others."
+            f"WARNING: --batch-size {args.batch_size} is neither the current "
+            f"whole-corpus shape nor the legacy value ({LEGACY_BATCH_SIZE}); this "
+            "run is comparable to nothing already reported."
         )
 
     run_id = _run_id()
-    schemas, raw_records = run_batches(spec, batches, template)
-    merged = merge_batches(schemas)
-    sources = [source for _batch in batches for source, _text in _batch]
-    output = build_output(merged, sources, run_id, spec)
-
     args.out_dir.mkdir(parents=True, exist_ok=True)
+    raw_path = args.out_dir / f"{run_id}_b3_{spec.key}_batches.jsonl"
+    raw_records: list[dict] = []
+
+    try:
+        schemas = run_calls(spec, calls, template, raw_records)
+    finally:
+        # Written even when the run dies, so a truncated or unparseable response is
+        # inspectable instead of lost with the process. The schema JSON below is
+        # deliberately NOT written on that path: a partial run must not leave behind
+        # a file that looks like a result.
+        raw_path.write_text(
+            "".join(json.dumps(record) + "\n" for record in raw_records),
+            encoding="utf-8",
+        )
+        if raw_records:
+            print(f"wrote {os.path.relpath(raw_path, _REPO_ROOT)}")
+
+    merged = merge_batches(schemas)
+    sources = [source for _call in calls for source, _text in _call]
+    usage = [
+        {
+            "batch": record["batch"],
+            "stop_reason": record["stop_reason"],
+            "completion_tokens": record["completion_tokens"],
+        }
+        for record in raw_records
+    ]
+    output = build_output(
+        merged,
+        sources,
+        run_id,
+        spec,
+        batching=batching,
+        batch_size=args.batch_size,
+        usage=usage,
+    )
+
     out_path = args.out_dir / f"{run_id}_b3_{spec.key}.json"
     out_path.write_text(json.dumps(output, indent=2) + "\n", encoding="utf-8")
 
-    raw_path = args.out_dir / f"{run_id}_b3_{spec.key}_batches.jsonl"
-    raw_path.write_text(
-        "".join(json.dumps(record) + "\n" for record in raw_records), encoding="utf-8"
-    )
-
-    skipped = len(batches) - len(schemas)
+    skipped = len(calls) - len(schemas)
     n_attributes = sum(len(c["attributes"]) for c in output["classes"])
     print(
         f"induced: {len(output['classes'])} classes, {n_attributes} attributes, "
         f"{len(output['relations'])} relations"
-        + (f" ({skipped} batches unparseable)" if skipped else "")
+        + (f" ({skipped} of {len(calls)} calls unparseable)" if skipped else "")
     )
     print(f"wrote {os.path.relpath(out_path, _REPO_ROOT)}")
-    print(f"wrote {os.path.relpath(raw_path, _REPO_ROOT)}")
 
 
 if __name__ == "__main__":
