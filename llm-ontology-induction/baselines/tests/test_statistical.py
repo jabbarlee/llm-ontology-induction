@@ -16,7 +16,7 @@ from pathlib import Path
 
 import pytest
 
-from baselines import term_extraction as te
+from baselines.b1_statistical import term_extraction as te
 
 # ---------------------------------------------------------------------------
 # T1 — nesting discount (DECISIONS.md D2)
@@ -441,7 +441,7 @@ def test_no_domain_vocabulary_leakage():
     """
     from eval.matching import normalize
 
-    root = Path(__file__).resolve().parents[1]
+    root = Path(__file__).resolve().parents[1] / "b1_statistical"
     vocab = {normalize(v) for v in _gold_vocabulary()}
     vocab.discard("")
     assert vocab, "gold vocabulary came back empty -- the check would be vacuous"
@@ -449,8 +449,12 @@ def test_no_domain_vocabulary_leakage():
     leaks: list[str] = []
     for module in _MODULES:
         path = root / module
-        if not path.exists():
-            continue
+        # Asserted, not skipped. This previously read `if not path.exists():
+        # continue`, which meant the 2026-08-14 move of these modules into
+        # b1_statistical/ would have turned the entire guard into a vacuous pass
+        # -- a green suite with no coverage, which is worse than a red one. A
+        # missing module is now a failure, so the next move has to notice.
+        assert path.exists(), f"{module} is not at {path} -- the leakage guard is scanning nothing"
         used = _executable_vocabulary(path.read_text())
         for term in sorted(vocab):
             needle = tuple(term.split())
