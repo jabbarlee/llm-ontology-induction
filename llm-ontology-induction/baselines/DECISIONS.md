@@ -412,8 +412,13 @@ Across the plausible price range for the tiers involved, a full five-model sweep
 `# TODO: confirm exact per-model $/MTok before quoting a figure in the paper` —
 the token arithmetic above is real; the dollar conversion is not yet.
 
-### B3-D1c — Local/open-weight model moved from on-device Ollama to Groq's free tier,
-and from qwen3:8b to llama-3.1-8b-instant
+### B3-D1c — Local/open-weight model moved from on-device Ollama to Groq's free tier, and from qwen3:8b to llama-3.1-8b-instant — then from Groq to Bedrock
+
+*Revised 2026-08-14: the open-weight condition now runs on **AWS Bedrock**
+(`us.meta.llama3-1-8b-instruct-v1:0`), not Groq. **This changes what the condition
+measures** — see the reframe at the end of this entry. The Groq entry is retained as a
+separate condition (B3-D6), not deleted. Everything below is the original record.*
+
 
 Tested qwen3:8b via Ollama directly on an M3 MacBook, 8GB unified memory —
 confirmed infeasible (severe memory pressure). Pivoted to Groq's free,
@@ -437,7 +442,52 @@ B3-D1b's corrected figure) is trivially within Groq's free-tier *daily* limits; 
 *per-minute* limit is a separate, tighter constraint that did bind — see B3-D2 and
 B3-D3.
 
-## B3-D2 — Fixed batch size of 7, documents interleaved round-robin across subdirectories, uniform across all five models
+---
+
+#### Groq → Bedrock, and the reframe it forces (revision of 2026-08-14)
+
+The same weights are served on Bedrock as `meta.llama3-1-8b-instruct-v1:0` with a **128K
+context window** and no per-minute token cap. Moving there is what dissolved the
+constraint behind B3-D2 and B3-D3, so the open-weight condition stops being the one that
+drags every other condition's task shape down to its hosting limit.
+
+**Model ID: the *geo* inference ID `us.meta.llama3-1-8b-instruct-v1:0`, not the bare
+`meta.` one.** Read off the model card's own regional table rather than guessed:
+us-east-1 and us-east-2 are In-Region ✗ / Geo ✓, and only us-west-2 serves the bare ID
+on demand. The geo ID is callable from all three US regions, which makes the region
+question moot for this condition instead of pinning it to one region. `ModelSpec` also
+gained a `region` field, because Sol and Luna have a genuine regional constraint that
+the default cannot express.
+
+**The reframe, stated explicitly rather than left to be inferred from a model ID.** This
+cell was scoped to answer *"what does an open-weight model get you at zero cost?"* — it
+was the only condition a reader could reproduce without a vendor account. **It now
+answers a different question: "what does an open-weight model get you, on paid
+hosting?"** Two of the three properties survive the move and one does not:
+
+| Property | Before (Groq free tier) | After (Bedrock) |
+|---|---|---|
+| Open weights | ✓ | ✓ |
+| Reproducible without a vendor account | ✓ | ✗ — Bedrock needs an AWS account and billing |
+| Zero cost | ✓ | ✗ — priced per token like the rest |
+
+The paid tiers still have a floor to justify themselves against, and it is still an 8B
+open-weight model. But "the only condition a reader can reproduce for free" is no longer
+true of this cell, and any sentence in the paper that leans on that claim has to be
+rewritten. `# TODO: check the Results and Discussion drafts for a "zero-cost" or "free"
+framing of the open-weight condition before submission.`
+
+This is precisely why the Groq condition is kept alive rather than deleted (B3-D6): it
+is the only thing still holding the zero-cost end of that comparison.
+
+## B3-D2 — ~~Fixed batch size of 7~~ **Whole corpus in one call**, documents interleaved round-robin across subdirectories, uniform across all models
+
+*Revised 2026-08-14. Was `BATCH_SIZE = 7`, applied to every model. Batching is now
+reachable only through an explicit `--batch-size` and exists only to reproduce the one
+run made under it (B3-D6). The interleaved document order is unchanged. **See "What
+made batching wrong" at the end of this entry — the original reasoning below is kept
+because it was correct about the constraint it was solving, and the constraint is what
+turned out to be an artifact.***
 
 *Revised 2026-08-12. Was `BATCH_SIZE = 10`, documents ordered by draining one
 subdirectory fully before the next. Both changed together — see the failure and the
@@ -511,7 +561,63 @@ Enforced structurally: `batch_documents()` takes no `ModelSpec`, so there is no
 parameter through which one model could receive different batches from another
 (`test_batching_cannot_depend_on_the_model`).
 
+---
+
+### What made batching wrong (revision of 2026-08-14)
+
+Everything above is a correct response to a 6,000 TPM cap on Groq's free tier. What it
+missed is that the cap was **a property of one host's free tier, not of the task, and
+not of any model in the grid.** Critical Rule 7 then did its job faithfully and
+propagated that one host's limit to all five conditions — so every model was being
+tested under the weakest-provisioned one's hosting constraint rather than a fair
+like-for-like task shape. Uniformity was the right instinct; it was applied at the
+wrong level.
+
+**Two things forced the re-examination.**
+
+1. **The measured cost of fragmentation.** The one completed batched run produced
+   **67 induced classes against a gold schema of 11** (`results/findings/B3-FINDINGS.md`).
+   The dominant driver was cross-batch fragmentation: 28 stateless calls, none of which
+   could see what any other had already named. `Tenant` accumulated 58 attributes,
+   largely the same underlying facts reworded per batch. That is the cost of the
+   *hosting workaround*, and reporting it as the cost of single-shot prompting would
+   have made B3 a strawman.
+2. **The constraint dissolved.** Llama 3.1 8B is served on Bedrock with a **128K
+   context window** (B3-D1c, revised). The corpus rendered through the frozen prompt is
+   **151,831 chars ≈ 43,400 input tokens** — measured, not estimated, by rendering it.
+   Every model in the grid now clears the whole corpus in one call with room to spare.
+
+**Decision:** the corpus goes to the model in **one call**. `--batch-size` still exists,
+labelled legacy in the code and the help text, reachable only when passed explicitly,
+and used for exactly one thing: reproducing the 2026-08-12 Groq run (B3-D6).
+
+**What this does *not* change:**
+
+- **B3-D4 is not relaxed.** With one call there is one schema to merge, so the naive
+  exact-string consolidation becomes a no-op. The rule is not weakened — it stops
+  biting. No fuzzy matching, no embeddings, no LLM call has been added, and
+  `test_distinct_wordings_are_never_merged` still passes unmodified.
+- **Critical Rule 7 still holds structurally.** `batch_documents()` still takes no
+  `ModelSpec`, and the call shape is decided in exactly one place in `main()` and never
+  reaches `build_request_body()` — so the same model sends a byte-identical body in
+  either shape (`test_the_body_is_identical_whatever_the_call_shape`). Without that,
+  B3-D6's two arms would differ in two ways at once and neither result could be
+  attributed.
+- **Document order is untouched.** The round-robin interleaving above stays, so the
+  whole-corpus prompt is literally the batched sequence concatenated. Ordering does not
+  become a silent new variable between the two arms.
+
+**What it costs, stated plainly:** whole-corpus removes fragmentation as a failure mode
+*structurally*, which is a real advantage handed to B3 over the version of B3 already
+run. That is the point — B3 should be the strongest honest version of "one prompt, no
+staged decomposition", because P1 has to beat it. It is not prompt tuning: the prompt
+(Critical Rule 2) is byte-identical and was not touched.
+
 ## B3-D3 — Frozen sampling settings
+
+*`MAX_OUTPUT_TOKENS` revised 2026-08-14: the single global constant is gone, replaced
+by a per-model `ModelSpec.max_output_tokens`. See "Why the cap had to become per-model"
+below.*
 
 *`MAX_OUTPUT_TOKENS` revised 2026-08-12. Was `8192`.*
 
@@ -532,6 +638,184 @@ temperature. `ModelSpec.supports_temperature` exists so a model that refuses `0.
 omit it in one visible place rather than by special-casing the sampling settings; if
 that flag has to be flipped for Sol or Luna, the change gets recorded here and every
 affected number re-run.
+
+---
+
+### `supports_top_p`, a second per-model sampling exception (revision of 2026-08-14)
+
+Confirmed at the first real Haiku 4.5 call, after the model-ID fix above got past the
+first error: a body carrying both `temperature` and `top_p` raised **"`temperature`
+and `top_p` cannot both be specified for this model. Please use only one."** This is
+not a Haiku-specific quirk — it is documented behavior of Claude 4.5+ models on
+Bedrock generally (also reported for Sonnet 4.5 and Opus 4.7/4.8): they reject the
+combination outright, independent of what either value is.
+
+`supports_temperature` alone cannot express this: it is all-or-nothing, and dropping
+*both* settings to fix a conflict over one of them would be wrong. **Decision:**
+`ModelSpec` gains a second, independent flag, `supports_top_p`. `haiku45` sets it
+`False`; `temperature=0.0` is kept, `top_p` is omitted entirely from its request body.
+
+**This is not a new judgment call about which value to sacrifice** — B3-D3's own row
+above already documents `top_p=1.0` as *"Neutral — with temperature at 0 it does
+nothing"*. Omitting a setting already on record as a no-op costs nothing; the
+load-bearing setting (`temperature=0.0`, kept for reproducibility) is untouched.
+
+Enforced on the request body, not just the flag:
+`test_haiku_omits_top_p_but_keeps_temperature` asserts `top_p` is absent from the
+actual body sent, and `test_supports_temperature_and_supports_top_p_are_independent_
+flags` pins that the two settings can be dropped independently rather than coupled.
+
+**Watch for this on Fable 5 too when its blocker (Finding 4, sampling constraints
+incompatible with `TEMPERATURE=0.0`/`TOP_P=1.0` entirely) gets resolved** — it is a
+different, harder problem than Haiku's (Fable 5 rejects the frozen *values*, not just
+the *combination*), but the same `supports_temperature`/`supports_top_p` machinery is
+where that decision will need to attach.
+
+---
+
+### Fable 5's blocker resolved (2026-08-15): `supports_temperature`/`supports_top_p` set `False`, a real reproducibility loss recorded rather than absorbed
+
+Fable 5's model card: *"temperature must be 1.0 or unset; top_p must be ≥ 0.99 and
+< 1.0, or unset."* This is not Haiku's problem (reject the *combination*) — it is
+each frozen value individually out of range: `TEMPERATURE=0.0` fails "must be 1.0 or
+unset" outright, and `TOP_P=1.0` fails "< 1.0" (the range is exclusive at 1.0, so
+1.0 itself is excluded). There is no in-range substitute this record can pick without
+inventing a new hyperparameter.
+
+**Decision:** both flags set `False`. Both settings are omitted entirely — the one
+option the model card actually permits ("or unset") — rather than any body carrying
+an out-of-range value.
+
+**This must be stated as a real loss, not a free substitution.** B3-D3 freezes
+`temperature` near zero specifically so a re-run is reproducible enough to debug.
+That guarantee **does not hold for Fable 5**: omitted, the model uses its own
+(unknown, undocumented) default temperature, and Fable 5's adaptive thinking being
+always-on (cannot be disabled, per its model card) compounds this — reasoning
+traces on extended-thinking models are known to vary run-to-run even when the
+sampling temperature is pinned elsewhere. **Fable 5 is the one B3 condition where a
+repeated run is not expected to reproduce the same schema**, and that has to be
+stated plainly wherever B3-D3's reproducibility claim is cited in the paper, not
+left to be discovered by a reviewer re-running the experiment.
+
+**A second, unrelated finding folded in here because it surfaced from the same
+model card while resolving this:** Fable 5's card documents `stop_reason:
+"refusal"` for content-policy blocks, with refusal rates "materially higher than
+on previous Claude models," and instructs callers to treat it as "a primary
+response path." The existing truncation guard could not have told a refusal apart
+from an ordinary empty response — it would have surfaced as a bare `ValueError`
+indistinguishable from a model that legitimately found nothing. **New:**
+`RefusalError`, structurally parallel to `TruncatedResponseError` (both now share a
+`ModelResponseError` base) — fatal, not retried (a content-policy block is
+deterministic at temperature 0, same as a cap cutoff), carries whatever partial
+text came back, and is logged in the run's raw JSONL as `stop_reason: "refused"`,
+distinct from `"truncated"`, so the two failure modes are never conflated by
+whoever reads the log. Scoped to the anthropic family only — the constraint is
+model-documented, not assumed to generalize to Meta or OpenAI-family stop reasons.
+
+**Still open, not resolved here — verified but not run:** the model card's separate
+data-retention requirement — *"To use this model, you must opt in to provider data
+sharing by setting your data retention mode to `provider_data_share` via the Data
+Retention API."* Confirmed against AWS's own abuse-detection page and the API
+reference (not guessed): Anthropic requires this specifically for Fable 5 —
+*"inputs and outputs will be retained for up to 30 days... you must opt in to
+sharing retained traffic with Anthropic for abuse detection and potential human
+review."* The real operation is **`PutAccountDataRetention`** — a **`bedrock`**
+control-plane call (not `bedrock-runtime`, and not something `model_clients.py`'s
+request body can express), one-time and account-level:
+
+```python
+import boto3
+boto3.client("bedrock", region_name="us-east-1").put_account_data_retention(
+    mode="provider_data_share"
+)
+```
+
+Requires IAM permission `bedrock:PutAccountDataRetention`. **This account's IAM
+user could not even list its own attached policies or call
+`bedrock:ListFoundationModels`** (confirmed while debugging the earlier Haiku
+Marketplace-subscription block) — it is narrowly scoped to `bedrock:InvokeModel`
+and almost certainly lacks this permission too. Expect either an `AccessDenied`
+here or, if skipped, an access/validation error on the first Fable 5 `invoke_model`
+call — a different failure from anything this revision fixes, and one this session
+cannot resolve without broader IAM access than the current user has.
+
+---
+
+### Why the cap had to become per-model (revision of 2026-08-14)
+
+`2048` was a Groq free-tier artifact and nothing else: that tier reserves the full
+requested output against its per-minute cap regardless of what the model generates, so
+a large cap starved the input. On Bedrock nothing reserves anything, and the number was
+left describing a constraint no longer present.
+
+The obvious fix — one larger global — does not survive contact with the grid, because
+**the ceiling is not the same for every model.**
+
+| Condition | `max_output_tokens` | Basis |
+|---|---|---|
+| `fable5`, `haiku45`, `sol`, `luna` | `16000` | Headroom over the largest plausible whole-corpus schema. Haiku 4.5's real Bedrock ceiling is 64,000; 16,000 is chosen for headroom, not because more is unavailable. |
+| `llama318b_bedrock` | **`4096`** | The Llama 3.1 8B Instruct model card states **"Max output tokens: 4K"** flat, against its 128K context window. Verified this is a property of the model as served and not of the API surface: Converse is supported and maps `maxTokens` onto the same limit, so there is no way around it. |
+| `llama318b_groq` | `2048` | Held at the historical value on purpose (B3-D6). Raising it would make a re-run a different experiment from the one already reported. |
+
+**Decision:** `max_output_tokens` moves onto `ModelSpec`. It is a property of the model
+as served — **never** of the call shape. Whole-corpus and batched runs of the same model
+send a byte-identical request body; enforced structurally, since `build_request_body()`
+takes no batching argument and reads the cap only from the spec
+(`test_the_output_cap_comes_from_the_spec_and_differs_per_model`,
+`test_the_body_is_identical_whatever_the_call_shape`).
+
+**A truncation guard, failing loud, with no retry.** `TruncatedResponseError` is raised
+whenever the provider reports stopping at the cap — meta `stop_reason == "length"`,
+anthropic `"max_tokens"`, openai `finish_reason == "length"`. A truncated schema is
+never merged and never written to a result file. It is deliberately *not* retried: at
+`TEMPERATURE = 0.0` an identical prompt returns an identical cut-off response, so
+retrying spends money to fail the same way, and the only fixes would be mutating a
+frozen value mid-run. The error's wording is itself load-bearing — `is_transient()`
+matches on message text, so a stray "rate limit" or "timeout" in the phrasing would burn
+five retries on a perfectly deterministic failure
+(`test_a_truncated_response_is_never_treated_as_transient`). The cut-off text *is* kept
+and written to the run log: fatal must not mean evidence-destroying.
+
+Every call records its stop reason and completion-token count, into the per-call JSONL
+and into `metadata.usage`. A run that finished well under its cap is the evidence that
+the differing caps had no effect, and that claim cannot be made if nothing recorded it.
+
+**A prediction, recorded before the run** (measured, not guessed): the merged schema
+from the 28-batch Groq run is **25,094 chars ≈ 7,170 tokens** — and that is the
+*deduplicated union*, the smallest honest estimate of what one whole-corpus answer must
+carry. That is **~1.75× the 4,096 ceiling**. Whole-corpus should over-generate less than
+28 fragmented calls did, so 7,170 is an upper bound rather than a forecast, but the
+margin is not comfortable and the open-weight whole-corpus run may well truncate.
+
+**Decision rule, fixed now so the outcome cannot be rationalized afterward:**
+
+> If no run in the matrix reaches its output cap, the differing caps had no effect and
+> are noted in Limitations only. If the open-weight whole-corpus run truncates at 4096,
+> that is reported as a finding about the **Bedrock Meta serving limit** — not a
+> limitation of Llama 3.1 8B itself, which has no such ceiling when served elsewhere —
+> and the other four models are **NOT** lowered to 4096 in response.
+
+Lowering the others would be the tempting move, by analogy with B3-D2's original
+uniformity argument. It is wrong here for the same reason B3-D2 was: it would propagate
+one host's serving limit to models that do not have it, and make every condition worse
+in order to make one number match.
+
+**Outcome, applied 2026-08-14.** The open-weight whole-corpus run did truncate
+(`2026-08-14T20:29:28Z-f800`, `stop_reason: "length"` at exactly 4,096 tokens). The
+decision rule above therefore applies as written: this is reported as a finding about
+the Bedrock Meta serving limit, and the other four models' caps are unchanged.
+
+One thing the rule didn't anticipate, so it is recorded rather than folded silently
+into "it truncated": the response was not 4,096 tokens of genuine content cut off
+mid-thought. It is 7 real classes followed by a mechanical repetition-degeneration
+loop — the model cloning earlier classes' attribute lists under invented combinatorial
+names (`Lease Renewal`, `Lease Termination Notice`, `Lease Cancellation Notice
+Agreement`, …) rather than extracting anything new, and the cap caught it mid-loop.
+Full evidence and analysis in `results/findings/B3-FINDINGS.md`, "Whole-corpus
+condition (Bedrock)". This does not change the decision rule's application — the cap
+is still the reason the run has no usable output — but it changes what should be said
+about *why* an 8B model in particular hits it, and that distinction belongs in
+Limitations rather than being silently absorbed into "the model had too much to say."
 
 ## B3-D4 — Consolidation across batches is naive, deliberately
 
@@ -579,6 +863,13 @@ easier to break than a statistical method does:
   nonzero taxonomy score here is *not* a bug — it means a model produced hierarchy
   unprompted, which is itself a finding.
 
+*Revised 2026-08-14: `metadata` gains `batching` (`"whole"` | `"batched"`),
+`batch_size`, and `usage` (per-call stop reason and completion-token count). Additive
+and contract-safe — `parse_induced_schema` ignores metadata entirely and
+`load_induced_metadata` is a bare `data.get("metadata", {})`. Required by B3-D6: two
+runs of one model in the two call shapes are otherwise indistinguishable from their
+output alone, and comparing them is the entire point of that entry.*
+
 One further rule is specific to B3: **no gold-schema vocabulary in the modules or in
 the prompt** (Critical Rule 1). A gold term in the prompt would make all five models
 oracles handed the answer key. The prompt is the likeliest place for this to slip in
@@ -588,6 +879,41 @@ relation labels: the prompt cannot say "list" (gold `lists`), "properties" (gold
 `Property`), or "covers"/"reports"/"concerns". It says "array", "attributes",
 "links" instead. Enforced by `test_no_domain_vocabulary_leakage`, which is itself
 checked against a planted term so it cannot pass vacuously.
+
+## B3-D6 — The Groq batched run is retained as its own condition, not superseded
+
+*New 2026-08-14, alongside the B3-D2 and B3-D1c revisions above.*
+
+Moving the open-weight model to Bedrock and to whole-corpus prompting would ordinarily
+retire the 2026-08-12 Groq run as a superseded first attempt. **Keeping it instead turns
+it into evidence.**
+
+The registry therefore holds **six conditions, not five**: `llama318b_bedrock` and
+`llama318b_groq` are the same open weights on two hosts, with distinct `model_id`s so
+`metadata.model` and the output filenames tell them apart. `--batch-size 7` reproduces
+the original run exactly — verified by dry run, per-batch char counts matching B3-D2's
+table to the character (9,889 / 8,764 / 11,528 / …).
+
+**Why this is worth the extra condition.** The difference between the two arms is a
+direct measurement of **what cross-batch fragmentation costs when nothing intelligent
+stitches the pieces back together** — same weights, same frozen prompt, same document
+order, same naive consolidation, differing only in how many documents ride in a call.
+That is exactly the gap P1's Stage 6 exists to close, so it is not a housekeeping detail
+but a load-bearing number for the paper's central argument. Discarding the batched run
+would have destroyed the only evidence for why the rework was needed at all.
+
+**What it is not.** It is not a clean two-factor experiment: the two arms differ in host
+(Groq vs. Bedrock) and output cap (2048 vs. 4096) as well as in call shape. Those are
+confounds and must be named as such wherever the comparison is reported. The reason they
+are not eliminated — by re-running the batched arm on Bedrock — is that doing so would
+spend money to weaken the *other* thing the Groq run uniquely holds, which is the only
+genuinely zero-cost cell in the grid (B3-D1c's reframe). `# TODO: decide before the
+Results section whether a batched Bedrock run is worth buying to de-confound this.`
+
+**What is held constant, structurally:** `batch_documents()` still takes no `ModelSpec`,
+the call shape is decided in one place in `main()` and never reaches
+`build_request_body()`, and the document order is byte-identical between the arms — so
+the whole-corpus prompt is literally the batched sequence concatenated.
 
 ---
 
