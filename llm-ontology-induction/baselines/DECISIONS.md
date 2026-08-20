@@ -371,6 +371,118 @@ exact provider identifier for each is what lands in `metadata.model` — results
 the artifact that produced them, never a friendly alias that could later be
 repointed.
 
+---
+
+### Revised 2026-08-19: three Anthropic conditions, direct API, Bedrock/Groq/open-weight all retired. Was the five-model grid above.
+
+**The brief changed, not just the models.** The user's own words: *"we will use these
+models from Anthropic only,"* replacing the two-vendor × two-tier grid with:
+
+| Condition | Models | Provider | Calls |
+|---|---|---|---|
+| B3 | Haiku 4.5, Opus 4.8, Opus 5 | Anthropic (direct API) | 1 whole-corpus call per model |
+| P1 | Haiku 4.5, Opus 4.8, Opus 5 | Anthropic (direct API) | N per-doc extraction calls + 1 consolidation call per model |
+
+**What's dropped, and why the old reasoning was still right about the wrong
+constraint.** The two-vendor grid above existed to separate "LLMs do this well"
+from "*this* LLM does this well" — a real, still-valid concern in the abstract.
+What actually consumed the sessions between that decision and this one was not the
+grid's logic but its *transport*: Fable 5 turned out to need an AWS account
+entitlement this account was never granted (a genuine "contact AWS Sales" wall, not
+a missed click — see the resolved-and-then-abandoned Finding 4 below); Sol and Luna
+were never reachable through `bedrock-runtime` at all, only through a
+`bedrock-mantle` Responses API this codebase never built a client for; and the
+open-weight condition's whole reason for existing on Groq — reproducibility without
+a vendor account — was already compromised the moment it moved to Bedrock (see
+B3-D1c below: *"open-weight model, paid hosting,"* not *"zero-cost"*). Three
+separate transport problems, one after another, each real and each independently
+blocking. Moving to direct Anthropic API calls removes every one of them at once,
+because none of the three was actually about *which model* — all three were about
+*how a call reaches it*.
+
+**What's lost, stated plainly rather than left for a reader to notice on their
+own:** this is no longer a two-vendor comparison. OpenAI's Sol/Luna cell and the
+open-weight/Llama cell are both gone from the active grid. The vendor-independence
+argument this entry opened with — "one model cannot separate general LLM capability
+from this LLM's capability" — is weaker with three same-vendor conditions than it
+was with a 2×2 grid, and that is a real limitation to state in the paper, not paper
+over. What is preserved: two capability tiers within the surviving vendor (Haiku
+4.5 budget; Opus 4.8 and Opus 5 frontier, one generation apart from each other),
+which still lets the paper separate "frontier vs. budget" from "which Opus
+generation" as two different axes.
+
+**"Opus 4.8/5" was given as the frontier pick, ambiguously.** Rather than guess
+which one was meant, both are real, runnable conditions (`opus48`, `opus5`) — see
+B3-D1 (revised) — so the choice is visible in the results rather than made
+silently on the user's behalf.
+
+**Nothing above is deleted.** The five-model grid, B3-D1a (Luna's reasoning
+effort), B3-D1b (the Groq-era budget estimate), and B3-D1c (the Ollama → Groq →
+Bedrock chain) all stay as written below — they are the accurate record of what was
+actually tried, in order, and why each step was abandoned. The Bedrock and Groq
+runs already completed and scored (Llama batched and whole-corpus, Haiku
+whole-corpus) are not deleted from `results/raw/` or from `B3-FINDINGS.md` either —
+they are real, paid-for, verified evidence about how single-shot prompting behaves
+at different model scales, and that evidence does not stop being true because the
+transport that produced it is no longer the active one. `baselines/b3_single_shot/
+model_clients.py`'s Bedrock-era content and `baselines/p1_pipeline/`'s absence
+before this date are both visible in git history for anyone who wants the prior
+shape back.
+
+### Revised again, 2026-08-19: two conditions, mixed transport — Haiku 4.5 back on AWS Bedrock, only Opus 5 on the direct API. Was the three-Anthropic-condition, direct-API-only grid immediately above.
+
+**The correction, in the user's own words:** *"We're actually gonna use Haiku from
+AWS Bedrock. We're only gonna use Opus 5 from our Anthropic Keys... The rule of
+thumb is Haiku from AWS Bedrock and Opus will be used from API."* This lands within
+the same session as the revision immediately above — the direct-API-only grid was
+never run against, just reworked again before a single live call was made.
+
+| Condition | Models | Transport | Calls |
+|---|---|---|---|
+| B3 | Haiku 4.5, Opus 5 | Haiku: AWS Bedrock. Opus 5: Anthropic (direct API). | 1 whole-corpus call per model |
+| P1 | Haiku 4.5, Opus 5 | Same split as B3. | N per-doc extraction calls + 1 consolidation call per model |
+
+**Two changes, not one.** First, `opus48` is dropped: the prior revision's "given
+ambiguously, so wire up both" hedge is resolved by the user naming Opus 5 alone,
+repeatedly, across both the interrupted message and its full follow-up. `opus48`'s
+code and registry entry are removed; it is not deleted from *this file's* history
+above, which stays as the accurate record of why both were briefly wired up.
+Second, Haiku moves back to AWS Bedrock while Opus 5 stays on the direct API — a
+single model, calling through the transport it actually needs credentials for,
+rather than the whole grid pinned to one transport. This is smaller than it looks:
+the immediately-preceding revision's stated reason for leaving Bedrock entirely was
+Fable 5's entitlement wall and Sol/Luna's unreachability through `bedrock-runtime`
+— neither of which applies to Haiku 4.5, which was already working on Bedrock
+before this session's pivot to direct-API-only (see B3-D1c below). Haiku going back
+to Bedrock is not undoing that finding; it's noting the finding was never about
+Haiku in the first place.
+
+**This resolves a flagged discrepancy rather than leaving it open.** B3-D3
+(revised, 2026-08-19) flagged that Haiku's `supports_top_p=False` constraint had
+been *empirically confirmed only on Bedrock*, and that carrying it into a
+direct-API-only Haiku condition was "carried forward as a prediction, not
+re-verified" against a transport where it had never actually been tested. Moving
+Haiku back to Bedrock removes the open question rather than answering it under a
+new transport: the constraint is reinstated exactly as originally measured, on the
+exact transport it was measured on.
+
+**What this means for `model_clients.py`:** the module now carries two backends,
+selected per `ModelSpec.backend` (`"bedrock"` | `"anthropic_api"`), with the
+request-building and response-reading logic split into backend-specific pure
+functions (`_build_bedrock_body`/`_build_anthropic_api_kwargs`,
+`extract_from_bedrock_payload`/`extract_from_anthropic_message`) behind two
+transport-agnostic entry points, `build_request(spec, prompt)` and
+`invoke(spec, prompt)`. Both `single_shot.py` and `pipeline.py` call only
+`invoke(spec, prompt)` and never branch on transport themselves — B3's and P1's own
+code needed zero changes for this revision, which is exactly what "mixed
+transport, one shared registry" is supposed to buy.
+
+**`requirements.txt` and `.env` follow the transport, not the vendor list:**
+`boto3` is back (Haiku only), `anthropic` stays (Opus 5 only), `AWS_PROFILE`/
+`AWS_REGION` are restored as live values, `ANTHROPIC_API_KEY` stays. `GROQ_API_KEY`
+remains present-but-unused, as it was after the prior revision — still not deleted,
+still the user's credential rather than the repo's concern.
+
 ### B3-D1a — Luna runs at `reasoning_effort="low"`, always
 
 The budget tier is only a controlled comparison if both budget models are actually
@@ -412,8 +524,13 @@ Across the plausible price range for the tiers involved, a full five-model sweep
 `# TODO: confirm exact per-model $/MTok before quoting a figure in the paper` —
 the token arithmetic above is real; the dollar conversion is not yet.
 
-### B3-D1c — Local/open-weight model moved from on-device Ollama to Groq's free tier,
-and from qwen3:8b to llama-3.1-8b-instant
+### B3-D1c — Local/open-weight model moved from on-device Ollama to Groq's free tier, and from qwen3:8b to llama-3.1-8b-instant — then from Groq to Bedrock
+
+*Revised 2026-08-14: the open-weight condition now runs on **AWS Bedrock**
+(`us.meta.llama3-1-8b-instruct-v1:0`), not Groq. **This changes what the condition
+measures** — see the reframe at the end of this entry. The Groq entry is retained as a
+separate condition (B3-D6), not deleted. Everything below is the original record.*
+
 
 Tested qwen3:8b via Ollama directly on an M3 MacBook, 8GB unified memory —
 confirmed infeasible (severe memory pressure). Pivoted to Groq's free,
@@ -437,7 +554,52 @@ B3-D1b's corrected figure) is trivially within Groq's free-tier *daily* limits; 
 *per-minute* limit is a separate, tighter constraint that did bind — see B3-D2 and
 B3-D3.
 
-## B3-D2 — Fixed batch size of 7, documents interleaved round-robin across subdirectories, uniform across all five models
+---
+
+#### Groq → Bedrock, and the reframe it forces (revision of 2026-08-14)
+
+The same weights are served on Bedrock as `meta.llama3-1-8b-instruct-v1:0` with a **128K
+context window** and no per-minute token cap. Moving there is what dissolved the
+constraint behind B3-D2 and B3-D3, so the open-weight condition stops being the one that
+drags every other condition's task shape down to its hosting limit.
+
+**Model ID: the *geo* inference ID `us.meta.llama3-1-8b-instruct-v1:0`, not the bare
+`meta.` one.** Read off the model card's own regional table rather than guessed:
+us-east-1 and us-east-2 are In-Region ✗ / Geo ✓, and only us-west-2 serves the bare ID
+on demand. The geo ID is callable from all three US regions, which makes the region
+question moot for this condition instead of pinning it to one region. `ModelSpec` also
+gained a `region` field, because Sol and Luna have a genuine regional constraint that
+the default cannot express.
+
+**The reframe, stated explicitly rather than left to be inferred from a model ID.** This
+cell was scoped to answer *"what does an open-weight model get you at zero cost?"* — it
+was the only condition a reader could reproduce without a vendor account. **It now
+answers a different question: "what does an open-weight model get you, on paid
+hosting?"** Two of the three properties survive the move and one does not:
+
+| Property | Before (Groq free tier) | After (Bedrock) |
+|---|---|---|
+| Open weights | ✓ | ✓ |
+| Reproducible without a vendor account | ✓ | ✗ — Bedrock needs an AWS account and billing |
+| Zero cost | ✓ | ✗ — priced per token like the rest |
+
+The paid tiers still have a floor to justify themselves against, and it is still an 8B
+open-weight model. But "the only condition a reader can reproduce for free" is no longer
+true of this cell, and any sentence in the paper that leans on that claim has to be
+rewritten. `# TODO: check the Results and Discussion drafts for a "zero-cost" or "free"
+framing of the open-weight condition before submission.`
+
+This is precisely why the Groq condition is kept alive rather than deleted (B3-D6): it
+is the only thing still holding the zero-cost end of that comparison.
+
+## B3-D2 — ~~Fixed batch size of 7~~ **Whole corpus in one call**, documents interleaved round-robin across subdirectories, uniform across all models
+
+*Revised 2026-08-14. Was `BATCH_SIZE = 7`, applied to every model. Batching is now
+reachable only through an explicit `--batch-size` and exists only to reproduce the one
+run made under it (B3-D6). The interleaved document order is unchanged. **See "What
+made batching wrong" at the end of this entry — the original reasoning below is kept
+because it was correct about the constraint it was solving, and the constraint is what
+turned out to be an artifact.***
 
 *Revised 2026-08-12. Was `BATCH_SIZE = 10`, documents ordered by draining one
 subdirectory fully before the next. Both changed together — see the failure and the
@@ -511,7 +673,63 @@ Enforced structurally: `batch_documents()` takes no `ModelSpec`, so there is no
 parameter through which one model could receive different batches from another
 (`test_batching_cannot_depend_on_the_model`).
 
+---
+
+### What made batching wrong (revision of 2026-08-14)
+
+Everything above is a correct response to a 6,000 TPM cap on Groq's free tier. What it
+missed is that the cap was **a property of one host's free tier, not of the task, and
+not of any model in the grid.** Critical Rule 7 then did its job faithfully and
+propagated that one host's limit to all five conditions — so every model was being
+tested under the weakest-provisioned one's hosting constraint rather than a fair
+like-for-like task shape. Uniformity was the right instinct; it was applied at the
+wrong level.
+
+**Two things forced the re-examination.**
+
+1. **The measured cost of fragmentation.** The one completed batched run produced
+   **67 induced classes against a gold schema of 11** (`results/findings/B3-FINDINGS.md`).
+   The dominant driver was cross-batch fragmentation: 28 stateless calls, none of which
+   could see what any other had already named. `Tenant` accumulated 58 attributes,
+   largely the same underlying facts reworded per batch. That is the cost of the
+   *hosting workaround*, and reporting it as the cost of single-shot prompting would
+   have made B3 a strawman.
+2. **The constraint dissolved.** Llama 3.1 8B is served on Bedrock with a **128K
+   context window** (B3-D1c, revised). The corpus rendered through the frozen prompt is
+   **151,831 chars ≈ 43,400 input tokens** — measured, not estimated, by rendering it.
+   Every model in the grid now clears the whole corpus in one call with room to spare.
+
+**Decision:** the corpus goes to the model in **one call**. `--batch-size` still exists,
+labelled legacy in the code and the help text, reachable only when passed explicitly,
+and used for exactly one thing: reproducing the 2026-08-12 Groq run (B3-D6).
+
+**What this does *not* change:**
+
+- **B3-D4 is not relaxed.** With one call there is one schema to merge, so the naive
+  exact-string consolidation becomes a no-op. The rule is not weakened — it stops
+  biting. No fuzzy matching, no embeddings, no LLM call has been added, and
+  `test_distinct_wordings_are_never_merged` still passes unmodified.
+- **Critical Rule 7 still holds structurally.** `batch_documents()` still takes no
+  `ModelSpec`, and the call shape is decided in exactly one place in `main()` and never
+  reaches `build_request_body()` — so the same model sends a byte-identical body in
+  either shape (`test_the_body_is_identical_whatever_the_call_shape`). Without that,
+  B3-D6's two arms would differ in two ways at once and neither result could be
+  attributed.
+- **Document order is untouched.** The round-robin interleaving above stays, so the
+  whole-corpus prompt is literally the batched sequence concatenated. Ordering does not
+  become a silent new variable between the two arms.
+
+**What it costs, stated plainly:** whole-corpus removes fragmentation as a failure mode
+*structurally*, which is a real advantage handed to B3 over the version of B3 already
+run. That is the point — B3 should be the strongest honest version of "one prompt, no
+staged decomposition", because P1 has to beat it. It is not prompt tuning: the prompt
+(Critical Rule 2) is byte-identical and was not touched.
+
 ## B3-D3 — Frozen sampling settings
+
+*`MAX_OUTPUT_TOKENS` revised 2026-08-14: the single global constant is gone, replaced
+by a per-model `ModelSpec.max_output_tokens`. See "Why the cap had to become per-model"
+below.*
 
 *`MAX_OUTPUT_TOKENS` revised 2026-08-12. Was `8192`.*
 
@@ -532,6 +750,297 @@ temperature. `ModelSpec.supports_temperature` exists so a model that refuses `0.
 omit it in one visible place rather than by special-casing the sampling settings; if
 that flag has to be flipped for Sol or Luna, the change gets recorded here and every
 affected number re-run.
+
+---
+
+### `supports_top_p`, a second per-model sampling exception (revision of 2026-08-14)
+
+Confirmed at the first real Haiku 4.5 call, after the model-ID fix above got past the
+first error: a body carrying both `temperature` and `top_p` raised **"`temperature`
+and `top_p` cannot both be specified for this model. Please use only one."** This is
+not a Haiku-specific quirk — it is documented behavior of Claude 4.5+ models on
+Bedrock generally (also reported for Sonnet 4.5 and Opus 4.7/4.8): they reject the
+combination outright, independent of what either value is.
+
+`supports_temperature` alone cannot express this: it is all-or-nothing, and dropping
+*both* settings to fix a conflict over one of them would be wrong. **Decision:**
+`ModelSpec` gains a second, independent flag, `supports_top_p`. `haiku45` sets it
+`False`; `temperature=0.0` is kept, `top_p` is omitted entirely from its request body.
+
+**This is not a new judgment call about which value to sacrifice** — B3-D3's own row
+above already documents `top_p=1.0` as *"Neutral — with temperature at 0 it does
+nothing"*. Omitting a setting already on record as a no-op costs nothing; the
+load-bearing setting (`temperature=0.0`, kept for reproducibility) is untouched.
+
+Enforced on the request body, not just the flag:
+`test_haiku_omits_top_p_but_keeps_temperature` asserts `top_p` is absent from the
+actual body sent, and `test_supports_temperature_and_supports_top_p_are_independent_
+flags` pins that the two settings can be dropped independently rather than coupled.
+
+**Watch for this on Fable 5 too when its blocker (Finding 4, sampling constraints
+incompatible with `TEMPERATURE=0.0`/`TOP_P=1.0` entirely) gets resolved** — it is a
+different, harder problem than Haiku's (Fable 5 rejects the frozen *values*, not just
+the *combination*), but the same `supports_temperature`/`supports_top_p` machinery is
+where that decision will need to attach.
+
+---
+
+### Fable 5's blocker resolved (2026-08-15): `supports_temperature`/`supports_top_p` set `False`, a real reproducibility loss recorded rather than absorbed
+
+Fable 5's model card: *"temperature must be 1.0 or unset; top_p must be ≥ 0.99 and
+< 1.0, or unset."* This is not Haiku's problem (reject the *combination*) — it is
+each frozen value individually out of range: `TEMPERATURE=0.0` fails "must be 1.0 or
+unset" outright, and `TOP_P=1.0` fails "< 1.0" (the range is exclusive at 1.0, so
+1.0 itself is excluded). There is no in-range substitute this record can pick without
+inventing a new hyperparameter.
+
+**Decision:** both flags set `False`. Both settings are omitted entirely — the one
+option the model card actually permits ("or unset") — rather than any body carrying
+an out-of-range value.
+
+**This must be stated as a real loss, not a free substitution.** B3-D3 freezes
+`temperature` near zero specifically so a re-run is reproducible enough to debug.
+That guarantee **does not hold for Fable 5**: omitted, the model uses its own
+(unknown, undocumented) default temperature, and Fable 5's adaptive thinking being
+always-on (cannot be disabled, per its model card) compounds this — reasoning
+traces on extended-thinking models are known to vary run-to-run even when the
+sampling temperature is pinned elsewhere. **Fable 5 is the one B3 condition where a
+repeated run is not expected to reproduce the same schema**, and that has to be
+stated plainly wherever B3-D3's reproducibility claim is cited in the paper, not
+left to be discovered by a reviewer re-running the experiment.
+
+**A second, unrelated finding folded in here because it surfaced from the same
+model card while resolving this:** Fable 5's card documents `stop_reason:
+"refusal"` for content-policy blocks, with refusal rates "materially higher than
+on previous Claude models," and instructs callers to treat it as "a primary
+response path." The existing truncation guard could not have told a refusal apart
+from an ordinary empty response — it would have surfaced as a bare `ValueError`
+indistinguishable from a model that legitimately found nothing. **New:**
+`RefusalError`, structurally parallel to `TruncatedResponseError` (both now share a
+`ModelResponseError` base) — fatal, not retried (a content-policy block is
+deterministic at temperature 0, same as a cap cutoff), carries whatever partial
+text came back, and is logged in the run's raw JSONL as `stop_reason: "refused"`,
+distinct from `"truncated"`, so the two failure modes are never conflated by
+whoever reads the log. Scoped to the anthropic family only — the constraint is
+model-documented, not assumed to generalize to Meta or OpenAI-family stop reasons.
+
+**Still open, not resolved here — verified but not run:** the model card's separate
+data-retention requirement — *"To use this model, you must opt in to provider data
+sharing by setting your data retention mode to `provider_data_share` via the Data
+Retention API."* Confirmed against AWS's own abuse-detection page and the API
+reference (not guessed): Anthropic requires this specifically for Fable 5 —
+*"inputs and outputs will be retained for up to 30 days... you must opt in to
+sharing retained traffic with Anthropic for abuse detection and potential human
+review."* The real operation is **`PutAccountDataRetention`** — a **`bedrock`**
+control-plane call (not `bedrock-runtime`, and not something `model_clients.py`'s
+request body can express), one-time and account-level:
+
+```python
+import boto3
+boto3.client("bedrock", region_name="us-east-1").put_account_data_retention(
+    mode="provider_data_share"
+)
+```
+
+Requires IAM permission `bedrock:PutAccountDataRetention`. **This account's IAM
+user could not even list its own attached policies or call
+`bedrock:ListFoundationModels`** (confirmed while debugging the earlier Haiku
+Marketplace-subscription block) — it is narrowly scoped to `bedrock:InvokeModel`
+and almost certainly lacks this permission too. Expect either an `AccessDenied`
+here or, if skipped, an access/validation error on the first Fable 5 `invoke_model`
+call — a different failure from anything this revision fixes, and one this session
+cannot resolve without broader IAM access than the current user has.
+
+---
+
+### Why the cap had to become per-model (revision of 2026-08-14)
+
+`2048` was a Groq free-tier artifact and nothing else: that tier reserves the full
+requested output against its per-minute cap regardless of what the model generates, so
+a large cap starved the input. On Bedrock nothing reserves anything, and the number was
+left describing a constraint no longer present.
+
+The obvious fix — one larger global — does not survive contact with the grid, because
+**the ceiling is not the same for every model.**
+
+| Condition | `max_output_tokens` | Basis |
+|---|---|---|
+| `fable5`, `haiku45`, `sol`, `luna` | `16000` | Headroom over the largest plausible whole-corpus schema. Haiku 4.5's real Bedrock ceiling is 64,000; 16,000 is chosen for headroom, not because more is unavailable. |
+| `llama318b_bedrock` | **`4096`** | The Llama 3.1 8B Instruct model card states **"Max output tokens: 4K"** flat, against its 128K context window. Verified this is a property of the model as served and not of the API surface: Converse is supported and maps `maxTokens` onto the same limit, so there is no way around it. |
+| `llama318b_groq` | `2048` | Held at the historical value on purpose (B3-D6). Raising it would make a re-run a different experiment from the one already reported. |
+
+**Decision:** `max_output_tokens` moves onto `ModelSpec`. It is a property of the model
+as served — **never** of the call shape. Whole-corpus and batched runs of the same model
+send a byte-identical request body; enforced structurally, since `build_request_body()`
+takes no batching argument and reads the cap only from the spec
+(`test_the_output_cap_comes_from_the_spec_and_differs_per_model`,
+`test_the_body_is_identical_whatever_the_call_shape`).
+
+**A truncation guard, failing loud, with no retry.** `TruncatedResponseError` is raised
+whenever the provider reports stopping at the cap — meta `stop_reason == "length"`,
+anthropic `"max_tokens"`, openai `finish_reason == "length"`. A truncated schema is
+never merged and never written to a result file. It is deliberately *not* retried: at
+`TEMPERATURE = 0.0` an identical prompt returns an identical cut-off response, so
+retrying spends money to fail the same way, and the only fixes would be mutating a
+frozen value mid-run. The error's wording is itself load-bearing — `is_transient()`
+matches on message text, so a stray "rate limit" or "timeout" in the phrasing would burn
+five retries on a perfectly deterministic failure
+(`test_a_truncated_response_is_never_treated_as_transient`). The cut-off text *is* kept
+and written to the run log: fatal must not mean evidence-destroying.
+
+Every call records its stop reason and completion-token count, into the per-call JSONL
+and into `metadata.usage`. A run that finished well under its cap is the evidence that
+the differing caps had no effect, and that claim cannot be made if nothing recorded it.
+
+**A prediction, recorded before the run** (measured, not guessed): the merged schema
+from the 28-batch Groq run is **25,094 chars ≈ 7,170 tokens** — and that is the
+*deduplicated union*, the smallest honest estimate of what one whole-corpus answer must
+carry. That is **~1.75× the 4,096 ceiling**. Whole-corpus should over-generate less than
+28 fragmented calls did, so 7,170 is an upper bound rather than a forecast, but the
+margin is not comfortable and the open-weight whole-corpus run may well truncate.
+
+**Decision rule, fixed now so the outcome cannot be rationalized afterward:**
+
+> If no run in the matrix reaches its output cap, the differing caps had no effect and
+> are noted in Limitations only. If the open-weight whole-corpus run truncates at 4096,
+> that is reported as a finding about the **Bedrock Meta serving limit** — not a
+> limitation of Llama 3.1 8B itself, which has no such ceiling when served elsewhere —
+> and the other four models are **NOT** lowered to 4096 in response.
+
+Lowering the others would be the tempting move, by analogy with B3-D2's original
+uniformity argument. It is wrong here for the same reason B3-D2 was: it would propagate
+one host's serving limit to models that do not have it, and make every condition worse
+in order to make one number match.
+
+**Outcome, applied 2026-08-14.** The open-weight whole-corpus run did truncate
+(`2026-08-14T20:29:28Z-f800`, `stop_reason: "length"` at exactly 4,096 tokens). The
+decision rule above therefore applies as written: this is reported as a finding about
+the Bedrock Meta serving limit, and the other four models' caps are unchanged.
+
+One thing the rule didn't anticipate, so it is recorded rather than folded silently
+into "it truncated": the response was not 4,096 tokens of genuine content cut off
+mid-thought. It is 7 real classes followed by a mechanical repetition-degeneration
+loop — the model cloning earlier classes' attribute lists under invented combinatorial
+names (`Lease Renewal`, `Lease Termination Notice`, `Lease Cancellation Notice
+Agreement`, …) rather than extracting anything new, and the cap caught it mid-loop.
+Full evidence and analysis in `results/findings/B3-FINDINGS.md`, "Whole-corpus
+condition (Bedrock)". This does not change the decision rule's application — the cap
+is still the reason the run has no usable output — but it changes what should be said
+about *why* an 8B model in particular hits it, and that distinction belongs in
+Limitations rather than being silently absorbed into "the model had too much to say."
+
+---
+
+### Revised 2026-08-19: direct-API sampling, thinking, effort, and per-model caps for the three surviving conditions. The Bedrock-era caps table, the truncation-guard/`is_transient` retry apparatus, and the Fable-5/Llama-specific material above are superseded, not deleted.
+
+With Bedrock and Groq gone (B3-D1, revised) the whole shape of this decision
+changes: there is no per-provider request-body branching left (Meta, OpenAI, and
+Anthropic-on-Bedrock shapes all disappear along with the providers that needed
+them), and the sampling story is now about what the **direct Anthropic Messages
+API** accepts per model, not about what one specific hosting surface enforced.
+
+**Sampling: `haiku45` keeps the frozen values; both Opus conditions reject them
+outright, confirmed against Anthropic's own current API documentation.**
+`temperature`, `top_p`, and `top_k` are removed entirely on Opus 4.7 and later —
+sending any of them is a 400, independent of value. This is not the Haiku-specific
+"can't combine both" problem found on Bedrock (the entry above) — it is a harder,
+flat rejection of the parameters existing at all. `opus48` and `opus5` therefore
+set both `supports_temperature=False` and `supports_top_p=False`; `TEMPERATURE`
+and `TOP_P` are never sent to either, and there is no fallback value to pick,
+because none exists — the API does not take one.
+
+**What replaces sampling control on the two Opus conditions: adaptive thinking at
+a fixed effort level, not a substitute for reproducibility so much as an
+acknowledgment that reproducibility in the old sense does not survive the move.**
+`thinking={"type": "adaptive"}` plus `output_config={"effort": "high"}`, applied
+identically to `opus48` and `opus5`. `effort` is the closest analog Opus offers to
+a frozen dial — fixed, documented, and applied uniformly — but it does not pin
+sampling the way `TEMPERATURE = 0.0` did; adaptive thinking is explicitly
+non-deterministic in depth and content run to run. **State this plainly wherever
+B3-D3's original reproducibility claim is cited**: it holds for `haiku45` exactly
+as before, and does not hold for `opus48`/`opus5` in the way it used to hold for
+every condition when everything ran through Bedrock.
+
+**A flag worth carrying into the paper's methods section, not resolved here:**
+Anthropic's own documentation groups Haiku 4.5 with "older models" that still
+accept `temperature`/`top_p`/`top_k` — which is what `haiku45`'s spec assumes. The
+Bedrock-era entry above found the *opposite* for Haiku 4.5 specifically (`top_p`
+had to be dropped to avoid a 400) empirically, on that transport. Whether that
+was a Bedrock-specific enforcement quirk that does not carry over to the direct
+API, or documentation that is itself stale, is not yet confirmed against a real
+call — the first real Haiku run under this rework settles it, the same discipline
+applied throughout this project: verify against a real response before trusting
+either the docs or the prior transport's behavior.
+
+**Per-model output caps, chosen with thinking's token-sharing in mind:**
+
+| Condition | `max_output_tokens` | Basis |
+|---|---|---|
+| `haiku45` | `16000` | No thinking, no effort — this cap bounds the visible response alone. Generous headroom over the largest plausible whole-corpus schema; Haiku 4.5's real ceiling is 64,000. |
+| `opus48`, `opus5` | `32000` | **Not directly comparable to Haiku's 16,000** — on a thinking-enabled call this cap is shared between the model's thinking and its visible response combined, not the response alone. A non-thinking-equivalent cap would starve reasoning before any schema text is written. 32,000 is generous headroom under both models' real 128,000-token ceiling, chosen without a completed run to calibrate against — flagged as a prediction, the same way the Llama 4,096-token cap was predicted-then-checked in the entry above, and to be revisited once a real Opus run shows how much of the cap thinking alone consumes. |
+
+**The custom retry apparatus (`is_transient()`, `_TRANSIENT_MARKERS`,
+`_with_retries()`) is removed, not ported.** It existed to hand-roll exactly what
+the official `anthropic` SDK already does natively — retry 429/5xx/connection
+errors with backoff — via message-substring matching, which is exactly the kind
+of thing a stray word in an error message could quietly break (as the truncation
+guard's own docstring above warned about its own wording). `baselines/shared/
+model_clients.py` now configures the SDK client with `max_retries=5` (the same
+frozen value) and lets the SDK's own typed exceptions do this correctly. This is
+a genuine simplification the move enables, not a loss: `TruncatedResponseError`
+and `RefusalError` remain fatal-not-retried, but that is now enforced by their
+type (never raised from a transport failure, so never routed into the SDK's own
+retry path) rather than by keeping their wording clear of a hand-maintained
+substring list.
+
+**The truncation and refusal guards themselves carry over unchanged in spirit,
+generalized to one body shape instead of three.** `TruncatedResponseError` on
+`stop_reason == "max_tokens"`, `RefusalError` on `stop_reason == "refusal"` — both
+now checked unconditionally (there is only the Anthropic family left, so the
+"scoped to the anthropic family only" caveat two entries up no longer needs
+scoping). Both still carry whatever partial text came back rather than
+discarding it, and neither is ever merged or scored.
+
+### Revised again, 2026-08-19: Haiku moves back to AWS Bedrock (B3-D1, revised again); `opus48` is dropped. This resolves the flag immediately above rather than leaving it open.
+
+The flag two paragraphs up asked whether Haiku's Bedrock-only `top_p` rejection was
+a transport quirk or stale documentation, "not yet confirmed against a real call."
+That question is moot now, not answered: Haiku goes back to the exact transport the
+constraint was originally measured on, per the user's correction recorded in B3-D1
+(revised again, above) — *"Haiku from AWS Bedrock and Opus will be used from API."*
+`haiku45.supports_top_p` reverts to `False`, `supports_temperature` stays `True`,
+exactly as first measured, with no new claim about how Haiku behaves on the direct
+API left dangling.
+
+Two backends now coexist in `model_clients.py`, one per model, and the two paragraphs
+above describing "the direct Anthropic Messages API" apply to `opus5` only:
+
+| Condition | Transport | `max_output_tokens` | Sampling | Thinking/effort |
+|---|---|---|---|---|
+| `haiku45` | AWS Bedrock | `16000` | `temperature=0.0` only — Bedrock 400s if `top_p` is also present (empirically confirmed on this exact transport, this exact model) | none |
+| `opus5` | Anthropic (direct API) | `32000` | none — rejected outright by the API on Opus 4.7+ | `thinking={"type": "adaptive"}`, `output_config={"effort": "high"}` |
+
+`opus48`'s row is removed along with the condition itself (B3-D1, revised again) —
+its cap and sampling rule were identical to `opus5`'s and are not lost information,
+just no longer a live row.
+
+**Request/response handling is now genuinely two functions per direction, not one
+generalized shape.** `build_request` dispatches to `_build_bedrock_body` (Bedrock's
+`anthropic_version`/block-structured `content`, model ID passed to `invoke_model`
+separately, not in the body) or `_build_anthropic_api_kwargs` (plain-string
+`content`, `model` in the kwargs) by `spec.backend`; response reading dispatches
+similarly to `extract_from_bedrock_payload` or `extract_from_anthropic_message`.
+The truncation/refusal checks (`_check_not_truncated`/`_check_not_refused`) stay
+backend-agnostic, called from both extraction functions — the guards described
+above did not need to change, only where they're called from.
+
+**The SDK-native retry story splits the same way, rather than only applying to
+Anthropic's SDK as the paragraph above assumed.** `invoke_anthropic_api` keeps
+`anthropic.Anthropic(max_retries=5)` exactly as described above; `invoke_bedrock`
+gets its own equivalent, `boto3.client("bedrock-runtime", config=Config(retries=
+{"max_attempts": 5, "mode": "standard"}))` — boto3's built-in standard retry mode,
+the same "let the SDK do it, don't hand-roll message-substring matching" reasoning
+applied to the transport that needed reintroducing.
 
 ## B3-D4 — Consolidation across batches is naive, deliberately
 
@@ -559,6 +1068,21 @@ borrow the scorer's brain.
 Expect this to cost B3 precision: the same entity emitted under three wordings is one
 true positive and two false positives. That cost is the measurement, not a defect.
 
+*Revised 2026-08-19: "P1's Stage 6" above refers to a staged design P1 never ended up
+being — the actual P1 (`baselines/p1_pipeline/`, see P1-D1 below) is two stages, N
+per-document extractions plus one consolidation call, and the consolidation call is
+what does the cross-wording resolution this entry describes B3 as deliberately not
+doing. The reasoning is unchanged; only the stage number was aspirational and is now
+wrong. Also worth stating precisely rather than left implicit: with B3 now always a
+single whole-corpus call (B3-D2, revised), this merge key structurally never sees more
+than one source schema — B3-D4 governs `clean_schema()`'s within-response cleanup
+(dropping malformed elements, collapsing literal duplicates the model repeated in its
+own output), not a cross-call merge, because there is no second call left to merge
+against. The rule is not weakened by this — it was never a live cross-call mechanism to
+begin with once B3-D2 moved to one call — but it is worth being exact that "naive
+exact-string consolidation" now describes a property of `clean_schema()`'s single-
+source cleanup, not an active multi-source merge step.*
+
 ## B3-D5 — Output contract, identical to B1's
 
 Same JSON contract as B1 (`eval/PLAN.md` §2, `eval/schema_ir.py::parse_induced_schema`):
@@ -579,6 +1103,22 @@ easier to break than a statistical method does:
   nonzero taxonomy score here is *not* a bug — it means a model produced hierarchy
   unprompted, which is itself a finding.
 
+*Revised 2026-08-14: `metadata` gains `batching` (`"whole"` | `"batched"`),
+`batch_size`, and `usage` (per-call stop reason and completion-token count). Additive
+and contract-safe — `parse_induced_schema` ignores metadata entirely and
+`load_induced_metadata` is a bare `data.get("metadata", {})`. Required by B3-D6: two
+runs of one model in the two call shapes are otherwise indistinguishable from their
+output alone, and comparing them is the entire point of that entry.*
+
+*Revised again 2026-08-19: `batching` and `batch_size` are dropped — with only one
+call shape left (B3-D2, revised), a key that would be constant across every future run
+carries no information. `usage` collapses from a per-call list to two direct scalar
+fields, `stop_reason` and `completion_tokens`, since there is only ever one call to
+report on now. Still additive/contract-safe for the same reason as before. B3-D6's
+comparison (which needed `batching` to tell its two arms apart) is itself retired
+along with the Groq transport it compared against — see B3-D1 (revised) and B3-D6
+below.*
+
 One further rule is specific to B3: **no gold-schema vocabulary in the modules or in
 the prompt** (Critical Rule 1). A gold term in the prompt would make all five models
 oracles handed the answer key. The prompt is the likeliest place for this to slip in
@@ -588,6 +1128,53 @@ relation labels: the prompt cannot say "list" (gold `lists`), "properties" (gold
 `Property`), or "covers"/"reports"/"concerns". It says "array", "attributes",
 "links" instead. Enforced by `test_no_domain_vocabulary_leakage`, which is itself
 checked against a planted term so it cannot pass vacuously.
+
+## B3-D6 — The Groq batched run is retained as its own condition, not superseded
+
+*New 2026-08-14, alongside the B3-D2 and B3-D1c revisions above.*
+
+Moving the open-weight model to Bedrock and to whole-corpus prompting would ordinarily
+retire the 2026-08-12 Groq run as a superseded first attempt. **Keeping it instead turns
+it into evidence.**
+
+The registry therefore holds **six conditions, not five**: `llama318b_bedrock` and
+`llama318b_groq` are the same open weights on two hosts, with distinct `model_id`s so
+`metadata.model` and the output filenames tell them apart. `--batch-size 7` reproduces
+the original run exactly — verified by dry run, per-batch char counts matching B3-D2's
+table to the character (9,889 / 8,764 / 11,528 / …).
+
+**Why this is worth the extra condition.** The difference between the two arms is a
+direct measurement of **what cross-batch fragmentation costs when nothing intelligent
+stitches the pieces back together** — same weights, same frozen prompt, same document
+order, same naive consolidation, differing only in how many documents ride in a call.
+That is exactly the gap P1's Stage 6 exists to close, so it is not a housekeeping detail
+but a load-bearing number for the paper's central argument. Discarding the batched run
+would have destroyed the only evidence for why the rework was needed at all.
+
+**What it is not.** It is not a clean two-factor experiment: the two arms differ in host
+(Groq vs. Bedrock) and output cap (2048 vs. 4096) as well as in call shape. Those are
+confounds and must be named as such wherever the comparison is reported. The reason they
+are not eliminated — by re-running the batched arm on Bedrock — is that doing so would
+spend money to weaken the *other* thing the Groq run uniquely holds, which is the only
+genuinely zero-cost cell in the grid (B3-D1c's reframe). `# TODO: decide before the
+Results section whether a batched Bedrock run is worth buying to de-confound this.`
+
+**What is held constant, structurally:** `batch_documents()` still takes no `ModelSpec`,
+the call shape is decided in one place in `main()` and never reaches
+`build_request_body()`, and the document order is byte-identical between the arms — so
+the whole-corpus prompt is literally the batched sequence concatenated.
+
+*Revised 2026-08-19: this comparison is retired going forward, not superseded in the
+sense of being wrong — the open-weight/Llama condition itself is gone from the active
+grid (B3-D1, revised), so there is no `llama318b_bedrock` to compare the retained
+`llama318b_groq` run against anymore, and no future run will add a second data point to
+either arm. The `# TODO` above about buying a de-confounding Bedrock batched run is
+moot for the same reason. **The comparison's actual finding does not stop being true**:
+fragmentation cost precision without breaking coherence, whole-corpus removed
+fragmentation but broke an 8B model's coherence outright (see the repetition-
+degeneration finding recorded earlier in B3-D3) — that remains real, reportable evidence
+about scale-dependent single-shot behavior, just no longer an axis this project keeps
+collecting data on. Both runs and this section stay in the record for that reason.*
 
 ---
 
@@ -612,3 +1199,206 @@ prediction rather than rationalized after it:
 
 If class F1 comes back near-perfect at M1, suspect vocabulary leakage into the prompt
 (Critical Rule 1) before celebrating.
+
+---
+---
+
+# P1 Baseline — Design Decisions
+
+Frozen decisions for **P1**, the staged-pipeline baseline
+(`baselines/p1_pipeline/pipeline.py` + `baselines/p1_pipeline/prompts/
+p1_consolidation_prompt.md` + the extraction prompt and calling code it shares with
+B3). Built 2026-08-19, alongside B3's move to direct-API-only calling — first
+decisions recorded here **before any P1 call of any kind**, the same discipline B1
+and B3 were held to.
+
+P1 is what B3 is measured against. Where B3 asks a model to read the whole corpus
+in one breath and merges the answer by exact string match (B3-D4), P1 splits the
+same corpus into one call per document and asks a **second** model call to
+reconcile the N results into one schema — resolving cross-wording the way B3-D4
+deliberately refuses to. That reconciliation is the entire thing this baseline
+exists to measure the value of; everything else about P1 is held as close to B3 as
+possible so that the comparison isolates it.
+
+## P1-D1 — Two stages: N per-document extraction calls, then one consolidation call
+
+**Decision:** for a corpus of N documents, make N calls — one per document, each
+asking for that single document's partial schema — then one further call that is
+handed all N partial schemas and asked to produce one final, reconciled schema.
+Both calls go through the identical model for a given condition; there is no
+cheaper model doing extraction and a stronger one doing consolidation.
+
+**Per-document, not per-batch.** A batch-of-K design (K documents per extraction
+call, like B3's retired legacy shape) would introduce a second free variable —
+batch size — on top of the one this baseline is meant to isolate. Per-document
+extraction removes that variable entirely: every extraction call sees exactly one
+document's worth of context, uniformly, regardless of corpus size or document
+density. The N/1 split is also the plainest possible operationalization of
+"staged" — each stage does the smallest coherent unit of work the next stage can
+build on.
+
+**Why the extraction stage reuses B3's frozen prompt verbatim, rather than P1
+getting its own.** `baselines/p1_pipeline/pipeline.py` imports
+`load_prompt_template`, `render_prompt`, and `parse_response` straight from
+`baselines.b3_single_shot.single_shot` and calls them unmodified, pointed at the
+same `b3_extraction_prompt.md` file (`baselines/b3_single_shot/prompts/`, not
+copied). This is deliberate, not laziness: if P1's extraction prompt differed from
+B3's even slightly, a difference in the final result could be attributed to either
+the prompting or the pipeline shape, and the comparison would stop meaning what the
+paper claims it means. Holding the extraction prompt byte-identical makes the
+consolidation call — the one genuinely new thing P1 does — the *only* variable
+between the two baselines' schemas at the point where they diverge.
+
+**Why the same document order.** `load_documents()` is imported from
+`baselines.b3_single_shot.single_shot` too, unmodified — the corpus is walked in
+the identical round-robin interleaving B3 uses. Document 1 of P1's extraction stage
+sees the identical file B3's whole-corpus call sees first. Order cannot introduce a
+difference either baseline's result could be attributed to.
+
+## P1-D2 — Model calling is shared with B3, not duplicated
+
+`baselines/shared/model_clients.py` — the registry, the request-building
+functions, the response readers, the truncation/refusal guards — is the same
+module B3 imports, with no P1-specific branch anywhere in it. The two frozen
+conditions (`haiku45` on AWS Bedrock, `opus5` on the direct Anthropic API), their
+output caps, their sampling/thinking/effort rules, are exactly B3-D3 (revised
+2026-08-19, twice) unchanged. A P1 extraction call and a B3 whole-corpus call for
+the same model go through the identical `invoke(spec, prompt)` entry point and the
+identical per-backend request-building function, differing only in which prompt
+and how many documents ride in it.
+
+**Decision, stated explicitly so it isn't discovered by omission:** there is no
+independent P1-D3-equivalent sampling decision to make. Sharing the calling module
+is itself the decision — it is what keeps "how a call reaches the model" identical
+across both baselines, so that whatever differs in the results is attributable to
+the staging and the consolidation call, not to two different implementations of the
+same transport plumbing quietly drifting apart.
+
+## P1-D3 — The consolidation prompt: merge by wording, never by invention
+
+**Decision:** a second, separately frozen prompt
+(`baselines/p1_pipeline/prompts/p1_consolidation_prompt.md`, `{{SCHEMAS}}`
+placeholder), given the full list of N partial schemas from Stage 1, serialized as
+JSON and tagged with the source document each came from. It is instructed to:
+
+- merge class (and relation) entries that plausibly name the same real-world kind
+  across partial schemas — different casing, spacing, abbreviation, or genuine
+  synonym — choosing the most frequently occurring wording as the merged name,
+  the same "most frequent wording wins" rule B3's own extraction prompt already
+  uses for a different purpose (picking a wording *within* one document rather than
+  *across* many);
+- keep genuinely different kinds separate even when their names or attribute
+  arrays overlap, told explicitly that a missed merge costs less here than a wrong
+  one — this is the one place P1's design deliberately biases against
+  over-consolidation, since the alternative failure mode (silently collapsing two
+  real gold classes into one) would be invisible in the emitted schema and only
+  show up as a harder-to-diagnose scoring loss;
+- work only from what the partial schemas already contain — explicitly forbidden
+  from adding a class, attribute, or relation that is not present, in some wording,
+  in at least one partial schema. This is a merge of existing extractions, not a
+  second reading of the source documents; the consolidation call never sees the raw
+  corpus text, only Stage 1's output.
+
+**Same output contract as the extraction prompt** (`classes`/`relations`,
+`name`/`parent`/`attributes`, `source`/`label`/`target`) — deliberately, so
+`parse_response` and `clean_schema` (imported from B3, unmodified) apply
+identically to a consolidation response as to an extraction one. Critical Rule 6
+(`parent` stays `null` unless a model volunteers one) is unchanged and applies at
+the consolidation stage exactly as it does everywhere else: nothing in
+`clean_schema()` infers hierarchy; a non-null `parent` in the final output means
+the consolidation call itself decided two merged classes stood in an is-a
+relationship, which is a real finding about that call, not a rule violation.
+
+**Critical Rule 1, extended to a second prompt.** Verified computationally, not
+assumed, before this prompt was ever used: every identifier and literal it
+introduces was checked against the real gold vocabulary loaded from
+`gold_schema.ttl`, the same way every prior prompt and module in this project has
+been. Three real collisions were caught and fixed this way, not hypothetically —
+"list" (from "a list of partial schemas" and "attribute lists"), "resolves" (from
+"resolves this"), and "own" (from "the partial schemas' own vocabulary") all
+normalize to gold relation-label terms (`lists`, `resolves`, `owns`) and were
+rewritten to "set", "reconciles", and "existing" respectively before the leakage
+guard passed clean. Enforced ongoing by
+`baselines/tests/test_p1_pipeline.py::test_no_domain_vocabulary_leakage`.
+
+## P1-D4 — Fault tolerance is asymmetric between the two stages, and that asymmetry is deliberate
+
+**Stage 1 (extraction) tolerates a single call's failure; Stage 2 (consolidation)
+does not.** A truncated, refused, or unparseable extraction call is recorded in the
+raw JSONL and skipped — the run continues with N-1 partial schemas rather than
+aborting — because with N independent calls (192, at full corpus size), one bad
+document does not invalidate the other 191 that already succeeded and were paid
+for. This is the same reasoning the old batched B3 shape used when it tolerated one
+bad batch out of 28 (see the retired B3-D2 material above); it applies here for an
+identical reason.
+
+**The consolidation call has no such tolerance — a truncation, refusal, or parse
+failure there aborts the run.** There is exactly one consolidation call; unlike a
+skipped extraction, there is nothing left to fall back on if it fails, and
+skipping it would mean emitting whatever Stage 1 produced with no reconciliation
+at all — silently changing what condition actually ran. This mirrors B3's own
+single-whole-corpus-call rule (B3-D2, revised) precisely: when a call is the only
+source, its failure is fatal by construction, not a judgment call made per run.
+
+**What gets written to disk either way:** the raw JSONL log captures every
+extraction call attempted (success or failure) plus the consolidation attempt,
+appended even when the pipeline dies mid-run — a paid-for response is never lost
+just because a later stage failed. No final schema JSON is written unless
+consolidation actually succeeds; a partial run must not leave behind a file that
+looks like a completed result.
+
+## P1-D5 — Output contract
+
+Same JSON contract as B1 and B3 (`eval/PLAN.md` §2,
+`eval/schema_ir.py::parse_induced_schema`): `classes` (`name`, `parent`,
+`attributes`), `relations` (`source`, `label`, `target`), with
+`metadata.condition = "P1"` and `metadata.model` set to the exact frozen model ID
+that produced the file — identical to what B3 records for the same model, so a
+reader can compare `metadata.model` values across both baselines without needing
+to know which pipeline produced which file.
+
+`metadata` additionally carries `extraction_calls` (always the document count),
+`extraction_skipped` (how many Stage 1 calls failed — P1-D4), and
+`consolidation_stop_reason` / `consolidation_completion_tokens` (the one Stage 2
+call's outcome). No per-extraction-call detail lives in the metadata itself — that
+level of detail belongs in the raw JSONL log, matching the split B3 already uses
+between its lean `metadata` and its verbose raw call record.
+
+Both Critical Rules inherited from B1/B3 apply unchanged: **no pre-cleaning**
+(Rule 5 — names are emitted exactly as returned; `clean_schema()`'s case/whitespace
+collapsing happens only inside its dedup key, never on an emitted string) and
+**`parent` stays `null` unless volunteered** (Rule 6).
+
+---
+
+## Expected result shape for P1 (a prediction, not a target)
+
+Recorded before the first P1 call, the same discipline B1 and B3 were held to:
+
+- **Higher recall than B3 at the same model**, specifically on the classes B3's
+  naive merge fragments across wordings (B3-D4's known cost). The consolidation
+  call exists to buy back exactly this; if it does not, the staged design is not
+  earning its extra 192 calls' worth of cost over B3's 1.
+- **A real risk of over-consolidation** — the consolidation prompt's own bias
+  against merging genuinely different classes (P1-D3) is a mitigation, not a
+  guarantee. Watch specifically for two gold-distinct classes (e.g. `Owner` and
+  `Agent`, both `Party` subclasses with overlapping attribute vocabulary in the
+  corpus) collapsing into one merged entry — this would be a **P1-specific**
+  failure mode with no B3 analog, since B3 structurally cannot over-merge (B3-D4
+  never merges distinct wordings at all).
+- **Substantially higher cost than B3** — 193 calls per model versus B3's 1 — is
+  the direct, known price of the staged design, not a defect to explain away. Any
+  quality gain has to be weighed against this explicitly in the paper, not
+  reported as a free improvement.
+- **The extraction stage should look like a degenerate, single-document version of
+  B3's own class-explosion problem** — with only one document's worth of evidence
+  per call, "several distinct instances beyond a bare label" (the extraction
+  prompt's own class criterion) is nearly impossible for the model to satisfy
+  honestly within one document, so Stage 1 output is expected to be sparse and
+  fragmented by design. This is not a bug in Stage 1; the whole point of Stage 2
+  is to do the job Stage 1 structurally cannot.
+
+If P1's class F1 does not exceed B3's at the same model and the same matching
+level, that is real, reportable evidence that staged consolidation added by an LLM
+call does not clearly outperform B3-D4's naive one for this corpus — not a result
+to quietly re-run until it looks better.

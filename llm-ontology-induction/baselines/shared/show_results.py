@@ -3,14 +3,15 @@ Read-only viewer for the latest B1 run — the induced schema, the score table,
 and the per-level match decisions.
 
 Purely a display tool: it computes nothing and writes nothing, so it can never
-affect a reported result. Run `python -m baselines.statistical` to produce a
+affect a reported result. Run `python -m baselines.b1_statistical.statistical` to
+produce a
 schema and `python -m eval.report ...` to score it before using this.
 
 Usage:
-    python -m baselines.show_results              # schema + scores + matches
-    python -m baselines.show_results --schema     # just the induced schema
-    python -m baselines.show_results --scores     # just the F1 table
-    python -m baselines.show_results --matches    # just the match decisions
+    python -m baselines.shared.show_results              # schema + scores + matches
+    python -m baselines.shared.show_results --schema     # just the induced schema
+    python -m baselines.shared.show_results --scores     # just the F1 table
+    python -m baselines.shared.show_results --matches    # just the match decisions
 """
 
 from __future__ import annotations
@@ -21,7 +22,7 @@ import json
 from collections import defaultdict
 from pathlib import Path
 
-_REPO_ROOT = Path(__file__).resolve().parents[1]
+_REPO_ROOT = Path(__file__).resolve().parents[2]
 _RAW = _REPO_ROOT / "results" / "raw"
 _TABLES = _REPO_ROOT / "results" / "tables_figures"
 
@@ -66,7 +67,7 @@ def _score_command(run_id: str) -> str:
 def show_schema() -> None:
     path = _latest(_RAW, "*_b1.json")
     if path is None:
-        return _missing("no B1 schema found", "python3 -m baselines.statistical")
+        return _missing("no B1 schema found", "python3 -m baselines.b1_statistical.statistical")
     data = json.loads(path.read_text())
 
     print(f"=== INDUCED SCHEMA ({path.name}) ===\n")
@@ -94,7 +95,7 @@ def show_schema() -> None:
 def show_scores() -> None:
     run_id = _latest_run_id()
     if run_id is None:
-        return _missing("no B1 schema found", "python3 -m baselines.statistical")
+        return _missing("no B1 schema found", "python3 -m baselines.b1_statistical.statistical")
     path = _TABLES / f"{run_id}.csv"
     if not path.exists():
         stale = _latest(_TABLES, "*.csv")
@@ -122,7 +123,7 @@ def show_scores() -> None:
 def show_matches() -> None:
     run_id = _latest_run_id()
     if run_id is None:
-        return _missing("no B1 schema found", "python3 -m baselines.statistical")
+        return _missing("no B1 schema found", "python3 -m baselines.b1_statistical.statistical")
     path = _RAW / f"{run_id}_matches.json"
     if not path.exists():
         return _missing(f"no match decisions for run {run_id}", _score_command(run_id))

@@ -1,0 +1,61 @@
+{
+  "classes": [
+    {
+      "name": "Lease",
+      "parent": null,
+      "attributes": [
+        "Lease Owner",
+        "Tenant Name",
+        "Agent Name",
+        "Monthly Base Rate",
+        "Escalation Structure",
+        "Holding Amount",
+        "Commence Date",
+        "Expiry Date",
+        "Contract Notes"
+      ]
+    },
+    {
+      "name": "Maintenance Request",
+      "parent": null,
+      "attributes": [
+        "Property Location",
+        "Issue Description",
+        "Estimated Cost",
+        "Status",
+        "Assigned Vendor"
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "source": "Lease",
+      "label": "involves",
+      "target": "Maintenance Request"
+    }
+  ],
+  "metadata": {
+    "condition": "B3",
+    "model": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "run_id": "2026-08-14T21:33:37Z-fdb3",
+    "source_documents": [
+      "csv_exports/leases_export_01.csv",
+      "lease_texts/lease-001.txt",
+      "notes/mr-001.txt",
+      "messages/mr-001.txt",
+      "csv_exports/leases_export_02.csv",
+      "lease_texts/lease-002.txt",
+      "notes/mr-002.txt",
+      "messages/mr-002.txt"
+    ],
+    "batching": "whole",
+    "batch_size": null,
+    "usage": [
+      {
+        "batch": 1,
+        "stop_reason": "end_turn",
+        "completion_tokens": 220
+      }
+    ]
+  }
+}

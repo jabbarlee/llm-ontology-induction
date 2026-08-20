@@ -1,0 +1,100 @@
+{
+  "run_id": "2026-08-14T21:34:50Z-6ee0",
+  "model": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
+  "condition": "B3",
+  "results": [
+    {
+      "level": "M1",
+      "classes_matched": [
+        {
+          "gold": "Property",
+          "induced": "Property",
+          "score": 1.0
+        },
+        {
+          "gold": "Lease",
+          "induced": "Lease",
+          "score": 1.0
+        },
+        {
+          "gold": "MaintenanceRequest",
+          "induced": "Maintenance Request",
+          "score": 1.0
+        }
+      ],
+      "classes_unmatched_gold": [
+        "Vendor",
+        "IndustrialProperty",
+        "Owner",
+        "RetailProperty",
+        "Party",
+        "Tenant",
+        "OfficeProperty",
+        "Agent"
+      ],
+      "classes_unmatched_induced": []
+    },
+    {
+      "level": "M2",
+      "classes_matched": [
+        {
+          "gold": "Property",
+          "induced": "Property",
+          "score": 1.0
+        },
+        {
+          "gold": "Lease",
+          "induced": "Lease",
+          "score": 1.0
+        },
+        {
+          "gold": "MaintenanceRequest",
+          "induced": "Maintenance Request",
+          "score": 1.0
+        }
+      ],
+      "classes_unmatched_gold": [
+        "Vendor",
+        "IndustrialProperty",
+        "Owner",
+        "RetailProperty",
+        "Party",
+        "Tenant",
+        "OfficeProperty",
+        "Agent"
+      ],
+      "classes_unmatched_induced": []
+    },
+    {
+      "level": "M3",
+      "classes_matched": [
+        {
+          "gold": "Property",
+          "induced": "Property",
+          "score": 1.0
+        },
+        {
+          "gold": "Lease",
+          "induced": "Lease",
+          "score": 1.0
+        },
+        {
+          "gold": "MaintenanceRequest",
+          "induced": "Maintenance Request",
+          "score": 1.0
+        }
+      ],
+      "classes_unmatched_gold": [
+        "Vendor",
+        "IndustrialProperty",
+        "Owner",
+        "RetailProperty",
+        "Party",
+        "Tenant",
+        "OfficeProperty",
+        "Agent"
+      ],
+      "classes_unmatched_induced": []
+    }
+  ]
+}

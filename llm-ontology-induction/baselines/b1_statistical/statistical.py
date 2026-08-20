@@ -15,7 +15,7 @@ HARD RULE (D3): zero domain vocabulary in this module. Enforced by
 baselines/tests/test_statistical.py::test_no_domain_vocabulary_leakage.
 
 Usage:
-    python -m baselines.statistical [--out-dir results/raw] [--limit N]
+    python -m baselines.b1_statistical.statistical [--out-dir results/raw] [--limit N]
 """
 
 from __future__ import annotations
@@ -29,7 +29,7 @@ from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
-from baselines import term_extraction as te
+from baselines.b1_statistical import term_extraction as te
 
 # --- Frozen hyperparameters (DECISIONS.md D7) ----------------------------
 TOP_N_CLASSES = 20
@@ -40,7 +40,7 @@ MIN_RELATION_FREQ = 3
 CONDITION = "B1"
 MODEL_ID = "statistical-tfidf-cvalue"
 
-_REPO_ROOT = Path(__file__).resolve().parents[1]
+_REPO_ROOT = Path(__file__).resolve().parents[2]
 _CORPUS_ROOT = _REPO_ROOT / "data" / "documents"
 _SUBDIRS = ("csv_exports", "lease_texts", "notes", "messages")
 DEFAULT_OUT_DIR = _REPO_ROOT / "results" / "raw"
