@@ -1,0 +1,163 @@
+{
+  "run_id": "2026-08-19T20:38:13Z-4776",
+  "model": "claude-opus-5",
+  "condition": "B3",
+  "results": [
+    {
+      "level": "M1",
+      "classes_matched": [
+        {
+          "gold": "Agent",
+          "induced": "Agent",
+          "score": 1.0
+        },
+        {
+          "gold": "Lease",
+          "induced": "Lease",
+          "score": 1.0
+        },
+        {
+          "gold": "Vendor",
+          "induced": "Vendor",
+          "score": 1.0
+        },
+        {
+          "gold": "MaintenanceRequest",
+          "induced": "Maintenance Request",
+          "score": 1.0
+        },
+        {
+          "gold": "Tenant",
+          "induced": "Tenant",
+          "score": 1.0
+        },
+        {
+          "gold": "Property",
+          "induced": "Property",
+          "score": 1.0
+        }
+      ],
+      "classes_unmatched_gold": [
+        "Party",
+        "IndustrialProperty",
+        "OfficeProperty",
+        "RetailProperty",
+        "Owner"
+      ],
+      "classes_unmatched_induced": [
+        "office",
+        "retail",
+        "industrial",
+        "Landlord"
+      ]
+    },
+    {
+      "level": "M2",
+      "classes_matched": [
+        {
+          "gold": "Agent",
+          "induced": "Agent",
+          "score": 1.0
+        },
+        {
+          "gold": "Lease",
+          "induced": "Lease",
+          "score": 1.0
+        },
+        {
+          "gold": "Vendor",
+          "induced": "Vendor",
+          "score": 1.0
+        },
+        {
+          "gold": "MaintenanceRequest",
+          "induced": "Maintenance Request",
+          "score": 1.0
+        },
+        {
+          "gold": "Tenant",
+          "induced": "Tenant",
+          "score": 1.0
+        },
+        {
+          "gold": "Property",
+          "induced": "Property",
+          "score": 1.0
+        },
+        {
+          "gold": "Owner",
+          "induced": "Landlord",
+          "score": 1.0
+        }
+      ],
+      "classes_unmatched_gold": [
+        "Party",
+        "IndustrialProperty",
+        "OfficeProperty",
+        "RetailProperty"
+      ],
+      "classes_unmatched_induced": [
+        "office",
+        "retail",
+        "industrial"
+      ]
+    },
+    {
+      "level": "M3",
+      "classes_matched": [
+        {
+          "gold": "Agent",
+          "induced": "Agent",
+          "score": 1.0
+        },
+        {
+          "gold": "Lease",
+          "induced": "Lease",
+          "score": 1.0
+        },
+        {
+          "gold": "Vendor",
+          "induced": "Vendor",
+          "score": 1.0
+        },
+        {
+          "gold": "IndustrialProperty",
+          "induced": "industrial",
+          "score": 0.7216883225706165
+        },
+        {
+          "gold": "MaintenanceRequest",
+          "induced": "Maintenance Request",
+          "score": 1.0
+        },
+        {
+          "gold": "Tenant",
+          "induced": "Tenant",
+          "score": 1.0
+        },
+        {
+          "gold": "OfficeProperty",
+          "induced": "office",
+          "score": 0.6574707291768159
+        },
+        {
+          "gold": "Property",
+          "induced": "Property",
+          "score": 1.0
+        },
+        {
+          "gold": "RetailProperty",
+          "induced": "retail",
+          "score": 0.729642307862163
+        }
+      ],
+      "classes_unmatched_gold": [
+        "Party",
+        "Owner"
+      ],
+      "classes_unmatched_induced": [
+        "Landlord"
+      ]
+    }
+  ]
+}

@@ -1,3 +1,30 @@
+## At a glance
+
+Every number below is reproduced from the per-condition tables further down this
+file — the charts are a visual index into the same evidence, not a separate claim.
+Where the two disagree, the tables are the source of truth.
+
+**The two charts immediately below predate the Opus 5 run (added 2026-08-19) and
+show only B1/Llama/Haiku** — rebuilding their pixel geometry for a fourth series
+is left for a follow-up pass rather than done inline here. **The headline number
+they're missing:** Opus 5 scores 0.857 classes F1 at M3, against Haiku's 0.429 and
+B1's 0.387 — see the dedicated Opus 5 section below for the full picture, which is
+not a small step up but the first condition to look like it is actually reading
+the corpus rather than pattern-matching a slice of it.
+
+
+Haiku is the first B3 condition to beat B1 on Classes F1, at every matching level —
+and, per the chart below, by the opposite failure mode from Llama: precision instead
+of coverage.
+
+Llama's batched run over-generates: 67 induced classes buy high recall (0.82 at M3)
+at the cost of precision (0.13 — 58 of 67 induced classes are false positives).
+Haiku's whole-corpus run does the opposite: 3 classes, all correct (precision 1.00),
+at the cost of recall (0.27 — 8 of 11 gold classes are missed entirely). Neither
+number is "better" in isolation; see each condition's own section for what drives it.
+
+---
+
 ## B3 — Single-shot LLM baseline: Llama 3.1 8B (open-weight, two conditions)
 
 Two runs of the same open weights, on two hosts, in the two B3 call shapes (B3-D6).
@@ -437,3 +464,167 @@ Do not treat "frontier tier" as a reason to assume better results by default —
 is the assumption this note exists to resist. Record the actual outcome here once
 Fable 5 has run, and note explicitly whether precision moved toward the first
 scenario or the second.
+
+**Superseded 2026-08-19, not deleted.** Fable 5 was dropped from the active B3
+registry when the grid narrowed to Haiku 4.5 (Bedrock) + Opus 5 (direct API) —
+see `baselines/DECISIONS.md` B3-D1 (revised again). No Fable 5 run exists or will
+exist under this baseline's current shape, so the prediction above is never
+checked against the model it names. It stays as written because the *reasoning*
+about frontier-tier disposition and the two candidate precision outcomes is still
+a real hypothesis worth having on record — it is simply now read against Opus 5,
+the frontier condition that actually ran, in the section immediately below rather
+than against Fable 5.
+
+---
+
+## B3 — Single-shot LLM baseline: Claude Opus 5 (frontier tier, whole-corpus, direct Anthropic API)
+
+**Run ID:** `2026-08-19T20:38:13Z-4776`
+**Scored:** full corpus, 192 documents, **one whole-corpus call** (151,831 prompt
+chars, ~43,380 est. input tokens). Reproduce with `--model opus5`.
+**Completed cleanly:** `stop_reason: "end_turn"` at **4,311 completion tokens**
+against a 32,000 cap shared between thinking and visible text (B3-D3, revised
+2026-08-19) — nowhere near binding. Not truncation; adaptive thinking plus a
+terse final answer.
+**Verified:** loaded through `eval/schema_ir.py`'s real
+`load_induced_json()`/`parse_induced_schema()` before scoring, then scored via
+`eval.report` against `schema/gold_schema.ttl` at all three levels.
+**Note on B3-D4:** one call, naive merge is a no-op — same as every other B3
+condition.
+
+### Scores
+
+| Level | Classes F1 | Taxonomy F1 | Attributes F1 (eff.) | Relations F1 |
+|---|---|---|---|---|
+| M1 (exact) | 0.571 | 0.000 | 0.000 | 0.065 |
+| M2 (fuzzy+lexicon) | 0.667 | 0.000 | 0.016 | 0.129 |
+| M3 (semantic) | **0.857** | **0.600** | 0.244 | 0.065 |
+
+Class-level detail at M3: **TP 9, FP 1, FN 2** against 11 gold classes — precision
+**0.900**, recall **0.818**. 10 induced classes total, closest to gold's 11 of any
+B3 condition so far.
+
+### Headline: the first condition to clear 0.8 on class F1 — and the first to score on taxonomy at all
+
+| Classes F1 | M1 | M3 |
+|---|---|---|
+| B1 (no AI) | 0.323 | 0.387 |
+| B3-Llama (batched, Groq) | 0.179 | 0.231 |
+| B3-Haiku (whole-corpus, Bedrock) | 0.429 | 0.429 |
+| **B3-Opus 5 (whole-corpus, direct API)** | **0.571** | **0.857** |
+
+| Taxonomy F1 (best level) | value |
+|---|---|
+| B1 | 0.000 (guaranteed — no mechanism) |
+| B3-Llama | 0.077 |
+| B3-Haiku | 0.000 |
+| **B3-Opus 5** | **0.600** (M3; precision 1.000, recall 0.429) |
+
+**Verified.** Opus 5 more than doubles Haiku's class F1 at M3 and is the only B3
+condition to date whose taxonomy F1 is not effectively zero. Every taxonomy edge
+it got right is exactly correct (precision 1.000, TP 3, FP 0) — it never guessed
+wrong, it just didn't guess often enough to catch everything (FN 4).
+
+### The mechanism: Opus 5 reads the prose documents — this is the opposite of Haiku's CSV anchoring
+
+**Verified by direct inspection of the induced attribute lists against the
+corpus**, the same check that established Haiku's CSV-only behavior. Several
+Opus 5 attributes have no CSV column of any kind behind them and can only have
+come from `lease_texts/`, `notes/`, or `messages/` prose:
+
+- `Lease`: `renews into a new term starting`, `term (period of years)`,
+  `square feet of space`, `use of premises (office-professional, retail,
+  restaurant-food service, warehouse-logistics, medical)`
+- `Tenant`: `doing business as`, `business (Huff Group, Higgins & Associates,
+  Parker & Associates, etc.)`, `industry / use (office-professional, retail,
+  …)`
+- `Vendor`: `type of work (pest, HVAC, plumbing, electrical, landscaping,
+  cleaning, drywall)`, `active insurance coverage on file`
+
+None of these strings appear in any `csv_exports/*.csv` header — they are
+free-text categories and clauses synthesized from the lease texts and message
+threads. This directly answers the open question the Haiku section left hanging
+("does the CSV anchoring persist in the frontier tier?"): **no, not for Opus 5.**
+The taxonomy recovery (`office`/`retail`/`industrial` under `Property`, matching
+gold's `OfficeProperty`/`RetailProperty`/`IndustrialProperty` exactly at M3) is
+itself only extractable from prose — no CSV column names a property's use type —
+so the taxonomy score above is direct evidence of the same mechanism, not a
+separate finding.
+
+This also resolves the two-scenario prediction recorded in the Haiku section's
+discussion for the (now-superseded) Fable 5 run: outcome landed close to the
+"self-verification acts as a brake" branch — recall rose sharply (0.273 → 0.818
+at M3) while precision stayed high (1.000 → 0.900), not the over-generation
+branch. One data point, one model family — stated as observation, not as a
+general claim about "frontier tier" behavior.
+
+### Familiar attribute bloat, present but far less severe than Llama's
+
+`Lease` carries 23 attributes, several clearly the same B3-D4 naive-consolidation
+pattern seen in the Llama batched run — near-duplicate facts under different
+per-source wording, un-merged because nothing here does semantic consolidation:
+`Monthly Payment`/`Monthly Base Rate`, `Escalation Method`/`Escalation
+Structure`, `Held Deposit`/`Holding Amount`/`Sec_Dep` (three variants of one
+fact), `Lease Start`/`Commence Date`, `Expiration Date`/`Expiry Date`,
+`Notes`/`Contract Notes`. This is expected and working as designed (B3-D4) —
+flagged here because it is the same mechanism as Llama's 58-attribute `Tenant`
+bloat, just far less extreme with only 12 CSV sources instead of 28 stateless
+batches feeding it. Attributes F1 (effective, M3) is **0.244** — TP 21, FP 107,
+FN 23 — the best of any B3 condition so far, but still low in absolute terms;
+the bloat is the direct cost.
+
+### Relations: only 1 of 15 induced relations matched at M3 — and the reason is verified, not the label wording
+
+**Verified by calling `eval.metrics._relations_match()` directly** against the
+real gold and induced schemas (not estimated from the aggregate table): the sole
+M3 true positive is `Lease --covers--> Property`, an exact label and direction
+match to gold's `Lease :covers Property`.
+
+**The more interesting, fully verified finding is why so many conceptually
+correct relations still miss.** Opus 5 named the maintenance-request-approval
+party and the property-owning party `Landlord`; gold's class is `Owner`. At M2,
+lexicon-based class matching pairs `Owner`↔`Landlord` and a second relation
+becomes scoreable: `Landlord --owns--> Property` matches gold's `Owner :owns
+Property` exactly (TP rises to 2 at M2). **At M3, that same class pair does not
+match** — `Owner` and `Landlord` both show up in `classes_unmatched_*` at M3,
+the identical non-monotonic-matching mechanism the Llama section documented
+(a semantic-embedding threshold miss where a lexicon-list hit had succeeded).
+Because relation matching buckets by *already-matched* class pairs (M2's
+`relations_layer` docstring, D4), every relation touching `Landlord` becomes
+unscoreable the moment its class match disappears — **6 of the 15 M3 false
+positives** (`Landlord --owns--> Property`, `Landlord --leases to--> Tenant`,
+`Lease --entered into by--> Landlord`, `Maintenance Request --Owner
+Approval--> Landlord`, `Tenant --shall pay--> Landlord`, `Agent --waiting on
+the owner to sign off--> Landlord`) are relations whose *content* is
+substantially correct but whose *scoreability* was lost entirely to a class-level
+matching decision one layer up, not to anything wrong with the relation itself.
+`Landlord --owns--> Property` in particular is a verbatim verb match to gold's
+`Owner :owns Property` — it would have scored as a clean TP at M3 under the
+exact same matching logic that accepted it at M2.
+
+Worth stating explicitly in the paper's methodology section, reinforcing the
+non-monotonicity note from the Llama section with a second, independent example:
+relations-layer recall is bounded above by classes-layer matching at the *same*
+level, and a real semantic-content match can be invisible to the relations score
+purely because of where the class-matching threshold happened to fall.
+
+### Open questions / Limitations material
+
+- **Does the Owner/Landlord non-monotonicity generalize, or is it a one-off
+  threshold miss?** Two independent conditions (Llama, Opus 5) now show a class
+  pair matching at one level and not another, each time costing downstream
+  relation/taxonomy score. Worth a dedicated toy fixture (flagged in the Llama
+  section too) to lock in and stress-test this harness behavior directly rather
+  than only observing it incidentally in real runs.
+- **CSV anchoring looks budget-tier-specific, not whole-corpus-shape-specific**,
+  now with two data points (Haiku anchors, Opus 5 does not) instead of one
+  hypothesis. The confound the Haiku section named — no batched-Haiku run to
+  separate "shape" from "model" — is still open; a `--batch-size 7` run of
+  either model would settle it directly.
+- **The attribute-bloat mechanism is confirmed present at the frontier tier**,
+  just proportionally smaller. Worth checking whether P1's consolidation stage
+  (which exists specifically to merge cross-wording) removes most of this bloat
+  for Opus 5 specifically, since a smaller starting mess is an easier case than
+  Llama's 58-attribute `Tenant`.
+- The at-a-glance charts at the top of this file do not yet include Opus 5 —
+  noted there, repeated here so it isn't missed by a reader who starts mid-file.
