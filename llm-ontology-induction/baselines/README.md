@@ -1,17 +1,40 @@
 # Baselines
 
-Two baselines the staged P1 pipeline has to beat to be worth having. Every frozen
-decision behind both lives in [`DECISIONS.md`](DECISIONS.md); this file is only a map
-and a set of commands.
+Two baselines and a staged pipeline the paper compares against each other. Every
+frozen decision behind all three lives in [`DECISIONS.md`](DECISIONS.md); this file
+is only a map and a set of commands.
 
 ```
 baselines/
 ├── DECISIONS.md          # the record. Read this before changing anything here.
 ├── b1_statistical/       # B1 -- statistical, zero-LLM
-├── b3_single_shot/       # B3 -- single-shot LLM, plus its frozen prompt
-├── shared/               # read-only viewers used by both
-└── tests/                # validation suites for both
+├── b3_single_shot/       # B3 -- single-shot LLM, plus its frozen extraction prompt
+├── p1_pipeline/           # P1 -- staged pipeline: per-doc extraction + LLM consolidation
+├── shared/                # model-calling code and read-only viewers used by all three
+└── tests/                 # validation suites for all three
 ```
+
+## Model matrix (current, as of 2026-08-19)
+
+| Condition | Models | Provider | Calls |
+|---|---|---|---|
+| B1 | none — statistical (C-value + dependency-parse SVO) | — | 0 (no LLM) |
+| B3 | Haiku 4.5, Opus 5 | Haiku via AWS Bedrock; Opus 5 via Anthropic (direct API) | 1 whole-corpus call per model |
+| P1 | Haiku 4.5, Opus 5 | Haiku via AWS Bedrock; Opus 5 via Anthropic (direct API) | N per-doc extraction calls + 1 consolidation call per model |
+
+**Mixed transport, deliberately.** The rule of thumb: Haiku 4.5 runs on AWS Bedrock,
+Opus 5 runs on the direct Anthropic API. Groq is retired — it existed only to route
+around a free-tier rate limit, and that problem disappears once the account has its
+own Anthropic API key for the frontier model. Bedrock stays, scoped to Haiku only.
+The historical Groq run and the decisions that governed the earlier direct-API-only
+attempt are not deleted — see `DECISIONS.md` B3-D1 (revised, twice) for the full
+history and what each move cost.
+
+**Two conditions, not three.** An earlier revision of this rework also wired up
+`opus48` (Opus 4.8) alongside `opus5`, since the brief that drove it named "Opus
+4.8/5" without disambiguating. A later correction narrowed the grid to Opus 5 only;
+`opus48` is dropped from the active registry (not deleted from history — see
+`DECISIONS.md`).
 
 ## B1 — statistical, no LLM
 
@@ -25,65 +48,74 @@ python3 -m baselines.b1_statistical.statistical
 
 ## B3 — single-shot LLM
 
-Hands a model the raw corpus under one frozen prompt, asks once for a schema, and
-merges with nothing cleverer than exact-string deduplication. Consolidating across
-wordings is P1's Stage 6 novelty; if B3 did that job too, the B3-vs-P1 comparison
-would measure nothing (B3-D4).
-
-**The current shape is whole-corpus: all 192 documents in a single call.** Batching
-was a Groq free-tier artifact, not a property of single-shot prompting (B3-D2).
+Hands a model the raw corpus under one frozen prompt, in **one call**, and asks
+once for a schema. Merges with nothing cleverer than dropping malformed elements
+and collapsing literal case/whitespace duplicates within that one response —
+consolidating across *wordings* is P1's job, not B3's (B3-D4).
 
 ### Conditions
 
-| `--model` | Provider ID | Host | Output cap |
-|---|---|---|---|
-| `fable5` | `us.anthropic.claude-fable-5` | Bedrock | 16000 |
-| `haiku45` | `us.anthropic.claude-haiku-4-5-20251001-v1:0` | Bedrock | 16000 |
-| `sol` | `openai.gpt-5.6-sol` | Bedrock — **not runnable yet, see below** | 16000 |
-| `luna` | `openai.gpt-5.6-luna` (`reasoning_effort="low"`) | Bedrock — **not runnable yet, see below** | 16000 |
-| `llama318b_bedrock` | `us.meta.llama3-1-8b-instruct-v1:0` | Bedrock | **4096** |
-| `llama318b_groq` | `llama-3.1-8b-instant` | Groq free tier | 2048 |
+| `--model` | Provider ID | Transport | Tier | Output cap | Sampling |
+|---|---|---|---|---|---|
+| `haiku45` | `us.anthropic.claude-haiku-4-5-20251001-v1:0` | AWS Bedrock | budget | 16000 | `temperature=0.0` only — Bedrock 400s if `top_p` is also present |
+| `opus5` | `claude-opus-5` | Anthropic (direct API) | frontier | 32000 | none — rejected by the API; adaptive thinking, `effort=high` instead |
 
-The open-weight model appears twice on purpose. The Groq entry reproduces the
-2026-08-12 batched run, which B3-D6 keeps as the batched arm of a same-model
-batched-vs-whole-corpus comparison. Llama's cap is lower than the rest because
-Bedrock serves the model at a documented 4K ceiling — see B3-D3, which also says what
-to do if a run hits it.
-
-`fable5` and `haiku45` use the **Geo inference ID** (`us.` prefix), not the bare model
-ID — Bedrock rejects the bare ID for on-demand invoke on both (confirmed for
-`haiku45` at the first real call, an actual `ValidationException`; matched
-proactively for `fable5` from the identical pattern in its model card).
-
-**`sol` and `luna` do not work yet.** Both are `bedrock-mantle`-only — the model card
-shows `bedrock-runtime` unsupported entirely (Invoke ✗, Converse ✗) — reachable only
-through the Responses API via the `openai` SDK, a different request/response shape
-than anything in `model_clients.py` today. `invoke()` raises `ValueError` for both
-rather than doing the wrong thing silently, but there is no working backend for them.
+Opus 5 rejects `temperature`/`top_p` outright (a documented Anthropic API constraint
+on Opus 4.7+, not a per-model choice) — see B3-D3 for what replaces sampling control
+on it. Haiku's Bedrock constraint is separate and narrower: `temperature` alone is
+fine, but the request 400s if `top_p` is present alongside it — confirmed empirically,
+not documented, see B3-D3 (revised).
 
 ### Running it
 
 ```bash
 # Costs nothing, calls nothing. Always do this first.
-python3 -m baselines.b3_single_shot.single_shot --model haiku45 --dry-run
+python3 -m baselines.b3_single_shot.single_shot --model opus5 --dry-run
 
 # Smoke test: caps files per subdirectory. Not a reportable run.
-python3 -m baselines.b3_single_shot.single_shot --model llama318b_bedrock --limit 2
+python3 -m baselines.b3_single_shot.single_shot --model haiku45 --limit 2
 
 # A real whole-corpus run.
-python3 -m baselines.b3_single_shot.single_shot --model llama318b_bedrock
-
-# The legacy batched shape, only for reproducing the historical Groq run.
-python3 -m baselines.b3_single_shot.single_shot --model llama318b_groq --batch-size 7
+python3 -m baselines.b3_single_shot.single_shot --model opus5
 ```
 
-Credentials: Bedrock uses the standard AWS chain (`AWS_REGION` selects the region
-unless a spec overrides it); Groq reads `GROQ_API_KEY` from `.env`.
+## P1 — staged pipeline
+
+Reads the corpus one document at a time (N extraction calls, same frozen prompt
+B3 uses, same document order), then makes **one more call** asking the model
+itself to reconcile the N partial schemas into a single one — resolving
+cross-wording the way B3-D4 deliberately refuses to. That reconciliation is the
+thing P1 exists to test the value of.
+
+### Conditions
+
+Same two models, same transports, same output caps and sampling rules as B3
+(above) — P1 reuses `baselines/shared/model_clients.py` unchanged; only the call
+shape differs.
+
+### Running it
+
+```bash
+python3 -m baselines.p1_pipeline.pipeline --model opus5 --dry-run
+
+# Smoke test.
+python3 -m baselines.p1_pipeline.pipeline --model haiku45 --limit 2
+
+# A real run: 192 extraction calls + 1 consolidation call.
+python3 -m baselines.p1_pipeline.pipeline --model opus5
+```
+
+Credentials: both baselines read from `.env` via `load_dotenv()`. `opus5` needs
+`ANTHROPIC_API_KEY` — get one at
+[console.anthropic.com/settings/keys](https://console.anthropic.com/settings/keys).
+`haiku45` needs AWS credentials resolvable by boto3's default chain (`AWS_PROFILE`
+and `AWS_REGION` in `.env`, or your usual `~/.aws` setup) with Bedrock access to
+the Haiku 4.5 Geo inference profile.
 
 ## Scoring and viewing
 
 ```bash
-python3 -m eval.report --induced results/raw/<run_id>_b3_<model>.json --level all
+python3 -m eval.report --gold schema/gold_schema.ttl --induced results/raw/<run_id>_<condition>_<model>.json --level all
 python3 -m baselines.shared.show_results
 ```
 
@@ -93,8 +125,8 @@ python3 -m baselines.shared.show_results
 python3 -m pytest baselines/tests -q
 ```
 
-Every test runs offline — no Bedrock call, no Groq call, no network of any kind. Some
-of them are not ordinary regression tests but tripwires on the rules that make these
-baselines valid (no gold-schema vocabulary, one frozen prompt, naive consolidation,
-batching that cannot depend on the model). Failing one of those does not mean the code
-got worse; it means the baseline stopped being the thing the paper claims it is.
+Every test runs offline — no network call of any kind. Some of them are not
+ordinary regression tests but tripwires on the rules that make these conditions
+valid (no gold-schema vocabulary, frozen prompts, no pre-cleaning, a truncated or
+refused response never scored). Failing one of those does not mean the code got
+worse; it means the baseline stopped being the thing the paper claims it is.

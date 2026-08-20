@@ -1,30 +1,25 @@
 """
 B3 baseline validation suite.
 
-Every test here runs offline: no Bedrock call, no Groq call, no network of any
-kind. The backend layer is split so that the parts worth asserting on -- the
-request body, the response parser, the consolidation -- are pure functions, and
-the tests that exercise orchestration substitute a fake `invoke`.
+Every test here runs offline: no network call of any kind. The backend layer is
+split so that the parts worth asserting on -- the request kwargs, the response
+reader, the malformed-element cleanup -- are pure functions, and the tests that
+exercise orchestration substitute a fake `invoke`.
 
-The five Critical Rules that make B3 a valid baseline each have a test that fails
-if the rule is broken:
+The Critical Rules that make B3 a valid baseline each have a test that fails if
+the rule is broken:
 
-  Rule 1 (no gold vocabulary)     test_no_domain_vocabulary_leakage
-  Rule 2 (one frozen prompt)      test_instruction_text_is_identical_across_batches
-  Rule 3 (Luna at low effort)     test_luna_always_carries_low_reasoning_effort
-  Rule 4 (naive consolidation)    test_distinct_wordings_are_never_merged
-  Rule 7 (identical batching)     test_batching_cannot_depend_on_the_model
+  Rule 1 (no gold vocabulary)   test_no_domain_vocabulary_leakage
+  Rule 2 (one frozen prompt)    test_instruction_text_is_identical_regardless_of_documents
+  Rule 5 (no pre-cleaning)      test_names_are_emitted_exactly_as_the_model_returned_them
+  Rule 6 (parent stays null)    test_parent_stays_null_unless_a_model_supplied_one
 
-Since the 2026-08-14 whole-corpus rework (B3-D2, B3-D3, B3-D6), three more
-properties are pinned the same way, because breaking any of them would corrupt a
-reported number rather than merely break the code:
+Plus the properties that corrupt a reported number if broken rather than merely
+break the code:
 
-  the output cap never varies with the call shape
-                                  test_the_body_is_identical_whatever_the_call_shape
-  a truncated schema is never merged
-                                  test_a_capped_generation_raises_instead_of_yielding_a_partial_schema
-  a single-call run never emits an empty schema as a completed result
-                                  test_an_unparseable_whole_corpus_response_aborts_instead_of_emitting_nothing
+  a truncated response is never scored     test_a_capped_response_raises_instead_of_yielding_a_partial_schema
+  a refusal is never scored                test_a_refusal_raises_a_distinct_error
+  the one call aborts (nothing to skip to) test_an_unparseable_response_aborts_instead_of_emitting_nothing
 """
 
 from __future__ import annotations
@@ -34,8 +29,8 @@ from dataclasses import FrozenInstanceError
 
 import pytest
 
-from baselines.b3_single_shot import model_clients as mc
 from baselines.b3_single_shot import single_shot as ss
+from baselines.shared import model_clients as mc
 
 # Reused rather than reimplemented: one source of truth for what counts as gold
 # vocabulary and as executable vocabulary, shared with the B1 suite.
@@ -45,7 +40,6 @@ from baselines.tests.test_statistical import (
     _gold_vocabulary,
 )
 
-_MODULES = ["single_shot.py", "model_clients.py"]
 _PROMPT = "prompts/b3_extraction_prompt.md"
 
 
@@ -85,53 +79,44 @@ def corpus(tmp_path):
     return tmp_path
 
 
+# A minimal stand-in for the anthropic SDK's Message object -- just enough
+# surface for extract_from_anthropic_message to read: .content (list of blocks with .type
+# and, for text blocks, .text), .stop_reason, .usage.output_tokens, and
+# (only on a refusal) .stop_details.category / .explanation.
+
+class _Block:
+    def __init__(self, type_: str, text: str = ""):
+        self.type = type_
+        self.text = text
+
+
+class _Usage:
+    def __init__(self, output_tokens: int | None):
+        self.output_tokens = output_tokens
+
+
+class _StopDetails:
+    def __init__(self, category: str | None = None, explanation: str | None = None):
+        self.category = category
+        self.explanation = explanation
+
+
+class _Message:
+    def __init__(self, text: str, stop_reason: str, tokens: int | None = 100, stop_details=None):
+        self.content = [_Block("text", text)] if text else []
+        self.stop_reason = stop_reason
+        self.usage = _Usage(tokens)
+        self.stop_details = stop_details
+
+
 # ---------------------------------------------------------------------------
-# T1 -- corpus loading and batching (B3-D2, Critical Rule 7)
+# T1 -- corpus loading (unchanged from before the rework)
 # ---------------------------------------------------------------------------
-
-def test_the_legacy_batch_size_still_reproduces_the_historical_run():
-    """B3-D2, superseded 2026-08-14 by whole-corpus but not deleted.
-
-    The 2026-08-12 Groq run was made at 7, and B3-D6 keeps it as the batched arm of a
-    same-model comparison. If this number moves, that run stops being reproducible
-    and the comparison loses one of its two sides.
-    """
-    assert ss.LEGACY_BATCH_SIZE == 7
-
-
-def test_batching_cannot_depend_on_the_model():
-    """Critical Rule 7, enforced structurally rather than by inspection.
-
-    batch_documents takes no ModelSpec, so there is no parameter through which one
-    model could receive different batches from another. A future signature change
-    that adds one has to break this test first.
-    """
-    import inspect
-
-    parameters = inspect.signature(ss.batch_documents).parameters
-    assert list(parameters) == ["documents", "size"]
-
-
-def test_every_document_lands_in_exactly_one_batch():
-    documents = _docs(25)
-    batches = ss.batch_documents(documents, 10)
-
-    assert [len(b) for b in batches] == [10, 10, 5]
-    flattened = [item for batch in batches for item in batch]
-    assert flattened == documents, "batching must preserve order and lose nothing"
-
-
-def test_batching_rejects_a_nonsense_size():
-    with pytest.raises(ValueError):
-        ss.batch_documents(_docs(3), 0)
-
 
 def test_documents_are_read_whole_and_in_a_deterministic_order(corpus):
-    """B3 hands raw files to the model -- no sentence splitting, no CSV flattening.
-
-    That B1 preprocesses and B3 does not is a real difference between the two
-    conditions, so the absence of preprocessing is asserted, not assumed.
-    """
+    """B3 hands raw files to the model -- no sentence splitting, no CSV
+    flattening. That B1 preprocesses and B3 does not is a real difference
+    between the two conditions, so the absence of preprocessing is asserted."""
     documents = ss.load_documents(corpus)
     sources = [source for source, _text in documents]
 
@@ -142,11 +127,7 @@ def test_documents_are_read_whole_and_in_a_deterministic_order(corpus):
         "messages/m1.txt",
         "csv_exports/b.csv",
         "lease_texts/t2.txt",
-    ], (
-        "round-robin across subdirectories (revised B3-D2, 2026-08-12): one "
-        "document per subdirectory per round, subdirectories in _SUBDIRS order, "
-        "filenames sorted within each"
-    )
+    ], "round-robin across subdirectories, filenames sorted within each"
 
     text = dict(documents)["csv_exports/a.csv"]
     assert text == "col one,col two\nvalue in a.csv\n", "raw bytes, untouched"
@@ -178,13 +159,15 @@ def test_load_prompt_template_rejects_a_template_without_the_placeholder(tmp_pat
         ss.load_prompt_template(path)
 
 
-def test_instruction_text_is_identical_across_batches():
-    """Critical Rule 2: only the documents block varies, byte for byte."""
+def test_instruction_text_is_identical_regardless_of_documents():
+    """Critical Rule 2: only the documents block varies, byte for byte -- true
+    whether the call carries all 192 documents (B3) or exactly 1 (P1's
+    per-document extraction stage, which renders through this same function)."""
     template = ss.load_prompt_template()
     head, tail = template.split(ss.DOCUMENTS_PLACEHOLDER)
 
     first = ss.render_prompt(template, _docs(3))
-    second = ss.render_prompt(template, _docs(7)[4:])
+    second = ss.render_prompt(template, _docs(1))
 
     assert first.startswith(head) and first.endswith(tail)
     assert second.startswith(head) and second.endswith(tail)
@@ -192,15 +175,10 @@ def test_instruction_text_is_identical_across_batches():
 
 
 def test_rendering_survives_json_braces_in_the_template():
-    """Why render_prompt uses str.replace and not str.format.
-
-    The frozen prompt shows a JSON output example. str.format would read those
-    braces as replacement fields and raise, which is exactly the bug this guards.
-    """
+    """Why render_prompt uses str.replace and not str.format. The frozen prompt
+    shows a JSON output example; str.format would read those braces as fields."""
     template = '{"name": "..."} then ' + ss.DOCUMENTS_PLACEHOLDER
-
     rendered = ss.render_prompt(template, _docs(1))
-
     assert rendered.startswith('{"name": "..."} then ')
     with pytest.raises((KeyError, IndexError, ValueError)):
         template.format(documents="x")
@@ -228,8 +206,6 @@ def test_parses_through_markdown_fences():
 
 
 def test_parses_through_preamble_and_trailing_commentary():
-    """The two habits models keep despite being told not to. Rejecting these
-    batches would silently shrink the corpus this condition saw."""
     response = (
         "Sure! Here is the schema I extracted:\n\n"
         + json.dumps(_SCHEMA)
@@ -239,23 +215,13 @@ def test_parses_through_preamble_and_trailing_commentary():
 
 
 def test_parses_through_a_reasoning_block_without_taking_its_contents():
-    """Defensive, not model-specific: none of the six frozen conditions currently
-    emits a <think> block, but the parser must not be fooled if one ever does.
-
-    The <think> block here contains its own JSON object with a `classes` key --
-    a parser that merely searched for the first brace would return the model's
-    scratch work as the answer.
-    """
+    """Defensive, not model-specific: Opus's thinking arrives as separate
+    content blocks the SDK already splits out (extract_from_anthropic_message only
+    assembles text-type blocks), so neither frozen condition is
+    expected to emit inline <think> tags -- but the parser must not be fooled
+    if the visible text ever contains one anyway."""
     response = (
         "<think>\nFirst I will draft {\"classes\": [], \"relations\": []} and check it.\n"
-        "</think>\n" + json.dumps(_SCHEMA)
-    )
-    assert ss.parse_response(response) == _SCHEMA
-
-
-def test_parses_when_only_the_closing_reasoning_tag_is_present():
-    response = (
-        "considering the documents {and some braces} before answering\n"
         "</think>\n" + json.dumps(_SCHEMA)
     )
     assert ss.parse_response(response) == _SCHEMA
@@ -270,14 +236,6 @@ def test_a_brace_inside_a_string_value_does_not_end_the_scan():
     assert ss.parse_response(response) == schema
 
 
-def test_nothing_is_dropped_when_the_response_needs_cleaning():
-    """The point of tolerance: the recovered schema is whole, not partial."""
-    response = "```json\n" + json.dumps(_SCHEMA) + "\n```\nHope that helps."
-    parsed = ss.parse_response(response)
-    assert len(parsed["classes"]) == len(_SCHEMA["classes"])
-    assert len(parsed["relations"]) == len(_SCHEMA["relations"])
-
-
 @pytest.mark.parametrize(
     "response",
     [
@@ -288,152 +246,103 @@ def test_nothing_is_dropped_when_the_response_needs_cleaning():
     ],
 )
 def test_unrecoverable_responses_raise_instead_of_returning_empty(response):
-    """The one failure mode that would corrupt a reported number invisibly.
-
-    An empty schema returned here is indistinguishable downstream from a batch
-    that genuinely contained nothing, so it must raise.
-    """
+    """The one failure mode that would corrupt a reported number invisibly: an
+    empty schema here is indistinguishable downstream from a call that
+    genuinely found nothing, so it must raise."""
     with pytest.raises(ss.ResponseParseError):
         ss.parse_response(response)
 
 
 # ---------------------------------------------------------------------------
-# T4 -- consolidation (B3-D4, Critical Rules 4 and 5)
+# T4 -- output cleanup (B3-D4, revised -- single response only, no cross-call merge)
 # ---------------------------------------------------------------------------
 
-def test_case_and_whitespace_variants_merge():
-    merged = ss.merge_batches(
-        [
-            {"classes": [{"name": "Owner", "parent": None, "attributes": []}]},
-            {"classes": [{"name": "  owner ", "parent": None, "attributes": []}]},
-        ]
+def test_case_and_whitespace_duplicates_within_one_response_collapse():
+    cleaned = ss.clean_schema(
+        {"classes": [
+            {"name": "Owner", "parent": None, "attributes": []},
+            {"name": "  owner ", "parent": None, "attributes": []},
+        ]}
     )
-    assert [c["name"] for c in merged["classes"]] == ["Owner"], (
-        "case/whitespace differences collapse, and the first surface form wins"
-    )
+    assert [c["name"] for c in cleaned["classes"]] == ["Owner"]
 
 
 def test_distinct_wordings_are_never_merged():
-    """B3-D4 / Critical Rule 4 -- the load-bearing test of this file.
-
-    A smarter method could obviously resolve these two to one entity. Doing so is
-    P1's Stage 6 novelty; if B3 does it too, the B3-vs-P1 comparison measures
-    nothing. Failing this test does not mean B3 got worse -- it means B3 stopped
-    being the baseline the paper claims it is.
-    """
-    merged = ss.merge_batches(
-        [
-            {"classes": [{"name": "Owner", "parent": None, "attributes": []}]},
-            {"classes": [{"name": "Landlord", "parent": None, "attributes": []}]},
-        ]
+    """The load-bearing test of this file. A smarter method could obviously
+    resolve these two to one entity -- doing so is P1's job (its consolidation
+    stage), not B3's. Failing this test does not mean B3 got worse; it means
+    B3 stopped being the baseline the paper claims it is."""
+    cleaned = ss.clean_schema(
+        {"classes": [
+            {"name": "Owner", "parent": None, "attributes": []},
+            {"name": "Landlord", "parent": None, "attributes": []},
+        ]}
     )
-    assert sorted(c["name"] for c in merged["classes"]) == ["Landlord", "Owner"]
+    assert sorted(c["name"] for c in cleaned["classes"]) == ["Landlord", "Owner"]
 
 
-def test_plural_and_camel_case_variants_also_stay_separate():
-    """_dedup_key is not eval.matching.normalize, and this is where that shows.
-
-    The harness's normalizer would fold all three of these together (it
-    singularizes and splits camelCase). Borrowing it here would let B3 merge
-    wordings a naive method cannot, and make B3's output partly a function of the
-    harness scoring it.
-    """
-    merged = ss.merge_batches(
-        [
-            {"classes": [{"name": "Invoice", "parent": None, "attributes": []}]},
-            {"classes": [{"name": "Invoices", "parent": None, "attributes": []}]},
-            {"classes": [{"name": "invoiceRecord", "parent": None, "attributes": []}]},
-        ]
+def test_attributes_dedup_within_one_class_keeping_first_surface_form():
+    cleaned = ss.clean_schema(
+        {"classes": [{"name": "Alpha", "parent": None, "attributes": ["Size", "size", "Hue"]}]}
     )
-    assert len(merged["classes"]) == 3
-
-
-def test_attributes_union_across_batches_keeping_first_surface_form():
-    merged = ss.merge_batches(
-        [
-            {"classes": [{"name": "Alpha", "parent": None, "attributes": ["Size", "Hue"]}]},
-            {"classes": [{"name": "alpha", "parent": None, "attributes": ["size", "Mass"]}]},
-        ]
-    )
-    assert merged["classes"][0]["attributes"] == ["Size", "Hue", "Mass"]
+    assert cleaned["classes"][0]["attributes"] == ["Size", "Hue"]
 
 
 def test_names_are_emitted_exactly_as_the_model_returned_them():
     """Critical Rule 5: the harness normalizes, the producer never pre-cleans."""
     ugly = "  Maintenance   REQUESTS_v2  "
-    merged = ss.merge_batches(
-        [{"classes": [{"name": ugly, "parent": None, "attributes": [" Odd  Field "]}]}]
+    cleaned = ss.clean_schema(
+        {"classes": [{"name": ugly, "parent": None, "attributes": [" Odd  Field "]}]}
     )
-    assert merged["classes"][0]["name"] == ugly
-    assert merged["classes"][0]["attributes"] == [" Odd  Field "]
+    assert cleaned["classes"][0]["name"] == ugly
+    assert cleaned["classes"][0]["attributes"] == [" Odd  Field "]
 
 
 def test_parent_stays_null_unless_a_model_supplied_one():
     """Critical Rule 6 -- no taxonomy is inferred here, ever."""
-    merged = ss.merge_batches(
-        [
-            {"classes": [{"name": "Alpha", "parent": None, "attributes": []}]},
-            {"classes": [{"name": "Beta", "parent": "Alpha", "attributes": []}]},
-        ]
+    cleaned = ss.clean_schema(
+        {"classes": [
+            {"name": "Alpha", "parent": None, "attributes": []},
+            {"name": "Beta", "parent": "Alpha", "attributes": []},
+        ]}
     )
-    by_name = {c["name"]: c for c in merged["classes"]}
+    by_name = {c["name"]: c for c in cleaned["classes"]}
     assert by_name["Alpha"]["parent"] is None
     assert by_name["Beta"]["parent"] == "Alpha"
 
 
-def test_first_non_null_parent_wins_when_batches_disagree():
-    merged = ss.merge_batches(
-        [
-            {"classes": [{"name": "Beta", "parent": None, "attributes": []}]},
-            {"classes": [{"name": "Beta", "parent": "Alpha", "attributes": []}]},
-            {"classes": [{"name": "Beta", "parent": "Gamma", "attributes": []}]},
-        ]
+def test_relations_dedup_on_the_whole_triple():
+    cleaned = ss.clean_schema(
+        {"relations": [
+            {"source": "Alpha", "label": "touches", "target": "Beta"},
+            {"source": "alpha", "label": "Touches", "target": " beta"},
+            {"source": "Alpha", "label": "avoids", "target": "Beta"},
+        ]}
     )
-    assert merged["classes"][0]["parent"] == "Alpha"
-
-
-def test_relations_deduplicate_on_the_whole_triple():
-    merged = ss.merge_batches(
-        [
-            {"relations": [{"source": "Alpha", "label": "touches", "target": "Beta"}]},
-            {"relations": [{"source": "alpha", "label": "Touches", "target": " beta"}]},
-            {"relations": [{"source": "Alpha", "label": "avoids", "target": "Beta"}]},
-        ]
-    )
-    assert len(merged["relations"]) == 2
-    assert merged["relations"][0] == {
-        "source": "Alpha",
-        "label": "touches",
-        "target": "Beta",
-    }
+    assert len(cleaned["relations"]) == 2
+    assert cleaned["relations"][0] == {"source": "Alpha", "label": "touches", "target": "Beta"}
 
 
 def test_malformed_elements_are_dropped_not_repaired():
-    """Repairing a model's malformed output would be the producer doing quality
-    work this baseline is supposed to be measured without."""
-    merged = ss.merge_batches(
-        [
-            {
-                "classes": [
-                    {"parent": None, "attributes": []},          # no name
-                    {"name": "   ", "parent": None},             # blank name
-                    {"name": "Alpha", "attributes": [None, 7, "ok"]},
-                    "not even an object",
-                ],
-                "relations": [
-                    {"source": "Alpha", "label": "touches"},     # no target
-                    {"source": "Alpha", "label": "touches", "target": "Beta"},
-                ],
-            }
-        ]
-    )
-    assert [c["name"] for c in merged["classes"]] == ["Alpha"]
-    assert merged["classes"][0]["attributes"] == ["ok"]
-    assert len(merged["relations"]) == 1
+    cleaned = ss.clean_schema({
+        "classes": [
+            {"parent": None, "attributes": []},          # no name
+            {"name": "   ", "parent": None},              # blank name
+            {"name": "Alpha", "attributes": [None, 7, "ok"]},
+            "not even an object",
+        ],
+        "relations": [
+            {"source": "Alpha", "label": "touches"},      # no target
+            {"source": "Alpha", "label": "touches", "target": "Beta"},
+        ],
+    })
+    assert [c["name"] for c in cleaned["classes"]] == ["Alpha"]
+    assert cleaned["classes"][0]["attributes"] == ["ok"]
+    assert len(cleaned["relations"]) == 1
 
 
-def test_merging_nothing_yields_an_empty_schema():
-    assert ss.merge_batches([]) == {"classes": [], "relations": []}
+def test_cleaning_nothing_yields_an_empty_schema():
+    assert ss.clean_schema({}) == {"classes": [], "relations": []}
 
 
 # ---------------------------------------------------------------------------
@@ -441,13 +350,13 @@ def test_merging_nothing_yields_an_empty_schema():
 # ---------------------------------------------------------------------------
 
 def test_output_satisfies_the_induced_schema_contract():
-    """Asserted by round-tripping through the harness's own loader rather than by
-    re-describing the shape here -- if the contract moves, this moves with it."""
+    """Asserted by round-tripping through the harness's own loader rather than
+    by re-describing the shape here -- if the contract moves, this moves with it."""
     from eval.schema_ir import Relation, effective_attributes, parse_induced_schema
 
     spec = mc.MODELS["haiku45"]
     output = ss.build_output(
-        ss.merge_batches([_SCHEMA]), ["dir/doc-000.txt"], "run-1", spec
+        ss.clean_schema(_SCHEMA), ["dir/doc-000.txt"], "run-1", spec, "end_turn", 42
     )
 
     schema = parse_induced_schema(output)
@@ -459,8 +368,10 @@ def test_output_satisfies_the_induced_schema_contract():
 
 
 def test_output_metadata_names_the_condition_and_the_exact_model():
-    spec = mc.MODELS["luna"]
-    output = ss.build_output({"classes": [], "relations": []}, ["a/b.txt"], "run-1", spec)
+    spec = mc.MODELS["opus5"]
+    output = ss.build_output(
+        {"classes": [], "relations": []}, ["a/b.txt"], "run-1", spec, "end_turn", 17
+    )
 
     assert set(output) == {"classes", "relations", "metadata"}
     assert output["metadata"] == {
@@ -468,539 +379,268 @@ def test_output_metadata_names_the_condition_and_the_exact_model():
         "model": spec.model_id,
         "run_id": "run-1",
         "source_documents": ["a/b.txt"],
-        "batching": "whole",
-        "batch_size": None,
-        "usage": [],
+        "stop_reason": "end_turn",
+        "completion_tokens": 17,
     }
 
 
-def test_output_metadata_records_which_call_shape_produced_it():
-    """B3-D6: two runs of one model in the two shapes are otherwise
-    indistinguishable from their output, and comparing them is the whole point."""
-    spec = mc.MODELS["llama318b_groq"]
-    output = ss.build_output(
-        {"classes": [], "relations": []},
-        ["a/b.txt"],
-        "run-1",
-        spec,
-        batching=ss.BATCHED,
-        batch_size=7,
-        usage=[{"batch": 1, "stop_reason": "stop", "completion_tokens": 812}],
-    )
-
-    assert output["metadata"]["batching"] == "batched"
-    assert output["metadata"]["batch_size"] == 7
-    assert output["metadata"]["usage"][0]["completion_tokens"] == 812
-
-
-def test_the_two_llama_conditions_are_distinguishable_from_their_output_alone():
-    """Same weights, two hosts. If metadata.model did not separate them, the
-    Bedrock and Groq results would be unattributable to either."""
-    bedrock = ss.build_output({"classes": [], "relations": []}, [], "r", mc.MODELS["llama318b_bedrock"])
-    groq = ss.build_output({"classes": [], "relations": []}, [], "r", mc.MODELS["llama318b_groq"])
-    assert bedrock["metadata"]["model"] != groq["metadata"]["model"]
-
-
 def test_output_is_json_serializable():
-    spec = mc.MODELS["llama318b_bedrock"]
-    output = ss.build_output(ss.merge_batches([_SCHEMA]), [], "run-1", spec)
+    spec = mc.MODELS["opus5"]
+    output = ss.build_output(ss.clean_schema(_SCHEMA), [], "run-1", spec, "end_turn", 1)
     assert json.loads(json.dumps(output)) == output
 
 
 # ---------------------------------------------------------------------------
-# T6 -- model registry and request bodies (B3-D1, B3-D1a, B3-D3)
+# T6 -- model registry and request construction (B3-D1, B3-D3)
 # ---------------------------------------------------------------------------
 
-def test_registry_holds_exactly_the_six_frozen_conditions():
-    """Six as of 2026-08-14, not five: the open-weight model appears twice, once per
-    host, because B3-D6 retains the Groq run as a controlled comparison."""
-    assert set(mc.MODELS) == {
-        "fable5",
-        "haiku45",
-        "sol",
-        "luna",
-        "llama318b_bedrock",
-        "llama318b_groq",
-    }
-    backends = [spec.backend for spec in mc.MODELS.values()]
-    assert backends.count("bedrock") == 5
-    assert backends.count("groq") == 1
+def test_registry_holds_exactly_the_two_frozen_conditions_on_their_own_backends():
+    assert set(mc.MODELS) == {"haiku45", "opus5"}
     for key, spec in mc.MODELS.items():
         assert spec.key == key, "registry key must match the spec it points at"
+    assert mc.MODELS["haiku45"].backend == "bedrock"
+    assert mc.MODELS["haiku45"].model_id == "us.anthropic.claude-haiku-4-5-20251001-v1:0"
+    assert mc.MODELS["opus5"].backend == "anthropic_api"
+    assert mc.MODELS["opus5"].model_id == "claude-opus-5"
 
 
 def test_model_specs_are_immutable():
-    """Critical Rule 3 cannot be honored by a spec that code can edit at runtime."""
     with pytest.raises(FrozenInstanceError):
-        mc.MODELS["luna"].reasoning_effort = "high"
+        mc.MODELS["haiku45"].max_output_tokens = 999
 
 
-def test_luna_always_carries_low_reasoning_effort():
-    """Critical Rule 3 / B3-D1a.
-
-    "low" is not a default worth keeping -- it is the setting that makes Luna
-    capability-matched to the other budget-tier model. Any other value silently
-    turns this condition into a different experiment.
-    """
-    assert mc.MODELS["luna"].reasoning_effort == "low"
-    body = mc.build_request_body(mc.MODELS["luna"], "prompt text")
-    assert body["reasoning_effort"] == "low"
-
-
-def test_no_other_model_sets_a_reasoning_effort():
-    for key, spec in mc.MODELS.items():
-        if key == "luna":
-            continue
-        assert spec.reasoning_effort is None
-        assert "reasoning_effort" not in mc.build_request_body(spec, "prompt text")
-
-
-def test_every_model_builds_a_body_carrying_the_prompt_and_frozen_sampling():
-    """B3-D3: the sampling settings are identical across all six conditions, modulo
-    the two documented per-model exceptions (supports_temperature, supports_top_p) --
-    each asserted on the real request body, not just on the spec's flag.
-
-    The output cap is the one setting that is deliberately not shared -- it is a
-    property of the model as served, asserted separately in
-    test_the_output_cap_comes_from_the_spec_and_differs_per_model.
-    """
-    for spec in mc.MODELS.values():
-        body = mc.build_request_body(spec, "SENTINEL PROMPT")
-        assert "SENTINEL PROMPT" in json.dumps(body)
-        if spec.supports_temperature:
-            assert body["temperature"] == mc.TEMPERATURE == 0.0
-        else:
-            assert "temperature" not in body
-        if spec.supports_top_p:
-            assert body["top_p"] == mc.TOP_P
-        else:
-            assert "top_p" not in body
-
-
-def test_haiku_omits_top_p_but_keeps_temperature():
-    """Confirmed at a real call: Haiku 4.5 on Bedrock 400s if both temperature and
-    top_p are present, regardless of value -- not either one alone. Dropping top_p
-    isn't a new judgment call: B3-D3's own table already calls top_p=1.0 "Neutral --
-    with temperature at 0 it does nothing," so nothing is lost by omitting it."""
+def test_haiku_on_bedrock_keeps_temperature_but_drops_top_p():
+    """Confirmed at a real call: Haiku 4.5 on Bedrock 400s if both temperature
+    and top_p are present, regardless of value -- not either one alone.
+    temperature=0.0 is kept (the load-bearing reproducibility setting); top_p is
+    dropped, per B3-D3's own note that top_p=1.0 is a no-op at temperature 0."""
     spec = mc.MODELS["haiku45"]
+    assert spec.supports_temperature is True
     assert spec.supports_top_p is False
-    body = mc.build_request_body(spec, "prompt text")
-    assert body["temperature"] == 0.0
+    body = mc.build_request(spec, "prompt text")
+    assert body["temperature"] == mc.TEMPERATURE == 0.0
     assert "top_p" not in body
 
 
-def test_supports_temperature_and_supports_top_p_are_independent_flags():
-    """The bug this guards: a model that can take temperature but not top_p (or vice
-    versa) must not have supports_temperature silently drop both."""
-    spec = mc.ModelSpec(
-        key="x",
-        model_id="x",
-        backend="bedrock",
-        tier="budget",
-        max_output_tokens=1,
-        family="anthropic",
-        supports_temperature=True,
-        supports_top_p=False,
-    )
-    body = mc.build_request_body(spec, "p")
-    assert "temperature" in body and "top_p" not in body
+def test_opus5_takes_neither_sampling_setting():
+    """Opus 4.7+ rejects temperature/top_p outright -- a documented Anthropic
+    API constraint, not a per-model preference."""
+    spec = mc.MODELS["opus5"]
+    assert spec.supports_temperature is False
+    assert spec.supports_top_p is False
+    kwargs = mc.build_request(spec, "prompt text")
+    assert "temperature" not in kwargs
+    assert "top_p" not in kwargs
 
 
-def test_an_unknown_backend_is_an_error_not_a_default():
-    spec = mc.ModelSpec(
-        key="x", model_id="x", backend="nowhere", tier="budget", max_output_tokens=1
-    )
+def test_only_opus_requests_thinking_and_effort():
+    haiku_body = mc.build_request(mc.MODELS["haiku45"], "p")
+    assert "thinking" not in haiku_body
+    assert "output_config" not in haiku_body
+
+    opus_kwargs = mc.build_request(mc.MODELS["opus5"], "p")
+    assert opus_kwargs["thinking"] == {"type": "adaptive", "display": "summarized"}
+    assert opus_kwargs["output_config"] == {"effort": "high"}
+
+
+def test_bedrock_and_anthropic_api_bodies_have_the_right_shape_for_their_transport():
+    """The two backends build genuinely different request shapes -- Bedrock's
+    Anthropic-on-Bedrock body (`anthropic_version`, block-structured content, no
+    `model` key -- the model ID goes on the invoke_model call, not the body) vs.
+    the direct API's kwargs (`model` present, plain-string content)."""
+    bedrock_body = mc.build_request(mc.MODELS["haiku45"], "SENTINEL")
+    assert bedrock_body["anthropic_version"] == "bedrock-2023-05-31"
+    assert bedrock_body["max_tokens"] == mc.MODELS["haiku45"].max_output_tokens
+    assert bedrock_body["messages"] == [{"role": "user", "content": [{"type": "text", "text": "SENTINEL"}]}]
+    assert "model" not in bedrock_body
+
+    api_kwargs = mc.build_request(mc.MODELS["opus5"], "SENTINEL")
+    assert api_kwargs["model"] == "claude-opus-5"
+    assert api_kwargs["max_tokens"] == mc.MODELS["opus5"].max_output_tokens
+    assert api_kwargs["messages"] == [{"role": "user", "content": "SENTINEL"}]
+
+
+def test_build_request_is_a_pure_function_of_spec_and_prompt():
+    """No batching or call-shape argument exists to thread through -- the
+    request for a given model is identical whether it is B3's one whole-corpus
+    call or one of P1's per-document calls."""
+    import inspect
+
+    assert list(inspect.signature(mc.build_request).parameters) == ["spec", "prompt"]
+
+
+def test_build_request_rejects_an_unknown_backend():
+    spec = mc.ModelSpec(key="x", model_id="x", tier="budget", backend="nowhere", max_output_tokens=1)
     with pytest.raises(ValueError):
-        mc.build_request_body(spec, "prompt text")
+        mc.build_request(spec, "prompt text")
     with pytest.raises(ValueError):
         mc.invoke(spec, "prompt text")
 
 
 # ---------------------------------------------------------------------------
-# T6a -- per-model output caps (B3-D3, revised 2026-08-14)
+# T7 -- response reading (truncation, refusal, empty), both backends
 # ---------------------------------------------------------------------------
 
-def test_the_output_cap_comes_from_the_spec_and_differs_per_model():
-    """B3-D3: the cap is a property of the model as served, not one global number.
-
-    The Meta family is capped at 4K on Bedrock where the Anthropic and OpenAI
-    families are not; a single shared constant could only ever be right for one of
-    them. Asserted against the body actually sent, not just the spec, so a branch
-    that ignored the spec and hardcoded a number would fail here.
-    """
-    assert mc.MODELS["llama318b_bedrock"].max_output_tokens == 4096
-    assert mc.MODELS["haiku45"].max_output_tokens == 16000
-    assert mc.MODELS["llama318b_groq"].max_output_tokens == 2048
-
-    assert mc.build_request_body(mc.MODELS["llama318b_bedrock"], "p")["max_gen_len"] == 4096
-    assert mc.build_request_body(mc.MODELS["haiku45"], "p")["max_tokens"] == 16000
-    assert mc.build_request_body(mc.MODELS["sol"], "p")["max_completion_tokens"] == 16000
-    assert mc.build_request_body(mc.MODELS["llama318b_groq"], "p")["max_tokens"] == 2048
-
-
-def test_the_body_is_identical_whatever_the_call_shape():
-    """The cap must never become a function of how the corpus was split.
-
-    B3-D6 compares whole-corpus against batched for one model. That comparison only
-    attributes if the *only* difference is how many documents ride in the call --
-    so build_request_body takes no batching argument, and there is no parameter
-    through which one could be threaded in.
-    """
-    import inspect
-
-    assert list(inspect.signature(mc.build_request_body).parameters) == ["spec", "prompt"]
-
-    def without_the_payload(body: dict) -> dict:
-        # "prompt" for the meta family, "messages" for the other two.
-        return {k: v for k, v in body.items() if k not in ("prompt", "messages")}
-
-    for spec in mc.MODELS.values():
-        whole = mc.build_request_body(spec, "P" * 5000)
-        batched = mc.build_request_body(spec, "P" * 50)
-        assert without_the_payload(whole) == without_the_payload(batched), (
-            f"{spec.key} varies its body with the payload size"
-        )
-
-
-# ---------------------------------------------------------------------------
-# T6b -- the Meta family (Bedrock, added 2026-08-14)
-# ---------------------------------------------------------------------------
-
-def test_the_meta_body_uses_the_native_shape_and_its_chat_template():
-    """The native shape from AWS's Meta parameter reference.
-
-    AWS also publishes a contradictory `messages`/`max_tokens` sample on this model's
-    own card. The native shape is used because it is the one whose `stop_reason`
-    semantics are documented, and the truncation guard depends on that field.
-    """
-    body = mc.build_request_body(mc.MODELS["llama318b_bedrock"], "SENTINEL PROMPT")
-
-    assert set(body) == {"prompt", "max_gen_len", "temperature", "top_p"}
-    assert "SENTINEL PROMPT" in body["prompt"]
-    assert body["prompt"].startswith("<|begin_of_text|>")
-    assert body["prompt"].rstrip().endswith("<|end_header_id|>")
-    assert body["temperature"] == mc.TEMPERATURE
-    assert "messages" not in body and "max_tokens" not in body
-
-
-def test_the_meta_template_survives_json_braces_in_the_frozen_prompt():
-    """Why the template is concatenated and never str.format'd.
-
-    The frozen prompt contains a JSON output example. format() would read its braces
-    as replacement fields and raise -- the same bug render_prompt avoids.
-    """
-    prompt = ss.load_prompt_template()
-    body = mc.build_request_body(mc.MODELS["llama318b_bedrock"], prompt)
-    assert prompt in body["prompt"]
-
-
-def test_meta_responses_are_read_from_generation_not_content_or_choices():
-    completion = mc.extract_completion(
-        mc.MODELS["llama318b_bedrock"],
-        {
-            "generation": '{"classes": []}',
-            "prompt_token_count": 40000,
-            "generation_token_count": 812,
-            "stop_reason": "stop",
-        },
-    )
-    assert completion.text == '{"classes": []}'
-    assert completion.stop_reason == "stop"
-    assert completion.completion_tokens == 812
-
-
-# ---------------------------------------------------------------------------
-# T6c -- the truncation guard (B3-D3, revised 2026-08-14)
-# ---------------------------------------------------------------------------
-
-@pytest.mark.parametrize(
-    "key,payload",
-    [
-        ("llama318b_bedrock", {"generation": '{"classes": [{"na', "stop_reason": "length"}),
-        (
-            "haiku45",
-            {"content": [{"text": '{"classes": [{"na'}], "stop_reason": "max_tokens"},
-        ),
-        (
-            "sol",
-            {
-                "choices": [
-                    {"message": {"content": '{"classes": [{"na'}, "finish_reason": "length"}
-                ]
-            },
-        ),
-    ],
-)
-def test_a_capped_generation_raises_instead_of_yielding_a_partial_schema(key, payload):
-    """Truncated JSON that happens to still parse would be scored as if the model
-    had finished. Under whole-corpus that is not one bad batch out of 28 -- it is the
-    entire result silently halved."""
-    with pytest.raises(mc.TruncatedResponseError):
-        mc.extract_text(mc.MODELS[key], payload)
-    with pytest.raises(mc.TruncatedResponseError):
-        mc.extract_completion(mc.MODELS[key], payload)
-
-
-def test_a_normal_stop_is_not_mistaken_for_truncation():
-    """The guard must not fire on the ordinary case, or every run fails."""
-    assert mc.extract_text(
-        mc.MODELS["llama318b_bedrock"], {"generation": "text", "stop_reason": "stop"}
-    )
-    assert mc.extract_text(
-        mc.MODELS["haiku45"], {"content": [{"text": "text"}], "stop_reason": "end_turn"}
-    )
-    assert mc.extract_text(
-        mc.MODELS["sol"],
-        {"choices": [{"message": {"content": "text"}, "finish_reason": "stop"}]},
-    )
-
-
-def test_a_truncated_response_is_never_treated_as_transient():
-    """The load-bearing property of the error's wording.
-
-    is_transient() matches on the message text, so a stray "rate limit" or "timeout"
-    in the phrasing would make _with_retries burn five attempts on a failure that is
-    perfectly deterministic -- at temperature 0 the same prompt returns the same
-    cut-off answer every time.
-    """
-    exc = mc.TruncatedResponseError(
-        "'llama318b_bedrock' stopped at its output cap of 4096 tokens"
-    )
-    assert not mc.is_transient(exc)
-
-
-def test_the_cut_off_text_is_carried_on_the_error_not_discarded():
-    """Fatal must not mean evidence-destroying: the call was paid for, and how far
-    the answer got before the cap bit is the reported finding."""
-    with pytest.raises(mc.TruncatedResponseError) as caught:
-        mc.extract_text(
-            mc.MODELS["llama318b_bedrock"],
-            {
-                "generation": '{"classes": [{"na',
-                "generation_token_count": 4096,
-                "stop_reason": "length",
-            },
-        )
-    assert caught.value.text == '{"classes": [{"na'
-    assert caught.value.completion_tokens == 4096
-
-
-def test_extract_text_refuses_an_unrecognized_response_shape():
-    """An empty string here would be recorded as a batch that found nothing."""
-    with pytest.raises(ValueError):
-        mc.extract_text(mc.MODELS["sol"], {"choices": []})
-    with pytest.raises(ValueError):
-        mc.extract_text(mc.MODELS["haiku45"], {"content": [{"text": "   "}]})
-
-
-# ---------------------------------------------------------------------------
-# T6d -- refusals (B3-D1, added 2026-08-15 for Fable 5)
-# ---------------------------------------------------------------------------
-
-def test_a_refusal_raises_a_distinct_error_not_truncation_or_empty_text():
-    """stop_reason: "refusal" is a content-policy block, not a token-budget
-    problem. Content Restrictions on Fable 5's model card instruct callers to
-    handle it as a primary response path, not stumble into it as an empty-text
-    ValueError or misreport it as a cap truncation -- the two are different
-    findings (a modeling/prompt-content question vs. a serving-limit question)."""
+def _bedrock_payload(text: str, stop_reason: str, tokens: int | None = 100, stop_details=None) -> dict:
     payload = {
-        "content": [],
-        "stop_reason": "refusal",
-        "stop_details": {"category": "cyber"},
+        "content": [{"type": "text", "text": text}] if text else [],
+        "stop_reason": stop_reason,
+        "usage": {"output_tokens": tokens},
     }
+    if stop_details is not None:
+        payload["stop_details"] = stop_details
+    return payload
+
+
+def test_a_normal_bedrock_response_extracts_cleanly():
+    completion = mc.extract_from_bedrock_payload(
+        mc.MODELS["haiku45"], _bedrock_payload("hello", "end_turn", tokens=5)
+    )
+    assert completion.text == "hello"
+    assert completion.stop_reason == "end_turn"
+    assert completion.completion_tokens == 5
+
+
+def test_a_normal_anthropic_api_response_extracts_cleanly():
+    message = _Message("hello", "end_turn", tokens=5)
+    completion = mc.extract_from_anthropic_message(mc.MODELS["opus5"], message)
+    assert completion.text == "hello"
+    assert completion.stop_reason == "end_turn"
+    assert completion.completion_tokens == 5
+
+
+def test_a_capped_bedrock_response_raises_instead_of_yielding_a_partial_schema():
+    payload = _bedrock_payload('{"classes": [{"na', "max_tokens", tokens=16000)
+    with pytest.raises(mc.TruncatedResponseError) as caught:
+        mc.extract_from_bedrock_payload(mc.MODELS["haiku45"], payload)
+    assert caught.value.text == '{"classes": [{"na'
+    assert caught.value.completion_tokens == 16000
+
+
+def test_a_capped_anthropic_api_response_raises_instead_of_yielding_a_partial_schema():
+    message = _Message('{"classes": [{"na', "max_tokens", tokens=32000)
+    with pytest.raises(mc.TruncatedResponseError) as caught:
+        mc.extract_from_anthropic_message(mc.MODELS["opus5"], message)
+    assert caught.value.text == '{"classes": [{"na'
+    assert caught.value.completion_tokens == 32000
+
+
+def test_a_bedrock_refusal_raises_a_distinct_error():
+    payload = _bedrock_payload("", "refusal", tokens=0, stop_details={"category": "cyber", "explanation": "policy block"})
     with pytest.raises(mc.RefusalError) as caught:
-        mc.extract_text(mc.MODELS["fable5"], payload)
-    assert "refusal" in caught.value.args[0]
-    assert "cyber" in caught.value.args[0], "stop_details should be surfaced, not dropped"
+        mc.extract_from_bedrock_payload(mc.MODELS["haiku45"], payload)
+    assert "cyber" in str(caught.value)
+    assert "policy block" in str(caught.value)
     assert not isinstance(caught.value, mc.TruncatedResponseError)
 
 
-def test_a_refusal_is_never_treated_as_transient():
-    """Same load-bearing property as truncation's: a content-policy refusal is
-    deterministic at temperature 0, so retrying would only spend money to be
-    refused identically five times instead of once."""
-    exc = mc.RefusalError("'fable5' refused to respond (stop_reason='refusal')")
-    assert not mc.is_transient(exc)
-
-
-def test_a_refusal_carries_whatever_partial_text_came_back():
-    """Anthropic's card distinguishes prompt-stage refusals (blocked before any
-    output, unbilled) from mid-stream refusals (blocked after partial output,
-    billed for what was generated) -- whatever text exists must survive onto the
-    error so the run log reflects which kind happened."""
+def test_an_anthropic_api_refusal_raises_a_distinct_error():
+    message = _Message("", "refusal", tokens=0, stop_details=_StopDetails("cyber", "policy block"))
     with pytest.raises(mc.RefusalError) as caught:
-        mc.extract_text(
-            mc.MODELS["fable5"],
-            {
-                "content": [{"text": "Here is the sch"}],
-                "stop_reason": "refusal",
-                "usage": {"output_tokens": 4},
-            },
-        )
-    assert caught.value.text == "Here is the sch"
-    assert caught.value.completion_tokens == 4
+        mc.extract_from_anthropic_message(mc.MODELS["opus5"], message)
+    assert "cyber" in str(caught.value)
+    assert "policy block" in str(caught.value)
 
 
-def test_refusal_is_anthropic_specific_and_does_not_fire_for_other_families():
-    """A meta or openai response could coincidentally carry the string "refusal"
-    in an unrelated field; the check must be scoped to the family that actually
-    documents this stop_reason semantic, not to the literal string."""
-    # meta's stop_reason vocabulary is "stop" | "length" only -- a "refusal" value
-    # there is unrecognized, not a content-policy block, and must not raise
-    # RefusalError.
-    text = mc.extract_text(
-        mc.MODELS["llama318b_bedrock"],
-        {"generation": "some text", "stop_reason": "refusal"},
-    )
-    assert text == "some text"
+def test_a_refusal_with_no_stop_details_still_raises_cleanly():
+    """stop_details is only guaranteed populated on a refusal, and even then not
+    every field is guaranteed present -- must not crash reading it, on either
+    backend."""
+    with pytest.raises(mc.RefusalError):
+        mc.extract_from_bedrock_payload(mc.MODELS["haiku45"], _bedrock_payload("", "refusal", tokens=0))
+    with pytest.raises(mc.RefusalError):
+        mc.extract_from_anthropic_message(mc.MODELS["opus5"], _Message("", "refusal", tokens=0, stop_details=None))
 
 
-def test_transient_errors_are_told_apart_from_real_ones():
-    assert mc.is_transient(RuntimeError("ThrottlingException: slow down"))
-    assert mc.is_transient(RuntimeError("HTTP 429 rate limit exceeded"))
-    assert not mc.is_transient(ValueError("AccessDeniedException"))
+def test_extract_refuses_an_empty_normal_response_on_either_backend():
+    """An empty string on an ordinary end_turn would be recorded as a call that
+    found nothing -- must raise, not return ""."""
+    with pytest.raises(ValueError):
+        mc.extract_from_bedrock_payload(mc.MODELS["haiku45"], _bedrock_payload("   ", "end_turn", tokens=0))
+    with pytest.raises(ValueError):
+        mc.extract_from_anthropic_message(mc.MODELS["opus5"], _Message("   ", "end_turn", tokens=0))
+
+
+def test_response_errors_are_not_the_sdks_own_retryable_exception_types():
+    """Both are deterministic at the settings this project freezes -- retrying
+    would only spend money to fail the same way twice. There is no custom
+    retry/is_transient layer to test here anymore (see model_clients.py's
+    module docstring): retries are the SDK's own, gated on the typed exceptions
+    it raises for 429/5xx/connection errors. TruncatedResponseError and
+    RefusalError are raised from a successfully-completed call, never from a
+    transport failure, so they must never collide with that hierarchy."""
+    for cls in (mc.TruncatedResponseError, mc.RefusalError):
+        assert issubclass(cls, mc.ModelResponseError)
+        assert issubclass(cls, Exception)
+        assert not issubclass(cls, (ConnectionError, TimeoutError))
 
 
 # ---------------------------------------------------------------------------
-# T7 -- orchestration, with the backend faked out (no network)
+# T8 -- orchestration, with the backend faked out (no network)
 # ---------------------------------------------------------------------------
 
-def _completion(text: str, stop_reason: str = "stop", tokens: int = 100):
+def _completion(text: str, stop_reason: str = "end_turn", tokens: int = 100):
     return mc.Completion(text=text, stop_reason=stop_reason, completion_tokens=tokens)
 
 
-def test_the_whole_corpus_shape_makes_exactly_one_call(monkeypatch):
-    """The point of the 2026-08-14 rework. 192 documents, one call, so no part of
-    the corpus is invisible to any other part (B3-D2)."""
-    prompts: list[str] = []
+def test_run_whole_corpus_makes_exactly_one_call(monkeypatch):
+    calls: list[str] = []
 
     def fake_invoke(spec, prompt):
-        prompts.append(prompt)
+        calls.append(prompt)
         return _completion(json.dumps(_SCHEMA))
 
     monkeypatch.setattr(mc, "invoke", fake_invoke)
-    documents = _docs(192)
-    records: list[dict] = []
-    schemas = ss.run_calls(
-        mc.MODELS["llama318b_bedrock"], [documents], ss.DOCUMENTS_PLACEHOLDER, records
-    )
+    documents = _docs(50)
+    record: dict = {}
+    schema = ss.run_whole_corpus(mc.MODELS["opus5"], documents, ss.DOCUMENTS_PLACEHOLDER, record)
 
-    assert len(prompts) == 1
-    assert len(schemas) == 1
-    assert records[0]["source_documents"] == [s for s, _ in documents]
+    assert len(calls) == 1
+    assert schema == _SCHEMA
+    assert record["source_documents"] == [s for s, _ in documents]
+    assert record["stop_reason"] == "end_turn"
     for source, _text in documents:
-        assert source in prompts[0], "every document must ride in the single call"
+        assert source in calls[0], "every document must ride in the single call"
 
 
-def test_the_legacy_shape_still_calls_the_model_once_per_batch(monkeypatch):
-    prompts: list[str] = []
-
-    def fake_invoke(spec, prompt):
-        prompts.append(prompt)
-        return _completion(json.dumps(_SCHEMA))
-
-    monkeypatch.setattr(mc, "invoke", fake_invoke)
-    batches = ss.batch_documents(_docs(25), 10)
-    records: list[dict] = []
-    schemas = ss.run_calls(
-        mc.MODELS["haiku45"], batches, "P " + ss.DOCUMENTS_PLACEHOLDER, records
-    )
-
-    assert len(prompts) == 3
-    assert len(schemas) == 3
-    assert [r["batch"] for r in records] == [1, 2, 3]
-    assert records[0]["source_documents"] == [s for s, _ in batches[0]]
-
-
-def test_the_stop_reason_and_token_count_are_logged_for_every_call(monkeypatch):
-    """B3-D3's decision rule needs to know whether any run reached its cap. A run
-    that finished well under it is the evidence that the differing per-model caps
-    had no effect -- which cannot be claimed if nothing recorded it."""
-    monkeypatch.setattr(
-        mc, "invoke", lambda spec, prompt: _completion(json.dumps(_SCHEMA), "stop", 812)
-    )
-    records: list[dict] = []
-    ss.run_calls(mc.MODELS["haiku45"], [_docs(5)], ss.DOCUMENTS_PLACEHOLDER, records)
-
-    assert records[0]["stop_reason"] == "stop"
-    assert records[0]["completion_tokens"] == 812
-
-
-def test_one_unparseable_batch_is_recorded_and_skipped(monkeypatch):
-    """A run that has already been paid for should not be thrown away by one bad
-    response -- but the loss has to be visible, so it lands in the raw log."""
-    responses = iter(
-        [_completion(json.dumps(_SCHEMA)), _completion("sorry, I cannot help with that")]
-    )
-    monkeypatch.setattr(mc, "invoke", lambda spec, prompt: next(responses))
-
-    batches = ss.batch_documents(_docs(20), 10)
-    records: list[dict] = []
-    schemas = ss.run_calls(
-        mc.MODELS["llama318b_groq"], batches, ss.DOCUMENTS_PLACEHOLDER, records
-    )
-
-    assert len(schemas) == 1
-    assert "parse_error" in records[1]
-    assert records[1]["response"] == "sorry, I cannot help with that"
-
-
-def test_an_unparseable_whole_corpus_response_aborts_instead_of_emitting_nothing(monkeypatch):
-    """The mirror image of the test above, and the reason the two differ.
-
-    Skipping is right when 27 other batches survive. With a single call there is
-    nothing to salvage: skipping would merge zero schemas, write a well-formed file
-    with no classes in it, and report a completed run -- indistinguishable
-    downstream from a model that genuinely found no structure.
-    """
-    monkeypatch.setattr(
-        mc, "invoke", lambda spec, prompt: _completion("sorry, I cannot help with that")
-    )
-    records: list[dict] = []
+def test_an_unparseable_response_aborts_instead_of_emitting_nothing(monkeypatch):
+    """With one call there is nothing to fall back to: skipping would merge
+    zero schemas, write a well-formed file with no classes in it, and report a
+    completed run -- indistinguishable downstream from a model that genuinely
+    found no structure."""
+    monkeypatch.setattr(mc, "invoke", lambda spec, prompt: _completion("sorry, I cannot help"))
+    record: dict = {}
     with pytest.raises(ss.ResponseParseError):
-        ss.run_calls(
-            mc.MODELS["llama318b_bedrock"], [_docs(192)], ss.DOCUMENTS_PLACEHOLDER, records
-        )
-
-    assert len(records) == 1, "the paid-for response must still reach the raw log"
-    assert records[0]["response"] == "sorry, I cannot help with that"
+        ss.run_whole_corpus(mc.MODELS["opus5"], _docs(5), ss.DOCUMENTS_PLACEHOLDER, record)
+    assert record["response"] == "sorry, I cannot help", "the paid-for response must still be captured"
 
 
-def test_a_truncated_call_is_logged_before_the_run_dies(monkeypatch):
-    """Fatal, but not silent and not evidence-destroying."""
+def test_a_truncated_call_is_captured_before_the_run_dies(monkeypatch):
     def fake_invoke(spec, prompt):
-        raise mc.TruncatedResponseError("stopped at the output cap", '{"classes": [{"na', 4096)
+        raise mc.TruncatedResponseError("stopped at cap", '{"classes": [{"na', 32000)
 
     monkeypatch.setattr(mc, "invoke", fake_invoke)
-    records: list[dict] = []
+    record: dict = {}
     with pytest.raises(mc.TruncatedResponseError):
-        ss.run_calls(
-            mc.MODELS["llama318b_bedrock"], [_docs(192)], ss.DOCUMENTS_PLACEHOLDER, records
-        )
-
-    assert records[0]["stop_reason"] == "truncated"
-    assert records[0]["completion_tokens"] == 4096
-    assert records[0]["response"] == '{"classes": [{"na'
+        ss.run_whole_corpus(mc.MODELS["opus5"], _docs(5), ss.DOCUMENTS_PLACEHOLDER, record)
+    assert record["stop_reason"] == "truncated"
+    assert record["completion_tokens"] == 32000
+    assert record["response"] == '{"classes": [{"na'
 
 
-def test_a_refusal_is_logged_distinctly_before_the_run_dies(monkeypatch):
-    """Mirrors the truncation test above, but the raw log must say *refused*, not
-    *truncated* -- collapsing the two into one label would make it impossible to
-    tell a content-policy block from a cap cutoff by reading the log alone."""
+def test_a_refused_call_is_captured_distinctly_from_a_truncated_one(monkeypatch):
     def fake_invoke(spec, prompt):
-        raise mc.RefusalError("refused (stop_reason='refusal')", "", None)
+        raise mc.RefusalError("refused", "", None)
 
     monkeypatch.setattr(mc, "invoke", fake_invoke)
-    records: list[dict] = []
+    record: dict = {}
     with pytest.raises(mc.RefusalError):
-        ss.run_calls(mc.MODELS["fable5"], [_docs(192)], ss.DOCUMENTS_PLACEHOLDER, records)
-
-    assert records[0]["stop_reason"] == "refused"
-    assert "refused" in records[0]["error"]
+        ss.run_whole_corpus(mc.MODELS["opus5"], _docs(5), ss.DOCUMENTS_PLACEHOLDER, record)
+    assert record["stop_reason"] == "refused"
 
 
 # ---------------------------------------------------------------------------
-# T8 -- no gold vocabulary anywhere (Critical Rule 1)
+# T9 -- no gold vocabulary anywhere (Critical Rule 1)
 # ---------------------------------------------------------------------------
 
 def _gold_terms() -> set[str]:
@@ -1020,14 +660,9 @@ def _contains_subsequence(haystack: tuple[str, ...], needle: tuple[str, ...]) ->
 
 
 def leaks_in_text(text: str) -> list[str]:
-    """Gold terms appearing in free text -- used on the prompt.
-
-    The module check inspects string literals and identifiers, because in code
-    only those can steer behavior. In a prompt there is no such distinction: the
-    prose *is* the instruction, so the whole file is scanned. Contract keys are
-    exempt, since the prompt cannot ask for the required output shape without
-    naming its keys.
-    """
+    """Gold terms appearing in free text -- used on the prompts. Contract keys
+    are exempt, since a prompt cannot ask for the required output shape
+    without naming its keys."""
     from eval.matching import normalize
 
     exempt = {normalize(k) for k in _CONTRACT_KEYS}
@@ -1044,20 +679,20 @@ def leaks_in_text(text: str) -> list[str]:
 
 
 def test_no_domain_vocabulary_leakage():
-    """Critical Rule 1, over both modules and the prompt.
-
-    A gold term reaching the prompt would make every model an oracle that was
-    handed the answer key, and every B3-vs-P1 number in the paper meaningless.
-    The prompt is the likeliest place for this to happen by accident -- writing
-    "for example, a Lease" while drafting instructions is a natural thing to do.
-    """
-    root = ss._MODULE_ROOT
-    vocabulary = _gold_terms()
+    """Critical Rule 1, over the B3 module, the shared model-calling module, and
+    the frozen prompt. A gold term reaching the prompt would make the model an
+    oracle handed the answer key, and every B3-vs-P1 number in the paper
+    meaningless."""
+    modules = [
+        ss._MODULE_ROOT / "single_shot.py",
+        ss._REPO_ROOT / "baselines" / "shared" / "model_clients.py",
+    ]
 
     leaks: list[str] = []
-    for module in _MODULES:
-        used = _executable_vocabulary((root / module).read_text(encoding="utf-8"))
-        for term in sorted(vocabulary):
+    for path in modules:
+        assert path.exists(), f"{path} not found -- the leakage guard is scanning nothing"
+        used = _executable_vocabulary(path.read_text(encoding="utf-8"))
+        for term in sorted(_gold_terms()):
             needle = tuple(term.split())
             for item in used:
                 words = tuple(item.split())
@@ -1067,9 +702,10 @@ def test_no_domain_vocabulary_leakage():
                     else _contains_subsequence(words, needle)
                 )
                 if hit:
-                    leaks.append(f"{module}: gold {term!r} appears as {item!r}")
+                    leaks.append(f"{path.name}: gold {term!r} appears as {item!r}")
 
-    for term in leaks_in_text((root / _PROMPT).read_text(encoding="utf-8")):
+    prompt_path = ss._MODULE_ROOT / _PROMPT
+    for term in leaks_in_text(prompt_path.read_text(encoding="utf-8")):
         leaks.append(f"{_PROMPT}: gold {term!r} appears in the prompt text")
 
     assert not leaks, (
@@ -1078,27 +714,15 @@ def test_no_domain_vocabulary_leakage():
 
 
 def test_the_prompt_leakage_check_actually_catches_a_planted_term():
-    """Proves the scan above is not vacuously passing.
-
-    Without this, a bug in normalization or tokenization would make the guard
-    quietly approve any prompt at all.
-
-    Plants a *raw* gold-vocabulary term -- as it would actually appear if typed
-    into a prompt -- rather than an already-normalized one. eval.matching.normalize
-    is not a fixed point (normalize("address") == "addres", itself unequal to
-    normalize("addres") == "addre"), and leaks_in_text normalizes its whole input
-    exactly once; feeding it an already-normalized planted term would silently
-    double-normalize just that one token and could miss a real hit for reasons
-    that have nothing to do with the leakage check itself.
-    """
+    """Proves the scan above is not vacuously passing. Plants a *raw* gold term
+    -- as it would actually appear typed into a prompt -- rather than an
+    already-normalized one, since eval.matching.normalize is not a fixed point."""
     planted = sorted(_gold_vocabulary())[0]
     assert leaks_in_text(f"Extract entities such as {planted} from the documents.")
     assert not leaks_in_text("Extract the recurring kinds of entity you find.")
 
 
 def test_the_prompt_still_names_the_contract_keys_it_must():
-    """The exemption in leaks_in_text is only safe because these are genuinely
-    required -- the model cannot emit valid output without being told them."""
     prompt = (ss._MODULE_ROOT / _PROMPT).read_text(encoding="utf-8")
     for key in ("classes", "relations", "name", "parent", "attributes", "source", "label", "target"):
         assert key in prompt
