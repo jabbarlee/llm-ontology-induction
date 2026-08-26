@@ -14,6 +14,14 @@ for why: Haiku's Bedrock access and credentials were already working and paid
 for; Opus 5 is not available on this account's Bedrock at all, and the direct
 API is where it actually runs.
 
+**A third condition, Llama 3.1 8B on Bedrock, restored 2026-08-21** (see
+DECISIONS.md B3-D1, revised a third time): the same open-weight condition run
+in the original five-model grid, on the same transport, using the native
+Meta request/response shape (`prompt`/`max_gen_len` -> `generation`/
+`stop_reason`) -- a third backend, `"bedrock_meta"`, distinct from `"bedrock"`
+(Anthropic-on-Bedrock) because the two shapes share nothing but the
+`invoke_model` call itself.
+
 HARD RULE (Critical Rule 1): zero gold-schema vocabulary in this module. Enforced
 by baselines/tests/test_single_shot.py::test_no_domain_vocabulary_leakage and
 baselines/tests/test_p1_pipeline.py's equivalent.
@@ -100,8 +108,8 @@ class ModelSpec:
 
     key: str  # CLI selector
     model_id: str  # exact provider model ID for this backend -> metadata.model
-    tier: str  # "frontier" | "budget"
-    backend: str  # "bedrock" | "anthropic_api"
+    tier: str  # "frontier" | "budget" | "open-weight"
+    backend: str  # "bedrock" | "bedrock_meta" | "anthropic_api"
     max_output_tokens: int  # B3-D3 / P1-D2, per model
     # Independent flags, not one -- a model that rejects only one of the pair
     # would otherwise force dropping both to fix the other.
@@ -150,6 +158,26 @@ MODELS: dict[str, ModelSpec] = {
         thinking=True,
         effort="high",
     ),
+    "llama318b": ModelSpec(
+        key="llama318b",
+        # The *geo* inference ID, not the bare `meta.` one. Read off the model card's
+        # own regional table: us-east-1 and us-east-2 are In-Region NO / Geo YES, and
+        # only us-west-2 serves the bare ID on demand. The geo ID is callable from all
+        # three, which makes the region question moot for this condition instead of
+        # pinning it to one region.
+        model_id="us.meta.llama3-1-8b-instruct-v1:0",
+        tier="open-weight",
+        backend="bedrock_meta",
+        # 4096, not Haiku's 16000. The model card states "Max output tokens: 4K" flat,
+        # against a 128K context window -- a property of the model as served, not a
+        # silent clamp. The original 2026-08-14 whole-corpus run against this exact
+        # condition truncated at exactly this cap mid-repetition (B3-FINDINGS.md) --
+        # a known, already-documented risk this condition carries back with it, not
+        # a new one.
+        max_output_tokens=4096,
+        supports_temperature=True,
+        supports_top_p=True,
+    ),
 }
 
 
@@ -164,6 +192,38 @@ def _build_bedrock_body(spec: ModelSpec, prompt: str) -> dict:
         "anthropic_version": "bedrock-2023-05-31",
         "max_tokens": spec.max_output_tokens,
         "messages": [{"role": "user", "content": [{"type": "text", "text": prompt}]}],
+    }
+    if spec.supports_temperature:
+        body["temperature"] = TEMPERATURE
+    if spec.supports_top_p:
+        body["top_p"] = TOP_P
+    return body
+
+
+_META_PREFIX = "<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\n"
+_META_SUFFIX = "<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n"
+
+
+def _build_bedrock_meta_body(spec: ModelSpec, prompt: str) -> dict:
+    """The JSON body for `bedrock-runtime`'s `invoke_model`, Meta's native
+    shape (`prompt`/`max_gen_len` -> `generation`/`stop_reason`) -- nothing
+    like Anthropic-on-Bedrock's shape above, which is why this is a separate
+    backend rather than a branch inside `_build_bedrock_body`.
+
+    AWS also publishes a contradictory sample on this model's own card that
+    posts `messages`/`max_tokens` to the same endpoint, with no documented
+    response shape. The native shape is used here because it is the one
+    whose `stop_reason` semantics are documented, and the truncation guard
+    depends on exactly that field.
+
+    Concatenated, never str.format: the frozen prompt contains a JSON output
+    example, and format() would read its braces as replacement fields -- the
+    same reasoning single_shot.render_prompt already follows for the same
+    reason.
+    """
+    body: dict = {
+        "prompt": _META_PREFIX + prompt + _META_SUFFIX,
+        "max_gen_len": spec.max_output_tokens,
     }
     if spec.supports_temperature:
         body["temperature"] = TEMPERATURE
@@ -201,6 +261,8 @@ def build_request(spec: ModelSpec, prompt: str) -> dict:
     is B3's one whole-corpus call or one of P1's per-document calls."""
     if spec.backend == "bedrock":
         return _build_bedrock_body(spec, prompt)
+    if spec.backend == "bedrock_meta":
+        return _build_bedrock_meta_body(spec, prompt)
     if spec.backend == "anthropic_api":
         return _build_anthropic_api_kwargs(spec, prompt)
     raise ValueError(f"unknown backend {spec.backend!r} for model {spec.key!r}")
@@ -232,12 +294,17 @@ def _check_not_refused(spec: ModelSpec, stop_reason, text: str, completion_token
     )
 
 
-def _check_not_truncated(spec: ModelSpec, stop_reason, text: str, completion_tokens) -> None:
-    if stop_reason != "max_tokens":
+def _check_not_truncated(spec: ModelSpec, stop_reason, text: str, completion_tokens, marker: str = "max_tokens") -> None:
+    """`marker` is the provider-specific value of `stop_reason` that means
+    "cut off at the cap" -- Anthropic (direct API and Bedrock alike) uses
+    `"max_tokens"`; Meta's native Bedrock shape uses `"length"` instead. One
+    shared function, not one per family, since the meaning and the message
+    are identical -- only the string being compared against differs."""
+    if stop_reason != marker:
         return
     raise TruncatedResponseError(
         f"{spec.key!r} stopped at its output cap of {spec.max_output_tokens} "
-        f"tokens (stop_reason='max_tokens'); the schema it returned is cut off "
+        f"tokens (stop_reason={marker!r}); the schema it returned is cut off "
         "and is not usable. Not retried: the same prompt returns the same "
         "cut-off answer under this project's frozen, deterministic settings.",
         text=text,
@@ -255,6 +322,23 @@ def extract_from_bedrock_payload(spec: ModelSpec, payload: dict) -> Completion:
 
     _check_not_refused(spec, stop_reason, text, completion_tokens, payload.get("stop_details"))
     _check_not_truncated(spec, stop_reason, text, completion_tokens)
+
+    if not text.strip():
+        raise ValueError(f"empty text in response from {spec.key!r} (stop_reason={stop_reason!r})")
+    return Completion(text=text, stop_reason=stop_reason, completion_tokens=completion_tokens)
+
+
+def extract_from_bedrock_meta_payload(spec: ModelSpec, payload: dict) -> Completion:
+    """Pull the assistant's text out of a decoded Meta-native Bedrock
+    `invoke_model` response body. No refusal check here: Meta's native shape
+    documents no `stop_reason` value analogous to Anthropic's
+    `"refusal"` -- only truncation (`stop_reason == "length"`) is a
+    documented, checkable failure mode for this family."""
+    text = payload.get("generation") or ""
+    stop_reason = payload.get("stop_reason")
+    completion_tokens = payload.get("generation_token_count")
+
+    _check_not_truncated(spec, stop_reason, text, completion_tokens, marker="length")
 
     if not text.strip():
         raise ValueError(f"empty text in response from {spec.key!r} (stop_reason={stop_reason!r})")
@@ -288,25 +372,66 @@ def extract_from_anthropic_message(spec: ModelSpec, message) -> Completion:
 # Backends
 # ---------------------------------------------------------------------------
 
-def invoke_bedrock(spec: ModelSpec, prompt: str) -> Completion:
-    """One Bedrock call. Credentials come from the standard AWS chain
-    (`AWS_PROFILE`/`AWS_REGION` in .env, or the environment)."""
+BEDROCK_READ_TIMEOUT = 300  # seconds -- see this function's own docstring
+
+
+def _bedrock_client(spec: ModelSpec):
+    """Shared by both Bedrock-hosted backends (`bedrock`, `bedrock_meta`) --
+    the client construction is identical; only the body shape and response
+    parsing differ per family, in their own functions.
+
+    `read_timeout=300`, not boto3's 60-second default. `invoke_model` is a
+    single blocking call that returns only once the *entire* completion has
+    been generated server-side -- unlike the direct Anthropic API path below,
+    Bedrock's non-streaming `invoke_model` has no equivalent to
+    `.messages.stream()` for a synchronous SDK call. A request allowing up to
+    16,000 output tokens (haiku45) can legitimately take longer than 60
+    seconds to generate, especially under Stage 2's large consolidation
+    prompts (pipeline/nodes/consolidate_types.py) -- confirmed at a real
+    call: a full-corpus Haiku run raised `ReadTimeoutError` at the default
+    60s on a call that was very plausibly still generating, not stuck. 300s
+    is comfortable headroom under every current condition's cap without
+    being so long that a genuinely hung request blocks the run indefinitely.
+    """
     import boto3  # lazy -- see module docstring
     from botocore.config import Config
 
-    client = boto3.client(
+    return boto3.client(
         "bedrock-runtime",
         region_name=spec.region or BEDROCK_REGION,
-        # boto3's own "standard" retry mode: retries throttling/5xx/connection
-        # errors with backoff. Deliberately not a hand-rolled second retry
-        # layer on top of this -- see the Anthropic-API path below, which
-        # relies on the SDK's equivalent for the same reason.
-        config=Config(retries={"max_attempts": MAX_RETRIES, "mode": "standard"}),
+        config=Config(
+            read_timeout=BEDROCK_READ_TIMEOUT,
+            # boto3's own "standard" retry mode: retries throttling/5xx/connection
+            # errors (including a read timeout) with backoff. Deliberately not a
+            # hand-rolled second retry layer on top of this -- see the
+            # Anthropic-API path below, which relies on the SDK's equivalent for
+            # the same reason. Retrying a read timeout at the *default* 60s
+            # would just reproduce the same failure MAX_RETRIES times in a row --
+            # raising read_timeout first is what makes the retry meaningful.
+            retries={"max_attempts": MAX_RETRIES, "mode": "standard"},
+        ),
     )
+
+
+def invoke_bedrock(spec: ModelSpec, prompt: str) -> Completion:
+    """One Bedrock call, Anthropic-on-Bedrock shape. Credentials come from
+    the standard AWS chain (`AWS_PROFILE`/`AWS_REGION` in .env, or the
+    environment)."""
+    client = _bedrock_client(spec)
     body = json.dumps(_build_bedrock_body(spec, prompt))
     response = client.invoke_model(modelId=spec.model_id, body=body)
     payload = json.loads(response["body"].read())
     return extract_from_bedrock_payload(spec, payload)
+
+
+def invoke_bedrock_meta(spec: ModelSpec, prompt: str) -> Completion:
+    """One Bedrock call, Meta's native shape. Same client, same credential
+    chain as `invoke_bedrock` -- only the body and the response differ."""
+    client = _bedrock_client(spec)
+    body = json.dumps(_build_bedrock_meta_body(spec, prompt))
+    response = client.invoke_model(modelId=spec.model_id, body=body)
+    payload = json.loads(response["body"].read())
+    return extract_from_bedrock_meta_payload(spec, payload)
 
 
 def invoke_anthropic_api(spec: ModelSpec, prompt: str) -> Completion:
@@ -333,6 +458,8 @@ def invoke(spec: ModelSpec, prompt: str) -> Completion:
     """The only entry point single_shot.py and pipeline.py use."""
     if spec.backend == "bedrock":
         return invoke_bedrock(spec, prompt)
+    if spec.backend == "bedrock_meta":
+        return invoke_bedrock_meta(spec, prompt)
     if spec.backend == "anthropic_api":
         return invoke_anthropic_api(spec, prompt)
     raise ValueError(f"unknown backend {spec.backend!r} for model {spec.key!r}")

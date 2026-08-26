@@ -1,0 +1,5535 @@
+{
+  "classes": [
+    {
+      "name": "Lease",
+      "parent": "Lease Agreement",
+      "attributes": [
+        "Lease Owner",
+        "Tenant Name",
+        "Agent Name",
+        "Monthly Base Rate",
+        "Escalation Method",
+        "Security deposit",
+        "Commence Date",
+        "Expiry Date",
+        "Contract Notes",
+        "property use",
+        "Performance Guarantee",
+        "annual percentage increase",
+        "binding agreement",
+        "payment adjustment",
+        "payment escalation",
+        "governing law",
+        "property location",
+        "premises type",
+        "term length",
+        "payment frequency",
+        "notice period for payment adjustments"
+      ]
+    },
+    {
+      "name": "commercial lease agreement",
+      "parent": "Lease Agreement",
+      "attributes": [
+        "term beginning",
+        "term ending",
+        "monthly payment",
+        "financial adjustments",
+        "initial funds",
+        "premises location",
+        "total financial obligation",
+        "CPI-indexed increase",
+        "use type",
+        "payment adjustment basis",
+        "security deposit",
+        "purpose of use",
+        "term duration",
+        "payment adjustment percentage",
+        "payment adjustment frequency",
+        "Landlord",
+        "Tenant",
+        "business",
+        "office space",
+        "fixed percentage increase",
+        "monthly payment increase percentage",
+        "performance guarantee amount",
+        "monthly payment amount",
+        "damage and performance bond",
+        "annual increase percentage",
+        "expiration date",
+        "annual adjustment percentage",
+        "initial funds amount",
+        "intended use",
+        "signing date",
+        "base payment amount",
+        "payment period",
+        "financial adjustments policy",
+        "damage assurance amount",
+        "initial payment",
+        "CPI-indexed adjustment",
+        "payment adjustment mechanism",
+        "security deposit amount",
+        "total sum",
+        "base payment obligation",
+        "payment increase percentage",
+        "governing law",
+        "Use of Premises",
+        "start date",
+        "end date",
+        "monthly base payment",
+        "annual increase based on Consumer Price Index (CPI)",
+        "industry",
+        "base financial consideration",
+        "duration",
+        "total amount due",
+        "total payment obligation",
+        "move-in date",
+        "move-out date",
+        "total rent amount",
+        "rent escalation policy",
+        "damage and performance bond amount",
+        "payment adjustment terms",
+        "annual payment adjustment rate",
+        "total lease payment",
+        "percentage increase",
+        "increase frequency",
+        "base payment",
+        "annual increase",
+        "cost-of-living escalation",
+        "good-faith payment",
+        "total payment amount",
+        "payment schedule",
+        "periodic increase",
+        "adjustment mechanism",
+        "full understanding",
+        "Owner",
+        "adjustments",
+        "security terms",
+        "begin date",
+        "CPI-indexed annual adjustments",
+        "initial funds held amount",
+        "term length",
+        "CPI-indexed escalation",
+        "CPI adjustment",
+        "permitted use",
+        "annual CPI-indexed adjustment",
+        "initial hold amount"
+      ]
+    },
+    {
+      "name": "Tenant",
+      "parent": "Party to Lease",
+      "attributes": [
+        "name",
+        "email address",
+        "representative",
+        "operating as",
+        "business",
+        "business name",
+        "location",
+        "organization",
+        "permitted use",
+        "entity represented",
+        "role",
+        "representing",
+        "business type",
+        "representing organization",
+        "contact information",
+        "responsibilities",
+        "maintenance responsibility",
+        "role in lease",
+        "industry",
+        "entity name",
+        "representative name",
+        "intended use of premises",
+        "reports issues",
+        "business entity",
+        "type",
+        "needs",
+        "occupancy purpose",
+        "occupancy period",
+        "utilities responsibility",
+        "maintenance obligations",
+        "business structure",
+        "intended use",
+        "request",
+        "representing entity",
+        "contact email",
+        "good-faith payment"
+      ]
+    },
+    {
+      "name": "landlord",
+      "parent": "Party to Lease",
+      "attributes": [
+        "name",
+        "email address",
+        "entity type",
+        "role",
+        "contact methods",
+        "contact information",
+        "contact email",
+        "authority to enter agreement",
+        "business entity",
+        "contact",
+        "sign-off status",
+        "Owner Approval",
+        "approval required",
+        "approval status",
+        "business type",
+        "approval_authority",
+        "sign-off"
+      ]
+    },
+    {
+      "name": "premises",
+      "parent": "Property Space",
+      "attributes": [
+        "location",
+        "type",
+        "condition at conclusion",
+        "address",
+        "type of space",
+        "building location",
+        "square footage",
+        "floors",
+        "parking spaces",
+        "parking facilities",
+        "current condition",
+        "Asset Class",
+        "Clear Height",
+        "Dock Count",
+        "Property Owner",
+        "Maint. Last Performed",
+        "Current Rent",
+        "condition upon return",
+        "intended use",
+        "office building",
+        "parking area",
+        "condition",
+        "property type",
+        "condition at lease conclusion",
+        "location description",
+        "condition at possession",
+        "loading docks",
+        "vertical clearance",
+        "name",
+        "square feet",
+        "building exterior",
+        "front entrance area",
+        "city",
+        "state",
+        "structure type",
+        "site maintenance needs",
+        "ceiling height",
+        "interior condition",
+        "purpose",
+        "zip code",
+        "owner",
+        "tenant",
+        "setting",
+        "location type",
+        "facility type",
+        "local ordinances governing use",
+        "structural integrity",
+        "environment type"
+      ]
+    },
+    {
+      "name": "Person",
+      "parent": null,
+      "attributes": [
+        "name",
+        "organization",
+        "role",
+        "affiliation",
+        "satisfaction",
+        "company"
+      ]
+    },
+    {
+      "name": "Organization",
+      "parent": null,
+      "attributes": [
+        "name",
+        "Vendor"
+      ]
+    },
+    {
+      "name": "location",
+      "parent": "Property Space",
+      "attributes": [
+        "name",
+        "type",
+        "contact person",
+        "address",
+        "space type",
+        "footprint",
+        "location"
+      ]
+    },
+    {
+      "name": "Issue",
+      "parent": "Maintenance Item",
+      "attributes": [
+        "type",
+        "description",
+        "severity",
+        "estimated cost",
+        "target resolution date",
+        "location",
+        "status",
+        "resolution status",
+        "deadline",
+        "duration",
+        "impact",
+        "quote amount",
+        "cost",
+        "estimated_completion",
+        "flagged date",
+        "nature of business"
+      ]
+    },
+    {
+      "name": "Work",
+      "parent": "Maintenance Item",
+      "attributes": [
+        "description",
+        "cost",
+        "status",
+        "type",
+        "completion time",
+        "timeline",
+        "quote amount",
+        "scale",
+        "approval_status",
+        "budget cap",
+        "quote",
+        "location",
+        "deadline",
+        "approval status",
+        "complexity",
+        "price",
+        "requires owner sign-off",
+        "invoice amount",
+        "bill amount",
+        "address",
+        "completion date",
+        "final bill",
+        "budget",
+        "square feet",
+        "scope",
+        "urgency",
+        "client",
+        "pest type",
+        "severity",
+        "invoice",
+        "work",
+        "invoice approval status",
+        "height",
+        "expected completion",
+        "assigned to",
+        "financials",
+        "estimated cost",
+        "service",
+        "scheduled_time",
+        "Current State",
+        "Entry Date",
+        "Task Summary",
+        "Budget Estimate",
+        "Submission_Date",
+        "Issue_Description",
+        "Projected_Budget",
+        "Job Status",
+        "Severity Level",
+        "Report Date",
+        "Resolution Date",
+        "Issue Summary",
+        "Budget Est",
+        "Service Location",
+        "scope of work",
+        "issue type"
+      ]
+    },
+    {
+      "name": "quote",
+      "parent": "Financial Document",
+      "attributes": [
+        "type",
+        "status",
+        "sign-off status",
+        "green light",
+        "service type",
+        "numbers",
+        "cost",
+        "amount",
+        "approval status",
+        "approval_pending",
+        "price",
+        "approval_status",
+        "paperwork",
+        "owner sign-off",
+        "source"
+      ]
+    },
+    {
+      "name": "invoice",
+      "parent": "Financial Document",
+      "attributes": [
+        "type",
+        "amount",
+        "status",
+        "recipient",
+        "cost",
+        "approval status",
+        "approval_required",
+        "approval_deadline",
+        "final paperwork",
+        "due date",
+        "vendor",
+        "deadline",
+        "approval deadline",
+        "approval_status",
+        "owner sign off",
+        "sign-off status"
+      ]
+    },
+    {
+      "name": "approval",
+      "parent": null,
+      "attributes": [
+        "status",
+        "recipient",
+        "deadline",
+        "type",
+        "required by",
+        "amount",
+        "name"
+      ]
+    },
+    {
+      "name": "contractor",
+      "parent": "Service Provider",
+      "attributes": [
+        "availability",
+        "name",
+        "estimated_cost",
+        "arrival time",
+        "task",
+        "location",
+        "specialization",
+        "usage pattern",
+        "role"
+      ]
+    },
+    {
+      "name": "Service",
+      "parent": null,
+      "attributes": [
+        "type",
+        "location",
+        "quote",
+        "status",
+        "cost",
+        "date",
+        "name"
+      ]
+    },
+    {
+      "name": "project",
+      "parent": "Maintenance Item",
+      "attributes": [
+        "location",
+        "status",
+        "cost estimate",
+        "name",
+        "cost",
+        "deadline"
+      ]
+    },
+    {
+      "name": "warehouse",
+      "parent": "Property Space",
+      "attributes": [
+        "inventory",
+        "ceiling",
+        "temperature condition",
+        "temperature",
+        "location",
+        "name"
+      ]
+    },
+    {
+      "name": "storefront",
+      "parent": "Property Space",
+      "attributes": [
+        "address",
+        "accessibility",
+        "hours",
+        "visibility",
+        "location",
+        "issue",
+        "foot traffic",
+        "exterior glass",
+        "presentation of the space",
+        "industry"
+      ]
+    },
+    {
+      "name": "office",
+      "parent": "Property Space",
+      "attributes": [
+        "location",
+        "condition",
+        "location name"
+      ]
+    },
+    {
+      "name": "shop",
+      "parent": "Property Space",
+      "attributes": [
+        "location"
+      ]
+    },
+    {
+      "name": "irrigation",
+      "parent": "Building System",
+      "attributes": [
+        "status",
+        "system",
+        "sprinkler head",
+        "lines",
+        "location",
+        "estimated cost",
+        "condition",
+        "water pressure",
+        "spraying",
+        "cost"
+      ]
+    },
+    {
+      "name": "water heater",
+      "parent": "Building System",
+      "attributes": [
+        "location",
+        "status",
+        "operational state"
+      ]
+    },
+    {
+      "name": "AC",
+      "parent": "Building System",
+      "attributes": [
+        "status",
+        "location",
+        "cost",
+        "cooling status"
+      ]
+    },
+    {
+      "name": "thermostat",
+      "parent": "Building System",
+      "attributes": [
+        "status",
+        "location"
+      ]
+    },
+    {
+      "name": "heating",
+      "parent": "Building System",
+      "attributes": [
+        "status",
+        "urgency",
+        "location"
+      ]
+    },
+    {
+      "name": "HVAC",
+      "parent": "Building System",
+      "attributes": [
+        "status"
+      ]
+    },
+    {
+      "name": "outlet",
+      "parent": "Building System",
+      "attributes": [
+        "status",
+        "location"
+      ]
+    },
+    {
+      "name": "lights",
+      "parent": "Building System",
+      "attributes": [
+        "location",
+        "status",
+        "condition"
+      ]
+    },
+    {
+      "name": "breaker",
+      "parent": "Building System",
+      "attributes": [
+        "location",
+        "status"
+      ]
+    },
+    {
+      "name": "panel",
+      "parent": "Building System",
+      "attributes": [
+        "location",
+        "status"
+      ]
+    },
+    {
+      "name": "electrical issue",
+      "parent": "Maintenance Item",
+      "attributes": [
+        "location",
+        "status",
+        "impact on workflow"
+      ]
+    },
+    {
+      "name": "electrical team",
+      "parent": "Service Provider",
+      "attributes": [
+        "name"
+      ]
+    },
+    {
+      "name": "pipe",
+      "parent": "Building System",
+      "attributes": [
+        "location",
+        "cost",
+        "status"
+      ]
+    },
+    {
+      "name": "Plumbing fix",
+      "parent": "Maintenance Item",
+      "attributes": [
+        "location",
+        "status",
+        "cost"
+      ]
+    },
+    {
+      "name": "plumbing crew",
+      "parent": "Service Provider",
+      "attributes": []
+    },
+    {
+      "name": "sink",
+      "parent": "Building System",
+      "attributes": [
+        "location",
+        "condition",
+        "status",
+        "description"
+      ]
+    },
+    {
+      "name": "washroom",
+      "parent": "Property Space",
+      "attributes": [
+        "water temperature"
+      ]
+    },
+    {
+      "name": "water",
+      "parent": "Building System",
+      "attributes": [
+        "location",
+        "state"
+      ]
+    },
+    {
+      "name": "water damage",
+      "parent": "Maintenance Item",
+      "attributes": [
+        "location",
+        "status",
+        "cost",
+        "owner sign-off",
+        "scope"
+      ]
+    },
+    {
+      "name": "carpet",
+      "parent": "Building Component",
+      "attributes": [
+        "location",
+        "condition"
+      ]
+    },
+    {
+      "name": "stains",
+      "parent": "Building Component",
+      "attributes": [
+        "location"
+      ]
+    },
+    {
+      "name": "hole",
+      "parent": "Building Component",
+      "attributes": [
+        "location"
+      ]
+    },
+    {
+      "name": "door frame",
+      "parent": "Building Component",
+      "attributes": [
+        "location",
+        "status"
+      ]
+    },
+    {
+      "name": "exterior windows",
+      "parent": "Building Component",
+      "attributes": [
+        "location",
+        "condition"
+      ]
+    },
+    {
+      "name": "lobby wall",
+      "parent": "Building Component",
+      "attributes": [
+        "condition",
+        "photos"
+      ]
+    },
+    {
+      "name": "patch job",
+      "parent": "Maintenance Item",
+      "attributes": [
+        "status"
+      ]
+    },
+    {
+      "name": "window cleaning",
+      "parent": "Maintenance Item",
+      "attributes": [
+        "cost",
+        "location",
+        "status",
+        "budget",
+        "bill"
+      ]
+    },
+    {
+      "name": "cleaning bill",
+      "parent": "Financial Document",
+      "attributes": [
+        "amount",
+        "status"
+      ]
+    },
+    {
+      "name": "Tree",
+      "parent": "Building Component",
+      "attributes": [
+        "condition",
+        "location"
+      ]
+    },
+    {
+      "name": "landscaping team",
+      "parent": "Service Provider",
+      "attributes": [
+        "on-site"
+      ]
+    },
+    {
+      "name": "sprinkler repairs",
+      "parent": "Maintenance Item",
+      "attributes": []
+    },
+    {
+      "name": "treatment",
+      "parent": "Maintenance Item",
+      "attributes": [
+        "completion status",
+        "completion time",
+        "scope"
+      ]
+    },
+    {
+      "name": "fix",
+      "parent": "Maintenance Item",
+      "attributes": [
+        "bill",
+        "status",
+        "cost",
+        "approval_required"
+      ]
+    },
+    {
+      "name": "repairs",
+      "parent": "Maintenance Item",
+      "attributes": [
+        "start date",
+        "expected duration",
+        "on-site time",
+        "status",
+        "type"
+      ]
+    },
+    {
+      "name": "replacement",
+      "parent": "Maintenance Item",
+      "attributes": []
+    },
+    {
+      "name": "tech",
+      "parent": "Service Provider",
+      "attributes": [
+        "availability",
+        "company"
+      ]
+    },
+    {
+      "name": "request",
+      "parent": null,
+      "attributes": [
+        "status",
+        "type of work",
+        "location",
+        "urgency",
+        "issue type"
+      ]
+    },
+    {
+      "name": "Walkthrough",
+      "parent": null,
+      "attributes": [
+        "scope of the work"
+      ]
+    },
+    {
+      "name": "Assessment",
+      "parent": null,
+      "attributes": [
+        "numbers"
+      ]
+    },
+    {
+      "name": "file",
+      "parent": null,
+      "attributes": [
+        "status",
+        "deadline"
+      ]
+    },
+    {
+      "name": "paperwork",
+      "parent": null,
+      "attributes": [
+        "type"
+      ]
+    },
+    {
+      "name": "Document",
+      "parent": null,
+      "attributes": [
+        "type",
+        "delivery_deadline"
+      ]
+    },
+    {
+      "name": "meeting",
+      "parent": null,
+      "attributes": [
+        "timing"
+      ]
+    },
+    {
+      "name": "visit",
+      "parent": null,
+      "attributes": [
+        "date",
+        "location",
+        "gate code"
+      ]
+    },
+    {
+      "name": "shift",
+      "parent": null,
+      "attributes": [
+        "time_of_day",
+        "location"
+      ]
+    },
+    {
+      "name": "front desk",
+      "parent": "Property Space",
+      "attributes": []
+    },
+    {
+      "name": "storage room",
+      "parent": "Property Space",
+      "attributes": [
+        "location",
+        "status"
+      ]
+    },
+    {
+      "name": "loading dock",
+      "parent": "Property Space",
+      "attributes": [
+        "location"
+      ]
+    },
+    {
+      "name": "inventory",
+      "parent": null,
+      "attributes": []
+    },
+    {
+      "name": "shipment",
+      "parent": null,
+      "attributes": [
+        "status"
+      ]
+    },
+    {
+      "name": "space",
+      "parent": "Property Space",
+      "attributes": [
+        "location",
+        "condition"
+      ]
+    },
+    {
+      "name": "building",
+      "parent": "Property Space",
+      "attributes": [
+        "location"
+      ]
+    },
+    {
+      "name": "Unit",
+      "parent": "Property Space",
+      "attributes": [
+        "Unit Location",
+        "Asset Class",
+        "Net Rentable Area",
+        "Level Count",
+        "Car Slots",
+        "Monthly Revenue"
+      ]
+    },
+    {
+      "name": "damage",
+      "parent": "Maintenance Item",
+      "attributes": [
+        "type",
+        "location",
+        "scope"
+      ]
+    },
+    {
+      "name": "parts",
+      "parent": null,
+      "attributes": [
+        "status"
+      ]
+    },
+    {
+      "name": "spend",
+      "parent": null,
+      "attributes": [
+        "amount",
+        "status"
+      ]
+    },
+    {
+      "name": "Payment",
+      "parent": null,
+      "attributes": [
+        "amount",
+        "type",
+        "due date",
+        "purpose",
+        "timing"
+      ]
+    },
+    {
+      "name": "monthly payment",
+      "parent": "Payment",
+      "attributes": [
+        "amount",
+        "frequency",
+        "annual increase percentage"
+      ]
+    },
+    {
+      "name": "Security Deposit",
+      "parent": null,
+      "attributes": [
+        "amount",
+        "purpose",
+        "held by",
+        "return conditions",
+        "account type",
+        "return timeline",
+        "held by Landlord",
+        "sum",
+        "usage conditions",
+        "deductions for damages"
+      ]
+    },
+    {
+      "name": "Initial Funds Held",
+      "parent": null,
+      "attributes": [
+        "amount",
+        "purpose",
+        "return condition",
+        "sum",
+        "return conditions",
+        "return timeline"
+      ]
+    },
+    {
+      "name": "HELD FUNDS",
+      "parent": null,
+      "attributes": [
+        "amount",
+        "purpose",
+        "return conditions",
+        "deductions"
+      ]
+    },
+    {
+      "name": "good-faith deposit",
+      "parent": null,
+      "attributes": [
+        "amount",
+        "purpose",
+        "application terms",
+        "return conditions"
+      ]
+    },
+    {
+      "name": "Performance Assurance",
+      "parent": null,
+      "attributes": [
+        "amount",
+        "purpose",
+        "return conditions",
+        "sum",
+        "return timeline"
+      ]
+    },
+    {
+      "name": "PAYMENT ADJUSTMENTS",
+      "parent": null,
+      "attributes": [
+        "initial rate",
+        "adjustment frequency",
+        "duration"
+      ]
+    },
+    {
+      "name": "Annual Adjustment",
+      "parent": "PAYMENT ADJUSTMENTS",
+      "attributes": [
+        "adjustment type",
+        "index used",
+        "recalculation basis",
+        "anniversary date",
+        "calculation basis",
+        "effective date",
+        "application frequency"
+      ]
+    },
+    {
+      "name": "CPI-indexed increase",
+      "parent": "Annual Adjustment",
+      "attributes": [
+        "calculation frequency",
+        "index source"
+      ]
+    },
+    {
+      "name": "Consumer Price Index",
+      "parent": null,
+      "attributes": [
+        "adjustment basis"
+      ]
+    },
+    {
+      "name": "Work Item",
+      "parent": "Maintenance Item",
+      "attributes": [
+        "description",
+        "location",
+        "cost",
+        "status"
+      ]
+    },
+    {
+      "name": "client",
+      "parent": null,
+      "attributes": [
+        "name",
+        "type"
+      ]
+    },
+    {
+      "name": "Lead Agent",
+      "parent": "Service Provider",
+      "attributes": []
+    },
+    {
+      "name": "Lead Broker",
+      "parent": "Service Provider",
+      "attributes": []
+    },
+    {
+      "name": "Agent",
+      "parent": "Service Provider",
+      "attributes": [
+        "AgentAssigned",
+        "Agent In-Charge"
+      ]
+    },
+    {
+      "name": "ManagerName",
+      "parent": "Service Provider",
+      "attributes": []
+    },
+    {
+      "name": "ServiceContractor",
+      "parent": "Service Provider",
+      "attributes": [
+        "ServiceContractor"
+      ]
+    },
+    {
+      "name": "OwnerApprovalSource",
+      "parent": null,
+      "attributes": [
+        "OwnerApprovalSource"
+      ]
+    },
+    {
+      "name": "Ownership_Auth",
+      "parent": "Party to Lease",
+      "attributes": [
+        "name"
+      ]
+    },
+    {
+      "name": "Service_Provider",
+      "parent": "Service Provider",
+      "attributes": [
+        "name"
+      ]
+    },
+    {
+      "name": "Leaseholder",
+      "parent": "Party to Lease",
+      "attributes": []
+    },
+    {
+      "name": "Account Holder",
+      "parent": null,
+      "attributes": [
+        "name"
+      ]
+    },
+    {
+      "name": "Portfolio Owner",
+      "parent": "Party to Lease",
+      "attributes": []
+    },
+    {
+      "name": "Last Audit",
+      "parent": null,
+      "attributes": []
+    },
+    {
+      "name": "Post Oak",
+      "parent": null,
+      "attributes": []
+    },
+    {
+      "name": "Foster Maintenance",
+      "parent": "Service Provider",
+      "attributes": []
+    },
+    {
+      "name": "Hoffman Services",
+      "parent": "Service Provider",
+      "attributes": [
+        "completion date"
+      ]
+    },
+    {
+      "name": "Rocha Solutions",
+      "parent": "Service Provider",
+      "attributes": [
+        "service type"
+      ]
+    },
+    {
+      "name": "Baker Solutions",
+      "parent": "Service Provider",
+      "attributes": [
+        "arrival status",
+        "name"
+      ]
+    },
+    {
+      "name": "Robinson Co.",
+      "parent": "Service Provider",
+      "attributes": [
+        "scheduled start date"
+      ]
+    },
+    {
+      "name": "Richards",
+      "parent": "Service Provider",
+      "attributes": []
+    },
+    {
+      "name": "Kirby Dr",
+      "parent": null,
+      "attributes": [
+        "name"
+      ]
+    },
+    {
+      "name": "Shawn",
+      "parent": "Person",
+      "attributes": [
+        "name",
+        "concern"
+      ]
+    },
+    {
+      "name": "sparky",
+      "parent": "Service Provider",
+      "attributes": []
+    },
+    {
+      "name": "county",
+      "parent": null,
+      "attributes": [
+        "name"
+      ]
+    },
+    {
+      "name": "firm",
+      "parent": "Organization",
+      "attributes": [
+        "name",
+        "history"
+      ]
+    },
+    {
+      "name": "retail",
+      "parent": "Property Space",
+      "attributes": [
+        "Physical Location",
+        "Unit Size (SqFt)",
+        "Category",
+        "Store Configuration",
+        "Traffic Rating",
+        "Account Holder",
+        "Last Rent Review",
+        "Monthly Rent"
+      ]
+    },
+    {
+      "name": "unwanted guests",
+      "parent": null,
+      "attributes": []
+    },
+    {
+      "name": "final check",
+      "parent": null,
+      "attributes": []
+    },
+    {
+      "name": "Lease Agreement",
+      "parent": null,
+      "attributes": []
+    },
+    {
+      "name": "Party to Lease",
+      "parent": null,
+      "attributes": []
+    },
+    {
+      "name": "Property Space",
+      "parent": null,
+      "attributes": []
+    },
+    {
+      "name": "Maintenance Item",
+      "parent": null,
+      "attributes": []
+    },
+    {
+      "name": "Financial Document",
+      "parent": null,
+      "attributes": []
+    },
+    {
+      "name": "Service Provider",
+      "parent": null,
+      "attributes": []
+    },
+    {
+      "name": "Building System",
+      "parent": null,
+      "attributes": []
+    },
+    {
+      "name": "Building Component",
+      "parent": null,
+      "attributes": []
+    }
+  ],
+  "relations": [
+    {
+      "source": "commercial lease agreement",
+      "label": "entered into by and between",
+      "target": "landlord"
+    },
+    {
+      "source": "commercial lease agreement",
+      "label": "entered into by and between",
+      "target": "Tenant"
+    },
+    {
+      "source": "commercial lease agreement",
+      "label": "regarding",
+      "target": "premises"
+    },
+    {
+      "source": "Tenant",
+      "label": "shall pay to",
+      "target": "landlord"
+    },
+    {
+      "source": "Tenant",
+      "label": "agrees to maintain",
+      "target": "premises"
+    },
+    {
+      "source": "fix",
+      "label": "involves",
+      "target": "thermostat"
+    },
+    {
+      "source": "fix",
+      "label": "at",
+      "target": "Post Oak"
+    },
+    {
+      "source": "fix",
+      "label": "requires approval from",
+      "target": "landlord"
+    },
+    {
+      "source": "thermostat",
+      "label": "located at",
+      "target": "premises"
+    },
+    {
+      "source": "quote",
+      "label": "for",
+      "target": "thermostat"
+    },
+    {
+      "source": "invoice",
+      "label": "for",
+      "target": "thermostat"
+    },
+    {
+      "source": "Tenant",
+      "label": "shall occupy",
+      "target": "premises"
+    },
+    {
+      "source": "Person",
+      "label": "works at",
+      "target": "Organization"
+    },
+    {
+      "source": "Person",
+      "label": "flagged",
+      "target": "Issue"
+    },
+    {
+      "source": "Issue",
+      "label": "located at",
+      "target": "premises"
+    },
+    {
+      "source": "Issue",
+      "label": "needs",
+      "target": "Organization"
+    },
+    {
+      "source": "contractor",
+      "label": "take a look",
+      "target": "lobby wall"
+    },
+    {
+      "source": "contractor",
+      "label": "perform",
+      "target": "patch job"
+    },
+    {
+      "source": "Lease",
+      "label": "held by",
+      "target": "landlord"
+    },
+    {
+      "source": "Lease",
+      "label": "between",
+      "target": "Tenant"
+    },
+    {
+      "source": "Lease",
+      "label": "managed by",
+      "target": "Lead Agent"
+    },
+    {
+      "source": "commercial lease agreement",
+      "label": "subject to",
+      "target": "premises"
+    },
+    {
+      "source": "Person",
+      "label": "finished",
+      "target": "Work"
+    },
+    {
+      "source": "Work",
+      "label": "has",
+      "target": "invoice"
+    },
+    {
+      "source": "Person",
+      "label": "sent",
+      "target": "invoice"
+    },
+    {
+      "source": "Organization",
+      "label": "coordinating with",
+      "target": "Issue"
+    },
+    {
+      "source": "Organization",
+      "label": "finished",
+      "target": "treatment"
+    },
+    {
+      "source": "Issue",
+      "label": "at",
+      "target": "location"
+    },
+    {
+      "source": "treatment",
+      "label": "addresses",
+      "target": "Issue"
+    },
+    {
+      "source": "Lease",
+      "label": "leases to",
+      "target": "premises"
+    },
+    {
+      "source": "Lease",
+      "label": "between",
+      "target": "landlord"
+    },
+    {
+      "source": "Tenant",
+      "label": "entitled to utilize",
+      "target": "premises"
+    },
+    {
+      "source": "Person",
+      "label": "finished",
+      "target": "project"
+    },
+    {
+      "source": "Person",
+      "label": "pushing for",
+      "target": "project"
+    },
+    {
+      "source": "project",
+      "label": "has",
+      "target": "invoice"
+    },
+    {
+      "source": "landlord",
+      "label": "give the go-ahead on",
+      "target": "invoice"
+    },
+    {
+      "source": "landscaping team",
+      "label": "scheduled to",
+      "target": "sprinkler repairs"
+    },
+    {
+      "source": "landlord",
+      "label": "signed off on",
+      "target": "sprinkler repairs"
+    },
+    {
+      "source": "Work",
+      "label": "assigned to",
+      "target": "Leaseholder"
+    },
+    {
+      "source": "Work",
+      "label": "managed by",
+      "target": "ManagerName"
+    },
+    {
+      "source": "Work",
+      "label": "performed by",
+      "target": "contractor"
+    },
+    {
+      "source": "Work",
+      "label": "approved by",
+      "target": "approval"
+    },
+    {
+      "source": "Tenant",
+      "label": "provide",
+      "target": "Initial Funds Held"
+    },
+    {
+      "source": "Issue",
+      "label": "at",
+      "target": "Organization"
+    },
+    {
+      "source": "Person",
+      "label": "fixed",
+      "target": "Issue"
+    },
+    {
+      "source": "Issue",
+      "label": "requires",
+      "target": "spend"
+    },
+    {
+      "source": "office",
+      "label": "has",
+      "target": "AC"
+    },
+    {
+      "source": "quote",
+      "label": "is for",
+      "target": "AC"
+    },
+    {
+      "source": "tech",
+      "label": "services",
+      "target": "AC"
+    },
+    {
+      "source": "Work",
+      "label": "reported by",
+      "target": "Tenant"
+    },
+    {
+      "source": "Work",
+      "label": "at",
+      "target": "location"
+    },
+    {
+      "source": "Work",
+      "label": "assigned to",
+      "target": "Agent"
+    },
+    {
+      "source": "Work",
+      "label": "performed by",
+      "target": "ServiceContractor"
+    },
+    {
+      "source": "Work",
+      "label": "approved by",
+      "target": "OwnerApprovalSource"
+    },
+    {
+      "source": "Tenant",
+      "label": "representing",
+      "target": "Tenant"
+    },
+    {
+      "source": "Work",
+      "label": "has",
+      "target": "Issue"
+    },
+    {
+      "source": "Person",
+      "label": "works at",
+      "target": "Work"
+    },
+    {
+      "source": "Person",
+      "label": "associated with",
+      "target": "Work"
+    },
+    {
+      "source": "premises",
+      "label": "has",
+      "target": "Issue"
+    },
+    {
+      "source": "Issue",
+      "label": "requires",
+      "target": "Walkthrough"
+    },
+    {
+      "source": "Walkthrough",
+      "label": "produces",
+      "target": "Assessment"
+    },
+    {
+      "source": "Work",
+      "label": "located at",
+      "target": "location"
+    },
+    {
+      "source": "Work",
+      "label": "assigned to",
+      "target": "Tenant"
+    },
+    {
+      "source": "Work",
+      "label": "managed by",
+      "target": "Person"
+    },
+    {
+      "source": "Lease",
+      "label": "lease",
+      "target": "premises"
+    },
+    {
+      "source": "Person",
+      "label": "works at",
+      "target": "location"
+    },
+    {
+      "source": "Person",
+      "label": "reporting",
+      "target": "Issue"
+    },
+    {
+      "source": "Issue",
+      "label": "located at",
+      "target": "location"
+    },
+    {
+      "source": "contractor",
+      "label": "assigned to",
+      "target": "Issue"
+    },
+    {
+      "source": "Tenant",
+      "label": "reached out about",
+      "target": "heating"
+    },
+    {
+      "source": "storefront",
+      "label": "has",
+      "target": "heating"
+    },
+    {
+      "source": "storefront",
+      "label": "has",
+      "target": "front desk"
+    },
+    {
+      "source": "Work",
+      "label": "submitted by",
+      "target": "Tenant"
+    },
+    {
+      "source": "Work",
+      "label": "assigned to",
+      "target": "Service_Provider"
+    },
+    {
+      "source": "Work",
+      "label": "authorized by",
+      "target": "Ownership_Auth"
+    },
+    {
+      "source": "Lease",
+      "label": "concerns",
+      "target": "premises"
+    },
+    {
+      "source": "Tenant",
+      "label": "responsible for",
+      "target": "premises"
+    },
+    {
+      "source": "Work",
+      "label": "needs sign-off from",
+      "target": "landlord"
+    },
+    {
+      "source": "Person",
+      "label": "is happy with",
+      "target": "Work"
+    },
+    {
+      "source": "Work",
+      "label": "requires",
+      "target": "quote"
+    },
+    {
+      "source": "contractor",
+      "label": "handles",
+      "target": "Work"
+    },
+    {
+      "source": "Work",
+      "label": "Agent In-Charge",
+      "target": "Agent"
+    },
+    {
+      "source": "Work",
+      "label": "assigned to",
+      "target": "Organization"
+    },
+    {
+      "source": "Work",
+      "label": "Owner Approval",
+      "target": "landlord"
+    },
+    {
+      "source": "Tenant",
+      "label": "shall provide",
+      "target": "commercial lease agreement"
+    },
+    {
+      "source": "landlord",
+      "label": "agrees to provide access to",
+      "target": "premises"
+    },
+    {
+      "source": "Issue",
+      "label": "affects",
+      "target": "contractor"
+    },
+    {
+      "source": "Organization",
+      "label": "finished",
+      "target": "Work"
+    },
+    {
+      "source": "Work",
+      "label": "generates",
+      "target": "invoice"
+    },
+    {
+      "source": "invoice",
+      "label": "requires sign off from",
+      "target": "landlord"
+    },
+    {
+      "source": "Work",
+      "label": "resolves",
+      "target": "Issue"
+    },
+    {
+      "source": "outlet",
+      "label": "located at",
+      "target": "premises"
+    },
+    {
+      "source": "invoice",
+      "label": "associated with",
+      "target": "outlet"
+    },
+    {
+      "source": "paperwork",
+      "label": "related to",
+      "target": "outlet"
+    },
+    {
+      "source": "Unit",
+      "label": "owned by",
+      "target": "Portfolio Owner"
+    },
+    {
+      "source": "Unit",
+      "label": "has",
+      "target": "Last Audit"
+    },
+    {
+      "source": "Tenant",
+      "label": "responsible for utilities and maintenance of",
+      "target": "premises"
+    },
+    {
+      "source": "Work",
+      "label": "at",
+      "target": "client"
+    },
+    {
+      "source": "Work",
+      "label": "requires",
+      "target": "approval"
+    },
+    {
+      "source": "washroom",
+      "label": "has",
+      "target": "water heater"
+    },
+    {
+      "source": "Foster Maintenance",
+      "label": "installed",
+      "target": "replacement"
+    },
+    {
+      "source": "replacement",
+      "label": "serves",
+      "target": "washroom"
+    },
+    {
+      "source": "retail",
+      "label": "Account Holder",
+      "target": "Account Holder"
+    },
+    {
+      "source": "Plumbing fix",
+      "label": "at",
+      "target": "Organization"
+    },
+    {
+      "source": "Plumbing fix",
+      "label": "completed by",
+      "target": "Person"
+    },
+    {
+      "source": "Service",
+      "label": "handle",
+      "target": "Issue"
+    },
+    {
+      "source": "premises",
+      "label": "owned by",
+      "target": "landlord"
+    },
+    {
+      "source": "Tenant",
+      "label": "shall provide",
+      "target": "HELD FUNDS"
+    },
+    {
+      "source": "commercial lease agreement",
+      "label": "includes",
+      "target": "PAYMENT ADJUSTMENTS"
+    },
+    {
+      "source": "Organization",
+      "label": "working on",
+      "target": "Work"
+    },
+    {
+      "source": "Work",
+      "label": "requires approval from",
+      "target": "Person"
+    },
+    {
+      "source": "Work",
+      "label": "requires sign off from",
+      "target": "landlord"
+    },
+    {
+      "source": "Work",
+      "label": "coordinated with",
+      "target": "Organization"
+    },
+    {
+      "source": "landlord",
+      "label": "lease to",
+      "target": "Tenant"
+    },
+    {
+      "source": "Tenant",
+      "label": "party to",
+      "target": "Lease"
+    },
+    {
+      "source": "landlord",
+      "label": "party to",
+      "target": "Lease"
+    },
+    {
+      "source": "Work",
+      "label": "assigned to",
+      "target": "Person"
+    },
+    {
+      "source": "Work",
+      "label": "requested by",
+      "target": "Person"
+    },
+    {
+      "source": "office",
+      "label": "needs",
+      "target": "quote"
+    },
+    {
+      "source": "landlord",
+      "label": "signs off on",
+      "target": "invoice"
+    },
+    {
+      "source": "quote",
+      "label": "precedes",
+      "target": "invoice"
+    },
+    {
+      "source": "Work",
+      "label": "handled by",
+      "target": "Organization"
+    },
+    {
+      "source": "Tree",
+      "label": "located at",
+      "target": "premises"
+    },
+    {
+      "source": "landscaping team",
+      "label": "submitted",
+      "target": "quote"
+    },
+    {
+      "source": "quote",
+      "label": "concerns",
+      "target": "Tree"
+    },
+    {
+      "source": "landlord",
+      "label": "enters into",
+      "target": "Lease"
+    },
+    {
+      "source": "Tenant",
+      "label": "enters into",
+      "target": "Lease"
+    },
+    {
+      "source": "Tenant",
+      "label": "pays",
+      "target": "landlord"
+    },
+    {
+      "source": "Person",
+      "label": "cleared",
+      "target": "Issue"
+    },
+    {
+      "source": "invoice",
+      "label": "requires",
+      "target": "Person"
+    },
+    {
+      "source": "Hoffman Services",
+      "label": "finished",
+      "target": "treatment"
+    },
+    {
+      "source": "Tenant",
+      "label": "shall provide",
+      "target": "Performance Assurance"
+    },
+    {
+      "source": "Performance Assurance",
+      "label": "held by",
+      "target": "landlord"
+    },
+    {
+      "source": "window cleaning",
+      "label": "at",
+      "target": "location"
+    },
+    {
+      "source": "window cleaning",
+      "label": "performed by",
+      "target": "Organization"
+    },
+    {
+      "source": "quote",
+      "label": "for",
+      "target": "Work"
+    },
+    {
+      "source": "Tenant",
+      "label": "shall use",
+      "target": "premises"
+    },
+    {
+      "source": "water damage",
+      "label": "signed off by",
+      "target": "landlord"
+    },
+    {
+      "source": "Person",
+      "label": "pushing for",
+      "target": "water damage"
+    },
+    {
+      "source": "water damage",
+      "label": "documented in",
+      "target": "file"
+    },
+    {
+      "source": "water damage",
+      "label": "in",
+      "target": "warehouse"
+    },
+    {
+      "source": "Robinson Co.",
+      "label": "scheduled to start",
+      "target": "repairs"
+    },
+    {
+      "source": "repairs",
+      "label": "address",
+      "target": "water damage"
+    },
+    {
+      "source": "Tenant",
+      "label": "agrees to occupy",
+      "target": "premises"
+    },
+    {
+      "source": "Organization",
+      "label": "finished",
+      "target": "project"
+    },
+    {
+      "source": "project",
+      "label": "involves",
+      "target": "Person"
+    },
+    {
+      "source": "project",
+      "label": "generates",
+      "target": "invoice"
+    },
+    {
+      "source": "Work",
+      "label": "belongs to",
+      "target": "landlord"
+    },
+    {
+      "source": "commercial lease agreement",
+      "label": "covers",
+      "target": "premises"
+    },
+    {
+      "source": "commercial lease agreement",
+      "label": "subject to",
+      "target": "CPI-indexed increase"
+    },
+    {
+      "source": "Tenant",
+      "label": "provide",
+      "target": "commercial lease agreement"
+    },
+    {
+      "source": "Person",
+      "label": "working on",
+      "target": "Work"
+    },
+    {
+      "source": "Work",
+      "label": "located at",
+      "target": "landlord"
+    },
+    {
+      "source": "landlord",
+      "label": "needs to sign off on",
+      "target": "invoice"
+    },
+    {
+      "source": "water heater",
+      "label": "has",
+      "target": "quote"
+    },
+    {
+      "source": "quote",
+      "label": "is for",
+      "target": "replacement"
+    },
+    {
+      "source": "landlord",
+      "label": "sign off on",
+      "target": "replacement"
+    },
+    {
+      "source": "Lease",
+      "label": "involves",
+      "target": "landlord"
+    },
+    {
+      "source": "Lease",
+      "label": "involves",
+      "target": "Tenant"
+    },
+    {
+      "source": "Tenant",
+      "label": "operates",
+      "target": "Tenant"
+    },
+    {
+      "source": "Person",
+      "label": "sorted out",
+      "target": "carpet"
+    },
+    {
+      "source": "carpet",
+      "label": "has",
+      "target": "invoice"
+    },
+    {
+      "source": "Person",
+      "label": "concerned about",
+      "target": "carpet"
+    },
+    {
+      "source": "Tenant",
+      "label": "shall maintain",
+      "target": "premises"
+    },
+    {
+      "source": "Person",
+      "label": "cleared",
+      "target": "Work"
+    },
+    {
+      "source": "Work",
+      "label": "concerns",
+      "target": "premises"
+    },
+    {
+      "source": "quote",
+      "label": "relates to",
+      "target": "Work"
+    },
+    {
+      "source": "landlord",
+      "label": "sign off on",
+      "target": "quote"
+    },
+    {
+      "source": "Lease",
+      "label": "subject to",
+      "target": "Annual Adjustment"
+    },
+    {
+      "source": "Lease",
+      "label": "requires",
+      "target": "Security Deposit"
+    },
+    {
+      "source": "Security Deposit",
+      "label": "held by",
+      "target": "landlord"
+    },
+    {
+      "source": "Person",
+      "label": "sign-off",
+      "target": "Work"
+    },
+    {
+      "source": "contractor",
+      "label": "submits",
+      "target": "request"
+    },
+    {
+      "source": "request",
+      "label": "sent over to",
+      "target": "landlord"
+    },
+    {
+      "source": "landlord",
+      "label": "approves",
+      "target": "request"
+    },
+    {
+      "source": "request",
+      "label": "assigned to",
+      "target": "contractor"
+    },
+    {
+      "source": "contractor",
+      "label": "works at",
+      "target": "contractor"
+    },
+    {
+      "source": "Tenant",
+      "label": "provides security deposit to",
+      "target": "landlord"
+    },
+    {
+      "source": "Person",
+      "label": "was stressed about",
+      "target": "Work"
+    },
+    {
+      "source": "Baker Solutions",
+      "label": "heading over to",
+      "target": "warehouse"
+    },
+    {
+      "source": "Baker Solutions",
+      "label": "finished up",
+      "target": "HVAC"
+    },
+    {
+      "source": "office",
+      "label": "gets",
+      "target": "invoice"
+    },
+    {
+      "source": "Tenant",
+      "label": "shall pay",
+      "target": "Payment"
+    },
+    {
+      "source": "commercial lease agreement",
+      "label": "specifies",
+      "target": "Payment"
+    },
+    {
+      "source": "contractor",
+      "label": "complaining about",
+      "target": "Issue"
+    },
+    {
+      "source": "quote",
+      "label": "needs approval from",
+      "target": "landlord"
+    },
+    {
+      "source": "Issue",
+      "label": "has",
+      "target": "quote"
+    },
+    {
+      "source": "Person",
+      "label": "alerted",
+      "target": "contractor"
+    },
+    {
+      "source": "contractor",
+      "label": "assigned to fix",
+      "target": "Issue"
+    },
+    {
+      "source": "Work",
+      "label": "addresses",
+      "target": "Issue"
+    },
+    {
+      "source": "Person",
+      "label": "sign off on",
+      "target": "Work"
+    },
+    {
+      "source": "commercial lease agreement",
+      "label": "rental of",
+      "target": "storefront"
+    },
+    {
+      "source": "Tenant",
+      "label": "provide initial funds held to",
+      "target": "landlord"
+    },
+    {
+      "source": "Tenant",
+      "label": "occupy",
+      "target": "storefront"
+    },
+    {
+      "source": "pipe",
+      "label": "at",
+      "target": "landlord"
+    },
+    {
+      "source": "sink",
+      "label": "is dripping",
+      "target": "water"
+    },
+    {
+      "source": "water",
+      "label": "pooling underneath",
+      "target": "sink"
+    },
+    {
+      "source": "repairs",
+      "label": "handle",
+      "target": "sink"
+    },
+    {
+      "source": "Tenant",
+      "label": "agrees to pay",
+      "target": "landlord"
+    },
+    {
+      "source": "Service",
+      "label": "requested at",
+      "target": "premises"
+    },
+    {
+      "source": "Service",
+      "label": "quoted by",
+      "target": "Person"
+    },
+    {
+      "source": "landlord",
+      "label": "owns",
+      "target": "premises"
+    },
+    {
+      "source": "commercial lease agreement",
+      "label": "governs the use of",
+      "target": "premises"
+    },
+    {
+      "source": "Tenant",
+      "label": "shall provide to",
+      "target": "landlord"
+    },
+    {
+      "source": "location",
+      "label": "has",
+      "target": "Issue"
+    },
+    {
+      "source": "Organization",
+      "label": "provides",
+      "target": "Work"
+    },
+    {
+      "source": "premises",
+      "label": "has",
+      "target": "irrigation"
+    },
+    {
+      "source": "landscaping team",
+      "label": "repair",
+      "target": "irrigation"
+    },
+    {
+      "source": "invoice",
+      "label": "associated with",
+      "target": "premises"
+    },
+    {
+      "source": "Tenant",
+      "label": "agrees to pay",
+      "target": "Payment"
+    },
+    {
+      "source": "landlord",
+      "label": "agrees to provide",
+      "target": "premises"
+    },
+    {
+      "source": "office",
+      "label": "has",
+      "target": "irrigation"
+    },
+    {
+      "source": "irrigation",
+      "label": "requires",
+      "target": "quote"
+    },
+    {
+      "source": "quote",
+      "label": "needs sign-off from",
+      "target": "landlord"
+    },
+    {
+      "source": "Person",
+      "label": "working on",
+      "target": "irrigation"
+    },
+    {
+      "source": "irrigation",
+      "label": "located at",
+      "target": "premises"
+    },
+    {
+      "source": "quote",
+      "label": "for",
+      "target": "irrigation"
+    },
+    {
+      "source": "Organization",
+      "label": "assigned to",
+      "target": "Issue"
+    },
+    {
+      "source": "Work",
+      "label": "for",
+      "target": "client"
+    },
+    {
+      "source": "Work",
+      "label": "requires",
+      "target": "invoice"
+    },
+    {
+      "source": "commercial lease agreement",
+      "label": "concerns",
+      "target": "premises"
+    },
+    {
+      "source": "Tenant",
+      "label": "agrees to pay",
+      "target": "monthly payment"
+    },
+    {
+      "source": "Tenant",
+      "label": "shall provide",
+      "target": "good-faith deposit"
+    },
+    {
+      "source": "Tenant",
+      "label": "is responsible for maintaining",
+      "target": "premises"
+    },
+    {
+      "source": "window cleaning",
+      "label": "needs sign off by",
+      "target": "landlord"
+    },
+    {
+      "source": "exterior windows",
+      "label": "at",
+      "target": "building"
+    },
+    {
+      "source": "contractor",
+      "label": "finished up",
+      "target": "Work"
+    },
+    {
+      "source": "Work",
+      "label": "on",
+      "target": "exterior windows"
+    },
+    {
+      "source": "Tenant",
+      "label": "provides damage and performance bond to",
+      "target": "landlord"
+    },
+    {
+      "source": "Tenant",
+      "label": "maintains",
+      "target": "premises"
+    },
+    {
+      "source": "water heater",
+      "label": "at",
+      "target": "landlord"
+    },
+    {
+      "source": "invoice",
+      "label": "for",
+      "target": "water heater"
+    },
+    {
+      "source": "landlord",
+      "label": "hit for",
+      "target": "invoice"
+    },
+    {
+      "source": "Issue",
+      "label": "occurs at",
+      "target": "location"
+    },
+    {
+      "source": "Work",
+      "label": "requires",
+      "target": "parts"
+    },
+    {
+      "source": "Work",
+      "label": "requires approval from",
+      "target": "landlord"
+    },
+    {
+      "source": "Tenant",
+      "label": "pay",
+      "target": "landlord"
+    },
+    {
+      "source": "Tenant",
+      "label": "provide security deposit to",
+      "target": "landlord"
+    },
+    {
+      "source": "Person",
+      "label": "assigned to",
+      "target": "Work"
+    },
+    {
+      "source": "Work",
+      "label": "located at",
+      "target": "premises"
+    },
+    {
+      "source": "Work",
+      "label": "needs",
+      "target": "approval"
+    },
+    {
+      "source": "heating",
+      "label": "is out for",
+      "target": "Tenant"
+    },
+    {
+      "source": "quote",
+      "label": "is for",
+      "target": "Work"
+    },
+    {
+      "source": "landlord",
+      "label": "gives green light on",
+      "target": "parts"
+    },
+    {
+      "source": "contractor",
+      "label": "performs",
+      "target": "Work"
+    },
+    {
+      "source": "Lease",
+      "label": "includes",
+      "target": "Performance Assurance"
+    },
+    {
+      "source": "Lease",
+      "label": "includes",
+      "target": "Annual Adjustment"
+    },
+    {
+      "source": "Tenant",
+      "label": "occupies",
+      "target": "premises"
+    },
+    {
+      "source": "location",
+      "label": "belongs to",
+      "target": "firm"
+    },
+    {
+      "source": "Work",
+      "label": "impacts",
+      "target": "storefront"
+    },
+    {
+      "source": "Tenant",
+      "label": "provides",
+      "target": "Security Deposit"
+    },
+    {
+      "source": "landlord",
+      "label": "holds",
+      "target": "Security Deposit"
+    },
+    {
+      "source": "Work",
+      "label": "assigned to",
+      "target": "Rocha Solutions"
+    },
+    {
+      "source": "Work",
+      "label": "concerns",
+      "target": "outlet"
+    },
+    {
+      "source": "Person",
+      "label": "resolved",
+      "target": "Issue"
+    },
+    {
+      "source": "invoice",
+      "label": "for",
+      "target": "Issue"
+    },
+    {
+      "source": "invoice",
+      "label": "sent to",
+      "target": "Person"
+    },
+    {
+      "source": "Tenant",
+      "label": "reporting",
+      "target": "request"
+    },
+    {
+      "source": "request",
+      "label": "at",
+      "target": "office"
+    },
+    {
+      "source": "request",
+      "label": "results in",
+      "target": "invoice"
+    },
+    {
+      "source": "Person",
+      "label": "reports",
+      "target": "Issue"
+    },
+    {
+      "source": "Issue",
+      "label": "affects",
+      "target": "premises"
+    },
+    {
+      "source": "Issue",
+      "label": "needs sign-off from",
+      "target": "Person"
+    },
+    {
+      "source": "heating",
+      "label": "affects",
+      "target": "Tenant"
+    },
+    {
+      "source": "quote",
+      "label": "requires approval from",
+      "target": "landlord"
+    },
+    {
+      "source": "heating",
+      "label": "located at",
+      "target": "heating"
+    },
+    {
+      "source": "Person",
+      "label": "called about",
+      "target": "Work"
+    },
+    {
+      "source": "Work",
+      "label": "needs",
+      "target": "contractor"
+    },
+    {
+      "source": "Tree",
+      "label": "subject of",
+      "target": "quote"
+    },
+    {
+      "source": "Tree",
+      "label": "needs to be cleared before",
+      "target": "meeting"
+    },
+    {
+      "source": "Tenant",
+      "label": "shall provide",
+      "target": "Security Deposit"
+    },
+    {
+      "source": "Person",
+      "label": "works at",
+      "target": "Person"
+    },
+    {
+      "source": "Person",
+      "label": "requesting sign-off on",
+      "target": "Work Item"
+    },
+    {
+      "source": "Work Item",
+      "label": "located at",
+      "target": "project"
+    },
+    {
+      "source": "Organization",
+      "label": "performs",
+      "target": "Work Item"
+    },
+    {
+      "source": "damage",
+      "label": "located at",
+      "target": "premises"
+    },
+    {
+      "source": "quote",
+      "label": "for",
+      "target": "damage"
+    },
+    {
+      "source": "Tenant",
+      "label": "at",
+      "target": "premises"
+    },
+    {
+      "source": "Person",
+      "label": "asking about",
+      "target": "Issue"
+    },
+    {
+      "source": "Issue",
+      "label": "requires",
+      "target": "Work"
+    },
+    {
+      "source": "Person",
+      "label": "needs to sign off on",
+      "target": "Work"
+    },
+    {
+      "source": "premises",
+      "label": "has",
+      "target": "quote"
+    },
+    {
+      "source": "Person",
+      "label": "is assigned to",
+      "target": "project"
+    },
+    {
+      "source": "Organization",
+      "label": "is waiting on",
+      "target": "project"
+    },
+    {
+      "source": "project",
+      "label": "has",
+      "target": "quote"
+    },
+    {
+      "source": "water heater",
+      "label": "located at",
+      "target": "warehouse"
+    },
+    {
+      "source": "invoice",
+      "label": "requires sign-off from",
+      "target": "landlord"
+    },
+    {
+      "source": "Richards",
+      "label": "will finish up",
+      "target": "water heater"
+    },
+    {
+      "source": "contractor",
+      "label": "affected by",
+      "target": "water heater"
+    },
+    {
+      "source": "Person",
+      "label": "requested",
+      "target": "Work"
+    },
+    {
+      "source": "contractor",
+      "label": "finished up",
+      "target": "stains"
+    },
+    {
+      "source": "landlord",
+      "label": "gave green light to bring in",
+      "target": "contractor"
+    },
+    {
+      "source": "Tenant",
+      "label": "pay to",
+      "target": "landlord"
+    },
+    {
+      "source": "Tenant",
+      "label": "provide",
+      "target": "good-faith deposit"
+    },
+    {
+      "source": "landlord",
+      "label": "hold",
+      "target": "good-faith deposit"
+    },
+    {
+      "source": "Person",
+      "label": "finished",
+      "target": "irrigation"
+    },
+    {
+      "source": "irrigation",
+      "label": "generates",
+      "target": "invoice"
+    },
+    {
+      "source": "Person",
+      "label": "sending",
+      "target": "invoice"
+    },
+    {
+      "source": "Issue",
+      "label": "affects",
+      "target": "irrigation"
+    },
+    {
+      "source": "Person",
+      "label": "responds to",
+      "target": "Issue"
+    },
+    {
+      "source": "Person",
+      "label": "worked on",
+      "target": "Issue"
+    },
+    {
+      "source": "Work",
+      "label": "at",
+      "target": "storefront"
+    },
+    {
+      "source": "Person",
+      "label": "wrapped up",
+      "target": "Work"
+    },
+    {
+      "source": "Work",
+      "label": "Sent",
+      "target": "invoice"
+    },
+    {
+      "source": "sink",
+      "label": "at",
+      "target": "shop"
+    },
+    {
+      "source": "Foster Maintenance",
+      "label": "working on",
+      "target": "sink"
+    },
+    {
+      "source": "Payment",
+      "label": "subject to adjustment based on",
+      "target": "Consumer Price Index"
+    },
+    {
+      "source": "Tenant",
+      "label": "occupy",
+      "target": "premises"
+    },
+    {
+      "source": "Issue",
+      "label": "resolved with",
+      "target": "Person"
+    },
+    {
+      "source": "Issue",
+      "label": "at",
+      "target": "Person"
+    },
+    {
+      "source": "Issue",
+      "label": "has",
+      "target": "invoice"
+    },
+    {
+      "source": "landlord",
+      "label": "sign off on",
+      "target": "invoice"
+    },
+    {
+      "source": "commercial lease agreement",
+      "label": "includes",
+      "target": "Security Deposit"
+    },
+    {
+      "source": "Organization",
+      "label": "took care of",
+      "target": "Issue"
+    },
+    {
+      "source": "Service",
+      "label": "resolves",
+      "target": "Issue"
+    },
+    {
+      "source": "Person",
+      "label": "affected by",
+      "target": "Issue"
+    },
+    {
+      "source": "Organization",
+      "label": "sends",
+      "target": "Document"
+    },
+    {
+      "source": "storage room",
+      "label": "has",
+      "target": "unwanted guests"
+    },
+    {
+      "source": "contractor",
+      "label": "handle",
+      "target": "unwanted guests"
+    },
+    {
+      "source": "contractor",
+      "label": "sent to",
+      "target": "warehouse"
+    },
+    {
+      "source": "landlord",
+      "label": "hold initial funds throughout",
+      "target": "commercial lease agreement"
+    },
+    {
+      "source": "Work",
+      "label": "performed by",
+      "target": "Person"
+    },
+    {
+      "source": "Work",
+      "label": "at",
+      "target": "Organization"
+    },
+    {
+      "source": "invoice",
+      "label": "for",
+      "target": "Work"
+    },
+    {
+      "source": "Work",
+      "label": "based on",
+      "target": "quote"
+    },
+    {
+      "source": "quote",
+      "label": "from",
+      "target": "electrical team"
+    },
+    {
+      "source": "electrical team",
+      "label": "handles",
+      "target": "Work"
+    },
+    {
+      "source": "Tenant",
+      "label": "provide",
+      "target": "Security Deposit"
+    },
+    {
+      "source": "landlord",
+      "label": "held by",
+      "target": "Security Deposit"
+    },
+    {
+      "source": "commercial lease agreement",
+      "label": "subject to",
+      "target": "Annual Adjustment"
+    },
+    {
+      "source": "Organization",
+      "label": "performed",
+      "target": "Work"
+    },
+    {
+      "source": "Work",
+      "label": "generated",
+      "target": "invoice"
+    },
+    {
+      "source": "contractor",
+      "label": "finished",
+      "target": "repairs"
+    },
+    {
+      "source": "repairs",
+      "label": "patched up",
+      "target": "hole"
+    },
+    {
+      "source": "commercial lease agreement",
+      "label": "requires",
+      "target": "Security Deposit"
+    },
+    {
+      "source": "Baker Solutions",
+      "label": "Fixed",
+      "target": "AC"
+    },
+    {
+      "source": "AC",
+      "label": "located at",
+      "target": "Kirby Dr"
+    },
+    {
+      "source": "Shawn",
+      "label": "was stressing about",
+      "target": "AC"
+    },
+    {
+      "source": "warehouse",
+      "label": "has",
+      "target": "AC"
+    },
+    {
+      "source": "tech",
+      "label": "working on",
+      "target": "repairs"
+    },
+    {
+      "source": "repairs",
+      "label": "affects",
+      "target": "AC"
+    },
+    {
+      "source": "Person",
+      "label": "flagged",
+      "target": "breaker"
+    },
+    {
+      "source": "breaker",
+      "label": "requires",
+      "target": "fix"
+    },
+    {
+      "source": "electrical issue",
+      "label": "requires",
+      "target": "Work"
+    },
+    {
+      "source": "Work",
+      "label": "has",
+      "target": "quote"
+    },
+    {
+      "source": "electrical issue",
+      "label": "affects",
+      "target": "panel"
+    },
+    {
+      "source": "contractor",
+      "label": "fixed",
+      "target": "outlet"
+    },
+    {
+      "source": "invoice",
+      "label": "billed to",
+      "target": "outlet"
+    },
+    {
+      "source": "outlet",
+      "label": "affects",
+      "target": "shift"
+    },
+    {
+      "source": "Work",
+      "label": "resolves",
+      "target": "outlet"
+    },
+    {
+      "source": "Person",
+      "label": "handling",
+      "target": "fix"
+    },
+    {
+      "source": "fix",
+      "label": "for",
+      "target": "Issue"
+    },
+    {
+      "source": "storage room",
+      "label": "located at",
+      "target": "premises"
+    },
+    {
+      "source": "inventory",
+      "label": "kept in",
+      "target": "storage room"
+    },
+    {
+      "source": "Work",
+      "label": "performed on",
+      "target": "storage room"
+    },
+    {
+      "source": "landlord",
+      "label": "signs off on",
+      "target": "Work"
+    },
+    {
+      "source": "Person",
+      "label": "is on",
+      "target": "Work"
+    },
+    {
+      "source": "landlord",
+      "label": "must sign off on",
+      "target": "Work"
+    },
+    {
+      "source": "carpet",
+      "label": "located at",
+      "target": "shop"
+    },
+    {
+      "source": "cleaning bill",
+      "label": "requires sign off from",
+      "target": "landlord"
+    },
+    {
+      "source": "cleaning bill",
+      "label": "covers",
+      "target": "carpet"
+    },
+    {
+      "source": "Person",
+      "label": "assigned to",
+      "target": "Issue"
+    },
+    {
+      "source": "Tenant",
+      "label": "reporting",
+      "target": "Issue"
+    },
+    {
+      "source": "Work",
+      "label": "scheduled at",
+      "target": "premises"
+    },
+    {
+      "source": "Person",
+      "label": "involved in",
+      "target": "Work"
+    },
+    {
+      "source": "door frame",
+      "label": "located at",
+      "target": "warehouse"
+    },
+    {
+      "source": "loading dock",
+      "label": "located at",
+      "target": "warehouse"
+    },
+    {
+      "source": "quote",
+      "label": "clears",
+      "target": "Work"
+    },
+    {
+      "source": "Work",
+      "label": "performed on",
+      "target": "door frame"
+    },
+    {
+      "source": "Person",
+      "label": "at",
+      "target": "Organization"
+    },
+    {
+      "source": "Issue",
+      "label": "concerns",
+      "target": "outlet"
+    },
+    {
+      "source": "Rocha Solutions",
+      "label": "heading over to wrap up",
+      "target": "Issue"
+    },
+    {
+      "source": "lights",
+      "label": "associated with",
+      "target": "invoice"
+    },
+    {
+      "source": "Rocha Solutions",
+      "label": "tapped to handle",
+      "target": "lights"
+    },
+    {
+      "source": "Work",
+      "label": "required before",
+      "target": "Rocha Solutions"
+    },
+    {
+      "source": "lights",
+      "label": "located at",
+      "target": "storefront"
+    },
+    {
+      "source": "quote",
+      "label": "sent to",
+      "target": "Person"
+    },
+    {
+      "source": "Tenant",
+      "label": "pushing for",
+      "target": "Work"
+    },
+    {
+      "source": "Person",
+      "label": "fixed",
+      "target": "pipe"
+    },
+    {
+      "source": "pipe",
+      "label": "located at",
+      "target": "landlord"
+    },
+    {
+      "source": "invoice",
+      "label": "clears",
+      "target": "pipe"
+    },
+    {
+      "source": "plumbing crew",
+      "label": "finished up the work",
+      "target": "sink"
+    },
+    {
+      "source": "plumbing crew",
+      "label": "clear",
+      "target": "pipe"
+    },
+    {
+      "source": "plumbing crew",
+      "label": "swing back by for",
+      "target": "final check"
+    },
+    {
+      "source": "county",
+      "label": "on",
+      "target": "irrigation"
+    },
+    {
+      "source": "landlord",
+      "label": "sign-off required for",
+      "target": "Work"
+    },
+    {
+      "source": "location",
+      "label": "has",
+      "target": "irrigation"
+    },
+    {
+      "source": "quote",
+      "label": "requires sign-off from",
+      "target": "landlord"
+    },
+    {
+      "source": "parts",
+      "label": "ordered based on",
+      "target": "quote"
+    },
+    {
+      "source": "Work",
+      "label": "performed at",
+      "target": "premises"
+    },
+    {
+      "source": "Person",
+      "label": "associated with",
+      "target": "premises"
+    },
+    {
+      "source": "sink",
+      "label": "at",
+      "target": "landlord"
+    },
+    {
+      "source": "pipe",
+      "label": "at",
+      "target": "sink"
+    },
+    {
+      "source": "Service",
+      "label": "handles",
+      "target": "Work"
+    },
+    {
+      "source": "Work",
+      "label": "fixes",
+      "target": "irrigation"
+    },
+    {
+      "source": "contractor",
+      "label": "looking into",
+      "target": "irrigation"
+    },
+    {
+      "source": "premises",
+      "label": "has owner who signs off on",
+      "target": "quote"
+    },
+    {
+      "source": "window cleaning",
+      "label": "at",
+      "target": "space"
+    },
+    {
+      "source": "window cleaning",
+      "label": "finished by",
+      "target": "Person"
+    },
+    {
+      "source": "space",
+      "label": "for",
+      "target": "Person"
+    },
+    {
+      "source": "Tenant",
+      "label": "asking to have",
+      "target": "Work"
+    },
+    {
+      "source": "Issue",
+      "label": "at",
+      "target": "premises"
+    },
+    {
+      "source": "invoice",
+      "label": "for",
+      "target": "sparky"
+    },
+    {
+      "source": "Organization",
+      "label": "owns",
+      "target": "premises"
+    },
+    {
+      "source": "visit",
+      "label": "addresses",
+      "target": "Issue"
+    },
+    {
+      "source": "quote",
+      "label": "relates to",
+      "target": "Issue"
+    },
+    {
+      "source": "Person",
+      "label": "works at",
+      "target": "premises"
+    },
+    {
+      "source": "Person",
+      "label": "requesting",
+      "target": "Service"
+    },
+    {
+      "source": "Service",
+      "label": "needed at",
+      "target": "premises"
+    },
+    {
+      "source": "Organization",
+      "label": "provides",
+      "target": "Service"
+    },
+    {
+      "source": "storefront",
+      "label": "has",
+      "target": "quote"
+    },
+    {
+      "source": "landlord",
+      "label": "sign-off on",
+      "target": "quote"
+    }
+  ],
+  "metadata": {
+    "condition": "P1",
+    "model": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "run_id": "2026-08-21T21:50:44Z-484f",
+    "source_documents": [
+      "csv_exports/leases_export_01.csv",
+      "lease_texts/lease-001.txt",
+      "notes/mr-001.txt",
+      "messages/mr-001.txt",
+      "csv_exports/leases_export_02.csv",
+      "lease_texts/lease-002.txt",
+      "notes/mr-002.txt",
+      "messages/mr-002.txt",
+      "csv_exports/leases_export_03.csv",
+      "lease_texts/lease-003.txt",
+      "notes/mr-003.txt",
+      "messages/mr-003.txt",
+      "csv_exports/leases_export_04.csv",
+      "lease_texts/lease-004.txt",
+      "notes/mr-004.txt",
+      "messages/mr-004.txt",
+      "csv_exports/maintenance_requests_export_01.csv",
+      "lease_texts/lease-005.txt",
+      "notes/mr-005.txt",
+      "messages/mr-005.txt",
+      "csv_exports/maintenance_requests_export_02.csv",
+      "lease_texts/lease-006.txt",
+      "notes/mr-006.txt",
+      "messages/mr-006.txt",
+      "csv_exports/maintenance_requests_export_03.csv",
+      "lease_texts/lease-007.txt",
+      "notes/mr-007.txt",
+      "messages/mr-007.txt",
+      "csv_exports/maintenance_requests_export_04.csv",
+      "lease_texts/lease-008.txt",
+      "notes/mr-008.txt",
+      "messages/mr-008.txt",
+      "csv_exports/maintenance_requests_export_05.csv",
+      "lease_texts/lease-009.txt",
+      "notes/mr-009.txt",
+      "messages/mr-009.txt",
+      "csv_exports/properties_export_01.csv",
+      "lease_texts/lease-010.txt",
+      "notes/mr-010.txt",
+      "messages/mr-010.txt",
+      "csv_exports/properties_export_02.csv",
+      "lease_texts/lease-011.txt",
+      "notes/mr-011.txt",
+      "messages/mr-011.txt",
+      "csv_exports/properties_export_03.csv",
+      "lease_texts/lease-012.txt",
+      "notes/mr-012.txt",
+      "messages/mr-012.txt",
+      "lease_texts/lease-013.txt",
+      "notes/mr-013.txt",
+      "messages/mr-013.txt",
+      "lease_texts/lease-014.txt",
+      "notes/mr-014.txt",
+      "messages/mr-014.txt",
+      "lease_texts/lease-015.txt",
+      "notes/mr-015.txt",
+      "messages/mr-015.txt",
+      "lease_texts/lease-016.txt",
+      "notes/mr-016.txt",
+      "messages/mr-016.txt",
+      "lease_texts/lease-017.txt",
+      "notes/mr-017.txt",
+      "messages/mr-017.txt",
+      "lease_texts/lease-018.txt",
+      "notes/mr-018.txt",
+      "messages/mr-018.txt",
+      "lease_texts/lease-019.txt",
+      "notes/mr-019.txt",
+      "messages/mr-019.txt",
+      "lease_texts/lease-020.txt",
+      "notes/mr-020.txt",
+      "messages/mr-020.txt",
+      "lease_texts/lease-021.txt",
+      "notes/mr-021.txt",
+      "messages/mr-021.txt",
+      "lease_texts/lease-022.txt",
+      "notes/mr-022.txt",
+      "messages/mr-022.txt",
+      "lease_texts/lease-023.txt",
+      "notes/mr-023.txt",
+      "messages/mr-023.txt",
+      "lease_texts/lease-024.txt",
+      "notes/mr-024.txt",
+      "messages/mr-024.txt",
+      "lease_texts/lease-025.txt",
+      "notes/mr-025.txt",
+      "messages/mr-025.txt",
+      "lease_texts/lease-026.txt",
+      "notes/mr-026.txt",
+      "messages/mr-026.txt",
+      "lease_texts/lease-027.txt",
+      "notes/mr-027.txt",
+      "messages/mr-027.txt",
+      "lease_texts/lease-028.txt",
+      "notes/mr-028.txt",
+      "messages/mr-028.txt",
+      "lease_texts/lease-029.txt",
+      "notes/mr-029.txt",
+      "messages/mr-029.txt",
+      "lease_texts/lease-030.txt",
+      "notes/mr-030.txt",
+      "messages/mr-030.txt",
+      "lease_texts/lease-031.txt",
+      "notes/mr-031.txt",
+      "messages/mr-031.txt",
+      "lease_texts/lease-032.txt",
+      "notes/mr-032.txt",
+      "messages/mr-032.txt",
+      "lease_texts/lease-033.txt",
+      "notes/mr-033.txt",
+      "messages/mr-033.txt",
+      "lease_texts/lease-034.txt",
+      "notes/mr-034.txt",
+      "messages/mr-034.txt",
+      "lease_texts/lease-035.txt",
+      "notes/mr-035.txt",
+      "messages/mr-035.txt",
+      "lease_texts/lease-036.txt",
+      "notes/mr-036.txt",
+      "messages/mr-036.txt",
+      "lease_texts/lease-037.txt",
+      "notes/mr-037.txt",
+      "messages/mr-037.txt",
+      "lease_texts/lease-038.txt",
+      "notes/mr-038.txt",
+      "messages/mr-038.txt",
+      "lease_texts/lease-039.txt",
+      "notes/mr-039.txt",
+      "messages/mr-039.txt",
+      "lease_texts/lease-040.txt",
+      "notes/mr-040.txt",
+      "messages/mr-040.txt",
+      "lease_texts/lease-041.txt",
+      "notes/mr-041.txt",
+      "messages/mr-041.txt",
+      "lease_texts/lease-042.txt",
+      "notes/mr-042.txt",
+      "messages/mr-042.txt",
+      "lease_texts/lease-043.txt",
+      "notes/mr-043.txt",
+      "messages/mr-043.txt",
+      "lease_texts/lease-044.txt",
+      "notes/mr-044.txt",
+      "messages/mr-044.txt",
+      "lease_texts/lease-045.txt",
+      "notes/mr-045.txt",
+      "messages/mr-045.txt",
+      "lease_texts/lease-046.txt",
+      "notes/mr-046.txt",
+      "messages/mr-046.txt",
+      "lease_texts/lease-047.txt",
+      "notes/mr-047.txt",
+      "messages/mr-047.txt",
+      "lease_texts/lease-048.txt",
+      "notes/mr-048.txt",
+      "messages/mr-048.txt",
+      "lease_texts/lease-049.txt",
+      "notes/mr-049.txt",
+      "messages/mr-049.txt",
+      "lease_texts/lease-050.txt",
+      "notes/mr-050.txt",
+      "messages/mr-050.txt",
+      "notes/mr-051.txt",
+      "messages/mr-051.txt",
+      "notes/mr-052.txt",
+      "messages/mr-052.txt",
+      "notes/mr-053.txt",
+      "messages/mr-053.txt",
+      "notes/mr-054.txt",
+      "messages/mr-054.txt",
+      "notes/mr-055.txt",
+      "messages/mr-055.txt",
+      "notes/mr-056.txt",
+      "messages/mr-056.txt",
+      "notes/mr-057.txt",
+      "messages/mr-057.txt",
+      "notes/mr-058.txt",
+      "messages/mr-058.txt",
+      "notes/mr-059.txt",
+      "messages/mr-059.txt",
+      "notes/mr-060.txt",
+      "messages/mr-060.txt",
+      "notes/mr-061.txt",
+      "messages/mr-061.txt",
+      "notes/mr-062.txt",
+      "messages/mr-062.txt",
+      "notes/mr-063.txt",
+      "messages/mr-063.txt",
+      "notes/mr-064.txt",
+      "messages/mr-064.txt",
+      "notes/mr-065.txt",
+      "messages/mr-065.txt"
+    ],
+    "extraction_calls": 192,
+    "extraction_skipped": 0,
+    "merge_log": [
+      {
+        "merged_name": "Lease",
+        "source_names": [
+          "Lease",
+          "Lease Agreement"
+        ],
+        "source_documents": [
+          "csv_exports/leases_export_01.csv",
+          "csv_exports/leases_export_02.csv",
+          "csv_exports/leases_export_03.csv",
+          "csv_exports/leases_export_04.csv",
+          "lease_texts/lease-004.txt",
+          "lease_texts/lease-007.txt",
+          "lease_texts/lease-008.txt",
+          "lease_texts/lease-013.txt",
+          "lease_texts/lease-015.txt",
+          "lease_texts/lease-016.txt",
+          "lease_texts/lease-020.txt",
+          "lease_texts/lease-021.txt",
+          "lease_texts/lease-022.txt",
+          "lease_texts/lease-023.txt",
+          "lease_texts/lease-029.txt",
+          "lease_texts/lease-033.txt",
+          "lease_texts/lease-035.txt",
+          "lease_texts/lease-039.txt",
+          "lease_texts/lease-040.txt"
+        ]
+      },
+      {
+        "merged_name": "commercial lease agreement",
+        "source_names": [
+          "commercial lease agreement"
+        ],
+        "source_documents": [
+          "lease_texts/lease-001.txt",
+          "lease_texts/lease-002.txt",
+          "lease_texts/lease-003.txt",
+          "lease_texts/lease-005.txt",
+          "lease_texts/lease-006.txt",
+          "lease_texts/lease-009.txt",
+          "lease_texts/lease-010.txt",
+          "lease_texts/lease-011.txt",
+          "lease_texts/lease-012.txt",
+          "lease_texts/lease-014.txt",
+          "lease_texts/lease-017.txt",
+          "lease_texts/lease-018.txt",
+          "lease_texts/lease-019.txt",
+          "lease_texts/lease-024.txt",
+          "lease_texts/lease-025.txt",
+          "lease_texts/lease-026.txt",
+          "lease_texts/lease-027.txt",
+          "lease_texts/lease-028.txt",
+          "lease_texts/lease-030.txt",
+          "lease_texts/lease-031.txt",
+          "lease_texts/lease-032.txt",
+          "lease_texts/lease-034.txt",
+          "lease_texts/lease-036.txt",
+          "lease_texts/lease-037.txt",
+          "lease_texts/lease-038.txt",
+          "lease_texts/lease-041.txt",
+          "lease_texts/lease-042.txt",
+          "lease_texts/lease-043.txt",
+          "lease_texts/lease-044.txt",
+          "lease_texts/lease-045.txt",
+          "lease_texts/lease-046.txt",
+          "lease_texts/lease-047.txt",
+          "lease_texts/lease-048.txt",
+          "lease_texts/lease-049.txt",
+          "lease_texts/lease-050.txt"
+        ]
+      },
+      {
+        "merged_name": "Tenant",
+        "source_names": [
+          "Tenant",
+          "Lessee",
+          "Occupant",
+          "Tenant Entity"
+        ],
+        "source_documents": [
+          "csv_exports/leases_export_03.csv",
+          "csv_exports/leases_export_04.csv",
+          "csv_exports/maintenance_requests_export_02.csv",
+          "csv_exports/maintenance_requests_export_03.csv",
+          "csv_exports/maintenance_requests_export_04.csv",
+          "csv_exports/maintenance_requests_export_05.csv",
+          "lease_texts/lease-001.txt",
+          "lease_texts/lease-002.txt",
+          "lease_texts/lease-003.txt",
+          "lease_texts/lease-004.txt",
+          "lease_texts/lease-005.txt",
+          "lease_texts/lease-006.txt",
+          "lease_texts/lease-007.txt",
+          "lease_texts/lease-008.txt",
+          "lease_texts/lease-009.txt",
+          "lease_texts/lease-010.txt",
+          "lease_texts/lease-011.txt",
+          "lease_texts/lease-012.txt",
+          "lease_texts/lease-013.txt",
+          "lease_texts/lease-014.txt",
+          "lease_texts/lease-015.txt",
+          "lease_texts/lease-016.txt",
+          "lease_texts/lease-017.txt",
+          "lease_texts/lease-018.txt",
+          "lease_texts/lease-019.txt",
+          "lease_texts/lease-020.txt",
+          "lease_texts/lease-021.txt",
+          "lease_texts/lease-022.txt",
+          "lease_texts/lease-023.txt",
+          "lease_texts/lease-024.txt",
+          "lease_texts/lease-025.txt",
+          "lease_texts/lease-026.txt",
+          "lease_texts/lease-027.txt",
+          "lease_texts/lease-028.txt",
+          "lease_texts/lease-029.txt",
+          "lease_texts/lease-030.txt",
+          "lease_texts/lease-031.txt",
+          "lease_texts/lease-032.txt",
+          "lease_texts/lease-033.txt",
+          "lease_texts/lease-034.txt",
+          "lease_texts/lease-035.txt",
+          "lease_texts/lease-036.txt",
+          "lease_texts/lease-037.txt",
+          "lease_texts/lease-038.txt",
+          "lease_texts/lease-039.txt",
+          "lease_texts/lease-040.txt",
+          "lease_texts/lease-041.txt",
+          "lease_texts/lease-042.txt",
+          "lease_texts/lease-043.txt",
+          "lease_texts/lease-044.txt",
+          "lease_texts/lease-045.txt",
+          "lease_texts/lease-046.txt",
+          "lease_texts/lease-047.txt",
+          "lease_texts/lease-048.txt",
+          "lease_texts/lease-049.txt",
+          "lease_texts/lease-050.txt",
+          "messages/mr-007.txt",
+          "messages/mr-032.txt",
+          "messages/mr-035.txt",
+          "messages/mr-036.txt",
+          "messages/mr-038.txt",
+          "messages/mr-054.txt",
+          "messages/mr-058.txt",
+          "messages/mr-063.txt"
+        ]
+      },
+      {
+        "merged_name": "landlord",
+        "source_names": [
+          "landlord",
+          "owner",
+          "Property Owner"
+        ],
+        "source_documents": [
+          "csv_exports/leases_export_03.csv",
+          "csv_exports/leases_export_04.csv",
+          "csv_exports/maintenance_requests_export_05.csv",
+          "csv_exports/properties_export_03.csv",
+          "lease_texts/lease-001.txt",
+          "lease_texts/lease-002.txt",
+          "lease_texts/lease-003.txt",
+          "lease_texts/lease-004.txt",
+          "lease_texts/lease-005.txt",
+          "lease_texts/lease-006.txt",
+          "lease_texts/lease-007.txt",
+          "lease_texts/lease-008.txt",
+          "lease_texts/lease-009.txt",
+          "lease_texts/lease-010.txt",
+          "lease_texts/lease-011.txt",
+          "lease_texts/lease-012.txt",
+          "lease_texts/lease-013.txt",
+          "lease_texts/lease-014.txt",
+          "lease_texts/lease-015.txt",
+          "lease_texts/lease-016.txt",
+          "lease_texts/lease-017.txt",
+          "lease_texts/lease-018.txt",
+          "lease_texts/lease-019.txt",
+          "lease_texts/lease-020.txt",
+          "lease_texts/lease-021.txt",
+          "lease_texts/lease-022.txt",
+          "lease_texts/lease-023.txt",
+          "lease_texts/lease-024.txt",
+          "lease_texts/lease-025.txt",
+          "lease_texts/lease-026.txt",
+          "lease_texts/lease-027.txt",
+          "lease_texts/lease-028.txt",
+          "lease_texts/lease-029.txt",
+          "lease_texts/lease-030.txt",
+          "lease_texts/lease-031.txt",
+          "lease_texts/lease-032.txt",
+          "lease_texts/lease-033.txt",
+          "lease_texts/lease-034.txt",
+          "lease_texts/lease-035.txt",
+          "lease_texts/lease-036.txt",
+          "lease_texts/lease-037.txt",
+          "lease_texts/lease-038.txt",
+          "lease_texts/lease-039.txt",
+          "lease_texts/lease-040.txt",
+          "lease_texts/lease-041.txt",
+          "lease_texts/lease-042.txt",
+          "lease_texts/lease-043.txt",
+          "lease_texts/lease-044.txt",
+          "lease_texts/lease-045.txt",
+          "lease_texts/lease-046.txt",
+          "lease_texts/lease-047.txt",
+          "lease_texts/lease-048.txt",
+          "lease_texts/lease-049.txt",
+          "lease_texts/lease-050.txt",
+          "messages/mr-004.txt",
+          "messages/mr-012.txt",
+          "messages/mr-013.txt",
+          "messages/mr-018.txt",
+          "messages/mr-019.txt",
+          "messages/mr-021.txt",
+          "messages/mr-022.txt",
+          "messages/mr-031.txt",
+          "messages/mr-032.txt",
+          "messages/mr-036.txt",
+          "messages/mr-040.txt",
+          "messages/mr-041.txt",
+          "messages/mr-045.txt",
+          "messages/mr-047.txt",
+          "messages/mr-052.txt",
+          "messages/mr-053.txt",
+          "messages/mr-058.txt",
+          "messages/mr-061.txt",
+          "messages/mr-065.txt",
+          "notes/mr-001.txt",
+          "notes/mr-008.txt",
+          "notes/mr-009.txt",
+          "notes/mr-017.txt",
+          "notes/mr-019.txt",
+          "notes/mr-024.txt",
+          "notes/mr-025.txt",
+          "notes/mr-026.txt",
+          "notes/mr-028.txt",
+          "notes/mr-030.txt",
+          "notes/mr-031.txt",
+          "notes/mr-050.txt",
+          "notes/mr-053.txt",
+          "notes/mr-059.txt",
+          "notes/mr-060.txt"
+        ]
+      },
+      {
+        "merged_name": "premises",
+        "source_names": [
+          "premises",
+          "Property",
+          "office space",
+          "retail space",
+          "office building",
+          "industrial property",
+          "retail property",
+          "industrial premises",
+          "retail premises"
+        ],
+        "source_documents": [
+          "csv_exports/properties_export_03.csv",
+          "lease_texts/lease-001.txt",
+          "lease_texts/lease-002.txt",
+          "lease_texts/lease-003.txt",
+          "lease_texts/lease-004.txt",
+          "lease_texts/lease-005.txt",
+          "lease_texts/lease-006.txt",
+          "lease_texts/lease-007.txt",
+          "lease_texts/lease-008.txt",
+          "lease_texts/lease-009.txt",
+          "lease_texts/lease-010.txt",
+          "lease_texts/lease-011.txt",
+          "lease_texts/lease-012.txt",
+          "lease_texts/lease-013.txt",
+          "lease_texts/lease-014.txt",
+          "lease_texts/lease-015.txt",
+          "lease_texts/lease-017.txt",
+          "lease_texts/lease-018.txt",
+          "lease_texts/lease-019.txt",
+          "lease_texts/lease-020.txt",
+          "lease_texts/lease-021.txt",
+          "lease_texts/lease-022.txt",
+          "lease_texts/lease-023.txt",
+          "lease_texts/lease-024.txt",
+          "lease_texts/lease-026.txt",
+          "lease_texts/lease-027.txt",
+          "lease_texts/lease-028.txt",
+          "lease_texts/lease-029.txt",
+          "lease_texts/lease-030.txt",
+          "lease_texts/lease-031.txt",
+          "lease_texts/lease-032.txt",
+          "lease_texts/lease-033.txt",
+          "lease_texts/lease-034.txt",
+          "lease_texts/lease-035.txt",
+          "lease_texts/lease-036.txt",
+          "lease_texts/lease-037.txt",
+          "lease_texts/lease-038.txt",
+          "lease_texts/lease-039.txt",
+          "lease_texts/lease-040.txt",
+          "lease_texts/lease-041.txt",
+          "lease_texts/lease-042.txt",
+          "lease_texts/lease-043.txt",
+          "lease_texts/lease-044.txt",
+          "lease_texts/lease-045.txt",
+          "lease_texts/lease-046.txt",
+          "lease_texts/lease-047.txt",
+          "lease_texts/lease-048.txt",
+          "lease_texts/lease-049.txt",
+          "lease_texts/lease-050.txt",
+          "messages/mr-001.txt",
+          "messages/mr-006.txt",
+          "messages/mr-009.txt",
+          "messages/mr-014.txt",
+          "messages/mr-021.txt",
+          "messages/mr-027.txt",
+          "messages/mr-028.txt",
+          "messages/mr-038.txt",
+          "messages/mr-039.txt",
+          "messages/mr-052.txt",
+          "messages/mr-054.txt",
+          "messages/mr-062.txt",
+          "notes/mr-002.txt",
+          "notes/mr-026.txt",
+          "notes/mr-032.txt",
+          "notes/mr-036.txt",
+          "notes/mr-054.txt",
+          "notes/mr-061.txt",
+          "notes/mr-064.txt",
+          "notes/mr-065.txt"
+        ]
+      },
+      {
+        "merged_name": "Person",
+        "source_names": [
+          "Person",
+          "Contact",
+          "Manager",
+          "Account Rep",
+          "technician",
+          "worker"
+        ],
+        "source_documents": [
+          "csv_exports/maintenance_requests_export_03.csv",
+          "csv_exports/maintenance_requests_export_04.csv",
+          "messages/mr-024.txt",
+          "messages/mr-042.txt",
+          "notes/mr-002.txt",
+          "notes/mr-003.txt",
+          "notes/mr-004.txt",
+          "notes/mr-005.txt",
+          "notes/mr-006.txt",
+          "notes/mr-007.txt",
+          "notes/mr-008.txt",
+          "notes/mr-010.txt",
+          "notes/mr-011.txt",
+          "notes/mr-012.txt",
+          "notes/mr-013.txt",
+          "notes/mr-014.txt",
+          "notes/mr-015.txt",
+          "notes/mr-016.txt",
+          "notes/mr-017.txt",
+          "notes/mr-018.txt",
+          "notes/mr-019.txt",
+          "notes/mr-020.txt",
+          "notes/mr-021.txt",
+          "notes/mr-022.txt",
+          "notes/mr-023.txt",
+          "notes/mr-026.txt",
+          "notes/mr-028.txt",
+          "notes/mr-029.txt",
+          "notes/mr-032.txt",
+          "notes/mr-033.txt",
+          "notes/mr-034.txt",
+          "notes/mr-035.txt",
+          "notes/mr-036.txt",
+          "notes/mr-037.txt",
+          "notes/mr-038.txt",
+          "notes/mr-039.txt",
+          "notes/mr-040.txt",
+          "notes/mr-041.txt",
+          "notes/mr-042.txt",
+          "notes/mr-043.txt",
+          "notes/mr-044.txt",
+          "notes/mr-045.txt",
+          "notes/mr-046.txt",
+          "notes/mr-047.txt",
+          "notes/mr-048.txt",
+          "notes/mr-050.txt",
+          "notes/mr-052.txt",
+          "notes/mr-053.txt",
+          "notes/mr-054.txt",
+          "notes/mr-055.txt",
+          "notes/mr-056.txt",
+          "notes/mr-058.txt",
+          "notes/mr-059.txt",
+          "notes/mr-061.txt",
+          "notes/mr-062.txt",
+          "notes/mr-063.txt",
+          "notes/mr-064.txt",
+          "notes/mr-065.txt"
+        ]
+      },
+      {
+        "merged_name": "Organization",
+        "source_names": [
+          "Organization",
+          "company",
+          "Vendor",
+          "service provider"
+        ],
+        "source_documents": [
+          "csv_exports/maintenance_requests_export_05.csv",
+          "messages/mr-003.txt",
+          "messages/mr-012.txt",
+          "notes/mr-002.txt",
+          "notes/mr-004.txt",
+          "notes/mr-005.txt",
+          "notes/mr-009.txt",
+          "notes/mr-011.txt",
+          "notes/mr-012.txt",
+          "notes/mr-014.txt",
+          "notes/mr-016.txt",
+          "notes/mr-018.txt",
+          "notes/mr-023.txt",
+          "notes/mr-026.txt",
+          "notes/mr-027.txt",
+          "notes/mr-029.txt",
+          "notes/mr-032.txt",
+          "notes/mr-034.txt",
+          "notes/mr-038.txt",
+          "notes/mr-040.txt",
+          "notes/mr-041.txt",
+          "notes/mr-045.txt",
+          "notes/mr-046.txt",
+          "notes/mr-047.txt",
+          "notes/mr-048.txt",
+          "notes/mr-053.txt",
+          "notes/mr-054.txt",
+          "notes/mr-056.txt",
+          "notes/mr-064.txt",
+          "notes/mr-065.txt"
+        ]
+      },
+      {
+        "merged_name": "location",
+        "source_names": [
+          "location",
+          "Building_Location",
+          "Property Address",
+          "site"
+        ],
+        "source_documents": [
+          "csv_exports/maintenance_requests_export_02.csv",
+          "csv_exports/maintenance_requests_export_03.csv",
+          "csv_exports/maintenance_requests_export_04.csv",
+          "messages/mr-003.txt",
+          "messages/mr-011.txt",
+          "messages/mr-016.txt",
+          "messages/mr-026.txt",
+          "messages/mr-029.txt",
+          "messages/mr-031.txt",
+          "messages/mr-042.txt",
+          "messages/mr-060.txt",
+          "notes/mr-007.txt",
+          "notes/mr-014.txt",
+          "notes/mr-015.txt",
+          "notes/mr-023.txt",
+          "notes/mr-027.txt",
+          "notes/mr-029.txt",
+          "notes/mr-033.txt",
+          "notes/mr-034.txt",
+          "notes/mr-035.txt",
+          "notes/mr-039.txt",
+          "notes/mr-043.txt",
+          "notes/mr-046.txt",
+          "notes/mr-048.txt",
+          "notes/mr-052.txt"
+        ]
+      },
+      {
+        "merged_name": "Issue",
+        "source_names": [
+          "Issue",
+          "problem",
+          "Infestation"
+        ],
+        "source_documents": [
+          "messages/mr-003.txt",
+          "messages/mr-006.txt",
+          "messages/mr-011.txt",
+          "messages/mr-024.txt",
+          "messages/mr-031.txt",
+          "messages/mr-042.txt",
+          "messages/mr-054.txt",
+          "messages/mr-056.txt",
+          "messages/mr-064.txt",
+          "notes/mr-002.txt",
+          "notes/mr-005.txt",
+          "notes/mr-006.txt",
+          "notes/mr-007.txt",
+          "notes/mr-009.txt",
+          "notes/mr-015.txt",
+          "notes/mr-024.txt",
+          "notes/mr-027.txt",
+          "notes/mr-029.txt",
+          "notes/mr-035.txt",
+          "notes/mr-036.txt",
+          "notes/mr-039.txt",
+          "notes/mr-043.txt",
+          "notes/mr-045.txt",
+          "notes/mr-046.txt",
+          "notes/mr-047.txt",
+          "notes/mr-052.txt",
+          "notes/mr-053.txt",
+          "notes/mr-054.txt",
+          "notes/mr-064.txt"
+        ]
+      },
+      {
+        "merged_name": "Work",
+        "source_names": [
+          "Work",
+          "job",
+          "task",
+          "repair",
+          "maintenance request",
+          "work order"
+        ],
+        "source_documents": [
+          "csv_exports/maintenance_requests_export_01.csv",
+          "csv_exports/maintenance_requests_export_02.csv",
+          "csv_exports/maintenance_requests_export_03.csv",
+          "csv_exports/maintenance_requests_export_04.csv",
+          "csv_exports/maintenance_requests_export_05.csv",
+          "messages/mr-008.txt",
+          "messages/mr-012.txt",
+          "messages/mr-016.txt",
+          "messages/mr-018.txt",
+          "messages/mr-020.txt",
+          "messages/mr-021.txt",
+          "messages/mr-024.txt",
+          "messages/mr-026.txt",
+          "messages/mr-029.txt",
+          "messages/mr-030.txt",
+          "messages/mr-031.txt",
+          "messages/mr-032.txt",
+          "messages/mr-033.txt",
+          "messages/mr-034.txt",
+          "messages/mr-043.txt",
+          "messages/mr-045.txt",
+          "messages/mr-047.txt",
+          "messages/mr-050.txt",
+          "messages/mr-051.txt",
+          "messages/mr-052.txt",
+          "messages/mr-054.txt",
+          "messages/mr-055.txt",
+          "messages/mr-057.txt",
+          "messages/mr-058.txt",
+          "messages/mr-063.txt",
+          "notes/mr-003.txt",
+          "notes/mr-006.txt",
+          "notes/mr-008.txt",
+          "notes/mr-009.txt",
+          "notes/mr-010.txt",
+          "notes/mr-012.txt",
+          "notes/mr-013.txt",
+          "notes/mr-014.txt",
+          "notes/mr-019.txt",
+          "notes/mr-021.txt",
+          "notes/mr-022.txt",
+          "notes/mr-023.txt",
+          "notes/mr-027.txt",
+          "notes/mr-032.txt",
+          "notes/mr-033.txt",
+          "notes/mr-034.txt",
+          "notes/mr-037.txt",
+          "notes/mr-039.txt",
+          "notes/mr-041.txt",
+          "notes/mr-044.txt",
+          "notes/mr-047.txt",
+          "notes/mr-048.txt",
+          "notes/mr-053.txt",
+          "notes/mr-055.txt",
+          "notes/mr-056.txt",
+          "notes/mr-058.txt",
+          "notes/mr-060.txt",
+          "notes/mr-061.txt",
+          "notes/mr-062.txt"
+        ]
+      },
+      {
+        "merged_name": "quote",
+        "source_names": [
+          "quote",
+          "Bid",
+          "repair quote",
+          "removal quote"
+        ],
+        "source_documents": [
+          "messages/mr-001.txt",
+          "messages/mr-005.txt",
+          "messages/mr-008.txt",
+          "messages/mr-013.txt",
+          "messages/mr-014.txt",
+          "messages/mr-016.txt",
+          "messages/mr-019.txt",
+          "messages/mr-021.txt",
+          "messages/mr-028.txt",
+          "messages/mr-032.txt",
+          "messages/mr-036.txt",
+          "messages/mr-037.txt",
+          "messages/mr-038.txt",
+          "messages/mr-039.txt",
+          "messages/mr-047.txt",
+          "messages/mr-050.txt",
+          "messages/mr-054.txt",
+          "messages/mr-055.txt",
+          "messages/mr-058.txt",
+          "messages/mr-060.txt",
+          "messages/mr-062.txt",
+          "messages/mr-064.txt",
+          "messages/mr-065.txt",
+          "notes/mr-024.txt",
+          "notes/mr-028.txt",
+          "notes/mr-029.txt",
+          "notes/mr-037.txt",
+          "notes/mr-040.txt",
+          "notes/mr-058.txt"
+        ]
+      },
+      {
+        "merged_name": "invoice",
+        "source_names": [
+          "invoice",
+          "bill",
+          "repair bill",
+          "repair invoice"
+        ],
+        "source_documents": [
+          "messages/mr-001.txt",
+          "messages/mr-004.txt",
+          "messages/mr-009.txt",
+          "messages/mr-013.txt",
+          "messages/mr-018.txt",
+          "messages/mr-020.txt",
+          "messages/mr-023.txt",
+          "messages/mr-027.txt",
+          "messages/mr-029.txt",
+          "messages/mr-035.txt",
+          "messages/mr-040.txt",
+          "messages/mr-045.txt",
+          "messages/mr-059.txt",
+          "messages/mr-063.txt",
+          "notes/mr-003.txt",
+          "notes/mr-004.txt",
+          "notes/mr-009.txt",
+          "notes/mr-013.txt",
+          "notes/mr-015.txt",
+          "notes/mr-018.txt",
+          "notes/mr-019.txt",
+          "notes/mr-020.txt",
+          "notes/mr-031.txt",
+          "notes/mr-035.txt",
+          "notes/mr-041.txt",
+          "notes/mr-042.txt",
+          "notes/mr-044.txt",
+          "notes/mr-045.txt",
+          "notes/mr-047.txt",
+          "notes/mr-048.txt",
+          "notes/mr-051.txt",
+          "notes/mr-055.txt",
+          "notes/mr-057.txt",
+          "notes/mr-059.txt",
+          "notes/mr-064.txt"
+        ]
+      },
+      {
+        "merged_name": "approval",
+        "source_names": [
+          "approval",
+          "Owner Approval",
+          "OwnerApproval"
+        ],
+        "source_documents": [
+          "csv_exports/maintenance_requests_export_01.csv",
+          "csv_exports/maintenance_requests_export_03.csv",
+          "notes/mr-010.txt",
+          "notes/mr-032.txt",
+          "notes/mr-033.txt"
+        ]
+      },
+      {
+        "merged_name": "contractor",
+        "source_names": [
+          "contractor",
+          "crew",
+          "team"
+        ],
+        "source_documents": [
+          "csv_exports/maintenance_requests_export_01.csv",
+          "csv_exports/maintenance_requests_export_03.csv",
+          "messages/mr-002.txt",
+          "messages/mr-008.txt",
+          "messages/mr-022.txt",
+          "messages/mr-024.txt",
+          "messages/mr-030.txt",
+          "messages/mr-032.txt",
+          "messages/mr-040.txt",
+          "messages/mr-041.txt",
+          "messages/mr-046.txt",
+          "messages/mr-048.txt",
+          "messages/mr-052.txt",
+          "messages/mr-062.txt",
+          "notes/mr-007.txt",
+          "notes/mr-009.txt",
+          "notes/mr-024.txt",
+          "notes/mr-037.txt",
+          "notes/mr-051.txt"
+        ]
+      },
+      {
+        "merged_name": "Service",
+        "source_names": [
+          "Service",
+          "maintenance service"
+        ],
+        "source_documents": [
+          "messages/mr-011.txt",
+          "notes/mr-026.txt",
+          "notes/mr-046.txt",
+          "notes/mr-062.txt",
+          "notes/mr-065.txt"
+        ]
+      },
+      {
+        "merged_name": "project",
+        "source_names": [
+          "project"
+        ],
+        "source_documents": [
+          "notes/mr-004.txt",
+          "notes/mr-018.txt",
+          "notes/mr-038.txt",
+          "notes/mr-040.txt"
+        ]
+      },
+      {
+        "merged_name": "warehouse",
+        "source_names": [
+          "warehouse"
+        ],
+        "source_documents": [
+          "messages/mr-017.txt",
+          "messages/mr-023.txt",
+          "messages/mr-046.txt",
+          "messages/mr-049.txt",
+          "messages/mr-055.txt"
+        ]
+      },
+      {
+        "merged_name": "storefront",
+        "source_names": [
+          "storefront",
+          "retail storefront"
+        ],
+        "source_documents": [
+          "lease_texts/lease-025.txt",
+          "messages/mr-007.txt",
+          "messages/mr-033.txt",
+          "messages/mr-043.txt",
+          "messages/mr-057.txt",
+          "messages/mr-065.txt"
+        ]
+      },
+      {
+        "merged_name": "office",
+        "source_names": [
+          "office"
+        ],
+        "source_documents": [
+          "messages/mr-005.txt",
+          "messages/mr-013.txt",
+          "messages/mr-035.txt",
+          "notes/mr-028.txt"
+        ]
+      },
+      {
+        "merged_name": "shop",
+        "source_names": [
+          "shop"
+        ],
+        "source_documents": [
+          "messages/mr-044.txt",
+          "messages/mr-053.txt"
+        ]
+      },
+      {
+        "merged_name": "irrigation",
+        "source_names": [
+          "irrigation",
+          "irrigation system",
+          "irrigation lines",
+          "irrigation fix"
+        ],
+        "source_documents": [
+          "messages/mr-004.txt",
+          "messages/mr-027.txt",
+          "messages/mr-028.txt",
+          "messages/mr-042.txt",
+          "messages/mr-060.txt",
+          "messages/mr-062.txt",
+          "notes/mr-028.txt",
+          "notes/mr-042.txt",
+          "notes/mr-060.txt",
+          "notes/mr-062.txt"
+        ]
+      },
+      {
+        "merged_name": "water heater",
+        "source_names": [
+          "water heater",
+          "heater"
+        ],
+        "source_documents": [
+          "messages/mr-010.txt",
+          "messages/mr-019.txt",
+          "messages/mr-040.txt",
+          "notes/mr-031.txt"
+        ]
+      },
+      {
+        "merged_name": "AC",
+        "source_names": [
+          "AC",
+          "AC unit"
+        ],
+        "source_documents": [
+          "messages/mr-005.txt",
+          "messages/mr-049.txt",
+          "notes/mr-049.txt"
+        ]
+      },
+      {
+        "merged_name": "thermostat",
+        "source_names": [
+          "thermostat"
+        ],
+        "source_documents": [
+          "messages/mr-001.txt",
+          "notes/mr-001.txt"
+        ]
+      },
+      {
+        "merged_name": "heating",
+        "source_names": [
+          "heating",
+          "heat",
+          "heating issue"
+        ],
+        "source_documents": [
+          "messages/mr-007.txt",
+          "messages/mr-032.txt",
+          "messages/mr-036.txt"
+        ]
+      },
+      {
+        "merged_name": "HVAC",
+        "source_names": [
+          "HVAC"
+        ],
+        "source_documents": [
+          "messages/mr-023.txt"
+        ]
+      },
+      {
+        "merged_name": "outlet",
+        "source_names": [
+          "outlet"
+        ],
+        "source_documents": [
+          "messages/mr-009.txt",
+          "messages/mr-034.txt",
+          "messages/mr-051.txt",
+          "messages/mr-056.txt",
+          "notes/mr-051.txt"
+        ]
+      },
+      {
+        "merged_name": "lights",
+        "source_names": [
+          "lights"
+        ],
+        "source_documents": [
+          "messages/mr-057.txt",
+          "notes/mr-057.txt"
+        ]
+      },
+      {
+        "merged_name": "breaker",
+        "source_names": [
+          "breaker"
+        ],
+        "source_documents": [
+          "notes/mr-050.txt"
+        ]
+      },
+      {
+        "merged_name": "panel",
+        "source_names": [
+          "panel"
+        ],
+        "source_documents": [
+          "messages/mr-050.txt"
+        ]
+      },
+      {
+        "merged_name": "electrical issue",
+        "source_names": [
+          "electrical issue"
+        ],
+        "source_documents": [
+          "messages/mr-050.txt"
+        ]
+      },
+      {
+        "merged_name": "electrical team",
+        "source_names": [
+          "electrical team"
+        ],
+        "source_documents": [
+          "messages/mr-047.txt"
+        ]
+      },
+      {
+        "merged_name": "pipe",
+        "source_names": [
+          "pipe",
+          "pipe leak",
+          "pipe repair"
+        ],
+        "source_documents": [
+          "messages/mr-059.txt",
+          "messages/mr-061.txt",
+          "notes/mr-025.txt",
+          "notes/mr-059.txt"
+        ]
+      },
+      {
+        "merged_name": "Plumbing fix",
+        "source_names": [
+          "Plumbing fix"
+        ],
+        "source_documents": [
+          "notes/mr-011.txt"
+        ]
+      },
+      {
+        "merged_name": "plumbing crew",
+        "source_names": [
+          "plumbing crew"
+        ],
+        "source_documents": [
+          "messages/mr-059.txt"
+        ]
+      },
+      {
+        "merged_name": "sink",
+        "source_names": [
+          "sink",
+          "sink issue",
+          "sink cabinet"
+        ],
+        "source_documents": [
+          "messages/mr-025.txt",
+          "messages/mr-044.txt",
+          "messages/mr-059.txt",
+          "messages/mr-061.txt"
+        ]
+      },
+      {
+        "merged_name": "washroom",
+        "source_names": [
+          "washroom"
+        ],
+        "source_documents": [
+          "messages/mr-010.txt"
+        ]
+      },
+      {
+        "merged_name": "water",
+        "source_names": [
+          "water"
+        ],
+        "source_documents": [
+          "messages/mr-025.txt"
+        ]
+      },
+      {
+        "merged_name": "water damage",
+        "source_names": [
+          "water damage"
+        ],
+        "source_documents": [
+          "messages/mr-017.txt",
+          "notes/mr-017.txt"
+        ]
+      },
+      {
+        "merged_name": "carpet",
+        "source_names": [
+          "carpet"
+        ],
+        "source_documents": [
+          "messages/mr-053.txt",
+          "notes/mr-020.txt"
+        ]
+      },
+      {
+        "merged_name": "stains",
+        "source_names": [
+          "stains"
+        ],
+        "source_documents": [
+          "messages/mr-041.txt"
+        ]
+      },
+      {
+        "merged_name": "hole",
+        "source_names": [
+          "hole"
+        ],
+        "source_documents": [
+          "messages/mr-048.txt"
+        ]
+      },
+      {
+        "merged_name": "door frame",
+        "source_names": [
+          "door frame"
+        ],
+        "source_documents": [
+          "messages/mr-055.txt"
+        ]
+      },
+      {
+        "merged_name": "exterior windows",
+        "source_names": [
+          "exterior windows"
+        ],
+        "source_documents": [
+          "messages/mr-030.txt"
+        ]
+      },
+      {
+        "merged_name": "lobby wall",
+        "source_names": [
+          "lobby wall"
+        ],
+        "source_documents": [
+          "messages/mr-002.txt"
+        ]
+      },
+      {
+        "merged_name": "patch job",
+        "source_names": [
+          "patch job"
+        ],
+        "source_documents": [
+          "messages/mr-002.txt"
+        ]
+      },
+      {
+        "merged_name": "window cleaning",
+        "source_names": [
+          "window cleaning"
+        ],
+        "source_documents": [
+          "notes/mr-016.txt",
+          "notes/mr-030.txt",
+          "notes/mr-063.txt"
+        ]
+      },
+      {
+        "merged_name": "cleaning bill",
+        "source_names": [
+          "cleaning bill"
+        ],
+        "source_documents": [
+          "messages/mr-053.txt"
+        ]
+      },
+      {
+        "merged_name": "Tree",
+        "source_names": [
+          "Tree"
+        ],
+        "source_documents": [
+          "messages/mr-014.txt",
+          "messages/mr-037.txt"
+        ]
+      },
+      {
+        "merged_name": "landscaping team",
+        "source_names": [
+          "landscaping team",
+          "Landscaping crew",
+          "landscapers"
+        ],
+        "source_documents": [
+          "messages/mr-004.txt",
+          "messages/mr-014.txt",
+          "messages/mr-027.txt"
+        ]
+      },
+      {
+        "merged_name": "sprinkler repairs",
+        "source_names": [
+          "sprinkler repairs"
+        ],
+        "source_documents": [
+          "messages/mr-004.txt"
+        ]
+      },
+      {
+        "merged_name": "treatment",
+        "source_names": [
+          "treatment",
+          "treatment plan"
+        ],
+        "source_documents": [
+          "messages/mr-003.txt",
+          "messages/mr-015.txt"
+        ]
+      },
+      {
+        "merged_name": "fix",
+        "source_names": [
+          "fix"
+        ],
+        "source_documents": [
+          "notes/mr-001.txt",
+          "notes/mr-050.txt",
+          "notes/mr-052.txt"
+        ]
+      },
+      {
+        "merged_name": "repairs",
+        "source_names": [
+          "repairs"
+        ],
+        "source_documents": [
+          "messages/mr-017.txt",
+          "messages/mr-025.txt",
+          "messages/mr-048.txt",
+          "messages/mr-049.txt"
+        ]
+      },
+      {
+        "merged_name": "replacement",
+        "source_names": [
+          "replacement",
+          "replacement unit"
+        ],
+        "source_documents": [
+          "messages/mr-010.txt",
+          "messages/mr-019.txt"
+        ]
+      },
+      {
+        "merged_name": "tech",
+        "source_names": [
+          "tech"
+        ],
+        "source_documents": [
+          "messages/mr-005.txt",
+          "messages/mr-049.txt"
+        ]
+      },
+      {
+        "merged_name": "request",
+        "source_names": [
+          "request"
+        ],
+        "source_documents": [
+          "messages/mr-022.txt",
+          "messages/mr-035.txt"
+        ]
+      },
+      {
+        "merged_name": "Walkthrough",
+        "source_names": [
+          "Walkthrough"
+        ],
+        "source_documents": [
+          "messages/mr-006.txt"
+        ]
+      },
+      {
+        "merged_name": "Assessment",
+        "source_names": [
+          "Assessment"
+        ],
+        "source_documents": [
+          "messages/mr-006.txt"
+        ]
+      },
+      {
+        "merged_name": "file",
+        "source_names": [
+          "file"
+        ],
+        "source_documents": [
+          "notes/mr-017.txt"
+        ]
+      },
+      {
+        "merged_name": "paperwork",
+        "source_names": [
+          "paperwork"
+        ],
+        "source_documents": [
+          "messages/mr-009.txt"
+        ]
+      },
+      {
+        "merged_name": "Document",
+        "source_names": [
+          "Document"
+        ],
+        "source_documents": [
+          "notes/mr-046.txt"
+        ]
+      },
+      {
+        "merged_name": "meeting",
+        "source_names": [
+          "meeting"
+        ],
+        "source_documents": [
+          "messages/mr-037.txt"
+        ]
+      },
+      {
+        "merged_name": "visit",
+        "source_names": [
+          "visit"
+        ],
+        "source_documents": [
+          "messages/mr-064.txt"
+        ]
+      },
+      {
+        "merged_name": "shift",
+        "source_names": [
+          "shift"
+        ],
+        "source_documents": [
+          "messages/mr-051.txt"
+        ]
+      },
+      {
+        "merged_name": "front desk",
+        "source_names": [
+          "front desk"
+        ],
+        "source_documents": [
+          "messages/mr-007.txt"
+        ]
+      },
+      {
+        "merged_name": "storage room",
+        "source_names": [
+          "storage room"
+        ],
+        "source_documents": [
+          "messages/mr-046.txt",
+          "messages/mr-052.txt"
+        ]
+      },
+      {
+        "merged_name": "loading dock",
+        "source_names": [
+          "loading dock"
+        ],
+        "source_documents": [
+          "messages/mr-055.txt"
+        ]
+      },
+      {
+        "merged_name": "inventory",
+        "source_names": [
+          "inventory"
+        ],
+        "source_documents": [
+          "messages/mr-052.txt"
+        ]
+      },
+      {
+        "merged_name": "shipment",
+        "source_names": [
+          "shipment"
+        ],
+        "source_documents": [
+          "messages/mr-055.txt"
+        ]
+      },
+      {
+        "merged_name": "space",
+        "source_names": [
+          "space"
+        ],
+        "source_documents": [
+          "notes/mr-063.txt"
+        ]
+      },
+      {
+        "merged_name": "building",
+        "source_names": [
+          "building"
+        ],
+        "source_documents": [
+          "messages/mr-030.txt"
+        ]
+      },
+      {
+        "merged_name": "Unit",
+        "source_names": [
+          "Unit"
+        ],
+        "source_documents": [
+          "csv_exports/properties_export_01.csv"
+        ]
+      },
+      {
+        "merged_name": "damage",
+        "source_names": [
+          "damage"
+        ],
+        "source_documents": [
+          "messages/mr-038.txt"
+        ]
+      },
+      {
+        "merged_name": "parts",
+        "source_names": [
+          "parts"
+        ],
+        "source_documents": [
+          "messages/mr-031.txt",
+          "messages/mr-032.txt",
+          "messages/mr-060.txt"
+        ]
+      },
+      {
+        "merged_name": "spend",
+        "source_names": [
+          "spend"
+        ],
+        "source_documents": [
+          "notes/mr-005.txt"
+        ]
+      },
+      {
+        "merged_name": "Payment",
+        "source_names": [
+          "Payment"
+        ],
+        "source_documents": [
+          "lease_texts/lease-024.txt",
+          "lease_texts/lease-028.txt",
+          "lease_texts/lease-045.txt"
+        ]
+      },
+      {
+        "merged_name": "monthly payment",
+        "source_names": [
+          "monthly payment"
+        ],
+        "source_documents": [
+          "lease_texts/lease-030.txt"
+        ]
+      },
+      {
+        "merged_name": "Security Deposit",
+        "source_names": [
+          "Security Deposit",
+          "Security Funds"
+        ],
+        "source_documents": [
+          "lease_texts/lease-022.txt",
+          "lease_texts/lease-034.txt",
+          "lease_texts/lease-038.txt",
+          "lease_texts/lease-040.txt",
+          "lease_texts/lease-046.txt",
+          "lease_texts/lease-048.txt",
+          "lease_texts/lease-049.txt"
+        ]
+      },
+      {
+        "merged_name": "Initial Funds Held",
+        "source_names": [
+          "Initial Funds Held",
+          "Initial Funds"
+        ],
+        "source_documents": [
+          "lease_texts/lease-005.txt",
+          "lease_texts/lease-039.txt"
+        ]
+      },
+      {
+        "merged_name": "HELD FUNDS",
+        "source_names": [
+          "HELD FUNDS"
+        ],
+        "source_documents": [
+          "lease_texts/lease-012.txt"
+        ]
+      },
+      {
+        "merged_name": "good-faith deposit",
+        "source_names": [
+          "good-faith deposit",
+          "good-faith fund"
+        ],
+        "source_documents": [
+          "lease_texts/lease-030.txt",
+          "lease_texts/lease-042.txt"
+        ]
+      },
+      {
+        "merged_name": "Performance Assurance",
+        "source_names": [
+          "Performance Assurance"
+        ],
+        "source_documents": [
+          "lease_texts/lease-016.txt",
+          "lease_texts/lease-033.txt"
+        ]
+      },
+      {
+        "merged_name": "PAYMENT ADJUSTMENTS",
+        "source_names": [
+          "PAYMENT ADJUSTMENTS"
+        ],
+        "source_documents": [
+          "lease_texts/lease-012.txt"
+        ]
+      },
+      {
+        "merged_name": "Annual Adjustment",
+        "source_names": [
+          "Annual Adjustment",
+          "Annual Adjustments"
+        ],
+        "source_documents": [
+          "lease_texts/lease-022.txt",
+          "lease_texts/lease-033.txt",
+          "lease_texts/lease-048.txt"
+        ]
+      },
+      {
+        "merged_name": "CPI-indexed increase",
+        "source_names": [
+          "CPI-indexed increase"
+        ],
+        "source_documents": [
+          "lease_texts/lease-019.txt"
+        ]
+      },
+      {
+        "merged_name": "Consumer Price Index",
+        "source_names": [
+          "Consumer Price Index"
+        ],
+        "source_documents": [
+          "lease_texts/lease-045.txt"
+        ]
+      },
+      {
+        "merged_name": "Work Item",
+        "source_names": [
+          "Work Item"
+        ],
+        "source_documents": [
+          "notes/mr-038.txt"
+        ]
+      },
+      {
+        "merged_name": "client",
+        "source_names": [
+          "client"
+        ],
+        "source_documents": [
+          "messages/mr-029.txt",
+          "notes/mr-010.txt"
+        ]
+      },
+      {
+        "merged_name": "Lead Agent",
+        "source_names": [
+          "Lead Agent"
+        ],
+        "source_documents": [
+          "csv_exports/leases_export_03.csv"
+        ]
+      },
+      {
+        "merged_name": "Lead Broker",
+        "source_names": [
+          "Lead Broker"
+        ],
+        "source_documents": [
+          "csv_exports/leases_export_04.csv"
+        ]
+      },
+      {
+        "merged_name": "Agent",
+        "source_names": [
+          "Agent"
+        ],
+        "source_documents": [
+          "csv_exports/maintenance_requests_export_02.csv",
+          "csv_exports/maintenance_requests_export_05.csv"
+        ]
+      },
+      {
+        "merged_name": "ManagerName",
+        "source_names": [
+          "ManagerName"
+        ],
+        "source_documents": [
+          "csv_exports/maintenance_requests_export_01.csv"
+        ]
+      },
+      {
+        "merged_name": "ServiceContractor",
+        "source_names": [
+          "ServiceContractor"
+        ],
+        "source_documents": [
+          "csv_exports/maintenance_requests_export_02.csv"
+        ]
+      },
+      {
+        "merged_name": "OwnerApprovalSource",
+        "source_names": [
+          "OwnerApprovalSource"
+        ],
+        "source_documents": [
+          "csv_exports/maintenance_requests_export_02.csv"
+        ]
+      },
+      {
+        "merged_name": "Ownership_Auth",
+        "source_names": [
+          "Ownership_Auth"
+        ],
+        "source_documents": [
+          "csv_exports/maintenance_requests_export_04.csv"
+        ]
+      },
+      {
+        "merged_name": "Service_Provider",
+        "source_names": [
+          "Service_Provider"
+        ],
+        "source_documents": [
+          "csv_exports/maintenance_requests_export_04.csv"
+        ]
+      },
+      {
+        "merged_name": "Leaseholder",
+        "source_names": [
+          "Leaseholder"
+        ],
+        "source_documents": [
+          "csv_exports/maintenance_requests_export_01.csv"
+        ]
+      },
+      {
+        "merged_name": "Account Holder",
+        "source_names": [
+          "Account Holder"
+        ],
+        "source_documents": [
+          "csv_exports/properties_export_02.csv"
+        ]
+      },
+      {
+        "merged_name": "Portfolio Owner",
+        "source_names": [
+          "Portfolio Owner"
+        ],
+        "source_documents": [
+          "csv_exports/properties_export_01.csv"
+        ]
+      },
+      {
+        "merged_name": "Last Audit",
+        "source_names": [
+          "Last Audit"
+        ],
+        "source_documents": [
+          "csv_exports/properties_export_01.csv"
+        ]
+      },
+      {
+        "merged_name": "Post Oak",
+        "source_names": [
+          "Post Oak"
+        ],
+        "source_documents": [
+          "notes/mr-001.txt"
+        ]
+      },
+      {
+        "merged_name": "Foster Maintenance",
+        "source_names": [
+          "Foster Maintenance"
+        ],
+        "source_documents": [
+          "messages/mr-010.txt",
+          "messages/mr-044.txt"
+        ]
+      },
+      {
+        "merged_name": "Hoffman Services",
+        "source_names": [
+          "Hoffman Services"
+        ],
+        "source_documents": [
+          "messages/mr-015.txt"
+        ]
+      },
+      {
+        "merged_name": "Rocha Solutions",
+        "source_names": [
+          "Rocha Solutions"
+        ],
+        "source_documents": [
+          "messages/mr-034.txt",
+          "messages/mr-056.txt",
+          "messages/mr-057.txt"
+        ]
+      },
+      {
+        "merged_name": "Baker Solutions",
+        "source_names": [
+          "Baker Solutions"
+        ],
+        "source_documents": [
+          "messages/mr-023.txt",
+          "notes/mr-049.txt"
+        ]
+      },
+      {
+        "merged_name": "Robinson Co.",
+        "source_names": [
+          "Robinson Co."
+        ],
+        "source_documents": [
+          "messages/mr-017.txt"
+        ]
+      },
+      {
+        "merged_name": "Richards",
+        "source_names": [
+          "Richards"
+        ],
+        "source_documents": [
+          "messages/mr-040.txt"
+        ]
+      },
+      {
+        "merged_name": "Kirby Dr",
+        "source_names": [
+          "Kirby Dr"
+        ],
+        "source_documents": [
+          "notes/mr-049.txt"
+        ]
+      },
+      {
+        "merged_name": "Shawn",
+        "source_names": [
+          "Shawn"
+        ],
+        "source_documents": [
+          "notes/mr-049.txt"
+        ]
+      },
+      {
+        "merged_name": "sparky",
+        "source_names": [
+          "sparky"
+        ],
+        "source_documents": [
+          "notes/mr-064.txt"
+        ]
+      },
+      {
+        "merged_name": "county",
+        "source_names": [
+          "county"
+        ],
+        "source_documents": [
+          "notes/mr-060.txt"
+        ]
+      },
+      {
+        "merged_name": "firm",
+        "source_names": [
+          "firm"
+        ],
+        "source_documents": [
+          "notes/mr-033.txt"
+        ]
+      },
+      {
+        "merged_name": "retail",
+        "source_names": [
+          "retail"
+        ],
+        "source_documents": [
+          "csv_exports/properties_export_02.csv"
+        ]
+      },
+      {
+        "merged_name": "unwanted guests",
+        "source_names": [
+          "unwanted guests"
+        ],
+        "source_documents": [
+          "messages/mr-046.txt"
+        ]
+      },
+      {
+        "merged_name": "final check",
+        "source_names": [
+          "final check"
+        ],
+        "source_documents": [
+          "messages/mr-059.txt"
+        ]
+      }
+    ],
+    "induced_superclasses": [
+      "Lease Agreement",
+      "Party to Lease",
+      "Property Space",
+      "Maintenance Item",
+      "Financial Document",
+      "Service Provider",
+      "Building System",
+      "Building Component"
+    ],
+    "stage_stop_reasons": {
+      "extract": [
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn",
+        "end_turn"
+      ],
+      "consolidate_types": [
+        "end_turn"
+      ],
+      "consolidate_attrs": [
+        "end_turn"
+      ],
+      "reconcile_relations": [
+        "end_turn"
+      ],
+      "induce_taxonomy": [
+        "end_turn"
+      ]
+    },
+    "stage_completion_tokens": {
+      "extract": 56187,
+      "consolidate_types": 4110,
+      "consolidate_attrs": 7004,
+      "reconcile_relations": 13160,
+      "induce_taxonomy": 7470
+    }
+  }
+}
