@@ -394,14 +394,16 @@ def test_output_is_json_serializable():
 # T6 -- model registry and request construction (B3-D1, B3-D3)
 # ---------------------------------------------------------------------------
 
-def test_registry_holds_exactly_the_two_frozen_conditions_on_their_own_backends():
-    assert set(mc.MODELS) == {"haiku45", "opus5"}
+def test_registry_holds_exactly_the_three_frozen_conditions_on_their_own_backends():
+    assert set(mc.MODELS) == {"haiku45", "opus5", "llama318b"}
     for key, spec in mc.MODELS.items():
         assert spec.key == key, "registry key must match the spec it points at"
     assert mc.MODELS["haiku45"].backend == "bedrock"
     assert mc.MODELS["haiku45"].model_id == "us.anthropic.claude-haiku-4-5-20251001-v1:0"
     assert mc.MODELS["opus5"].backend == "anthropic_api"
     assert mc.MODELS["opus5"].model_id == "claude-opus-5"
+    assert mc.MODELS["llama318b"].backend == "bedrock_meta"
+    assert mc.MODELS["llama318b"].model_id == "us.meta.llama3-1-8b-instruct-v1:0"
 
 
 def test_model_specs_are_immutable():
@@ -460,6 +462,35 @@ def test_bedrock_and_anthropic_api_bodies_have_the_right_shape_for_their_transpo
     assert api_kwargs["messages"] == [{"role": "user", "content": "SENTINEL"}]
 
 
+def test_llama_body_wraps_the_prompt_in_the_meta_chat_template():
+    """A third, genuinely different shape from either of the above: native
+    prompt/max_gen_len, not messages -- and the raw prompt text is wrapped in
+    Llama 3's chat-template tokens rather than passed through verbatim."""
+    body = mc.build_request(mc.MODELS["llama318b"], "SENTINEL")
+    assert body["prompt"] == (
+        "<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\n"
+        "SENTINEL"
+        "<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n"
+    )
+    assert body["max_gen_len"] == mc.MODELS["llama318b"].max_output_tokens
+    assert body["temperature"] == mc.TEMPERATURE == 0.0
+    assert body["top_p"] == mc.TOP_P == 1.0
+    assert "messages" not in body
+    assert "model" not in body
+
+
+def test_bedrock_client_reads_generously_beyond_boto3s_60s_default():
+    """Confirmed at a real call: a full-corpus Haiku run raised
+    ReadTimeoutError at boto3's default 60s on a call very plausibly still
+    generating -- invoke_model is a single blocking call with no streaming
+    equivalent, and up to 16,000 output tokens can legitimately take longer
+    than that. Pinned so a future edit to _bedrock_client can't silently
+    drop back to the default and reintroduce the failure."""
+    client = mc._bedrock_client(mc.MODELS["haiku45"])
+    assert client.meta.config.read_timeout == mc.BEDROCK_READ_TIMEOUT
+    assert mc.BEDROCK_READ_TIMEOUT > 60
+
+
 def test_build_request_is_a_pure_function_of_spec_and_prompt():
     """No batching or call-shape argument exists to thread through -- the
     request for a given model is identical whether it is B3's one whole-corpus
@@ -507,6 +538,43 @@ def test_a_normal_anthropic_api_response_extracts_cleanly():
     assert completion.text == "hello"
     assert completion.stop_reason == "end_turn"
     assert completion.completion_tokens == 5
+
+
+def _meta_payload(text: str, stop_reason: str, tokens: int | None = 100) -> dict:
+    return {"generation": text, "stop_reason": stop_reason, "generation_token_count": tokens}
+
+
+def test_a_normal_meta_response_extracts_cleanly():
+    completion = mc.extract_from_bedrock_meta_payload(
+        mc.MODELS["llama318b"], _meta_payload("hello", "stop", tokens=5)
+    )
+    assert completion.text == "hello"
+    assert completion.stop_reason == "stop"
+    assert completion.completion_tokens == 5
+
+
+def test_a_capped_meta_response_raises_on_its_own_truncation_marker():
+    """Meta's native shape signals truncation with stop_reason == 'length',
+    not Anthropic's 'max_tokens' -- the two families must not be conflated."""
+    payload = _meta_payload('{"classes": [{"na', "length", tokens=4096)
+    with pytest.raises(mc.TruncatedResponseError) as caught:
+        mc.extract_from_bedrock_meta_payload(mc.MODELS["llama318b"], payload)
+    assert caught.value.text == '{"classes": [{"na'
+    assert caught.value.completion_tokens == 4096
+
+
+def test_a_meta_response_with_max_tokens_as_stop_reason_is_not_mistaken_for_truncation():
+    """'max_tokens' means nothing on this family -- only 'length' does. A
+    literal string match on the wrong marker must not fire."""
+    completion = mc.extract_from_bedrock_meta_payload(
+        mc.MODELS["llama318b"], _meta_payload("finished fine", "max_tokens", tokens=10)
+    )
+    assert completion.text == "finished fine"
+
+
+def test_meta_extract_refuses_an_empty_normal_response():
+    with pytest.raises(ValueError):
+        mc.extract_from_bedrock_meta_payload(mc.MODELS["llama318b"], _meta_payload("   ", "stop", tokens=0))
 
 
 def test_a_capped_bedrock_response_raises_instead_of_yielding_a_partial_schema():

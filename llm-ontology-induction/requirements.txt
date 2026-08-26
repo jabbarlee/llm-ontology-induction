@@ -13,3 +13,5 @@ anthropic  # unpinned deliberately -- adaptive thinking + effort need a current
            # one supports both (see baselines/DECISIONS.md P1-D1)
 boto3      # AWS Bedrock transport for Haiku 4.5 only (opus5 uses `anthropic`
            # above, direct); see baselines/shared/model_clients.py
+langgraph                    # P1's six-stage graph assembly (pipeline/graph.py)
+langgraph-checkpoint-sqlite  # per-run resumability; see pipeline/DECISIONS.md

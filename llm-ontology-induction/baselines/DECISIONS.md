@@ -483,6 +483,72 @@ transport, one shared registry" is supposed to buy.
 remains present-but-unused, as it was after the prior revision — still not deleted,
 still the user's credential rather than the repo's concern.
 
+### Revised a third time, 2026-08-21: Llama 3.1 8B restored on AWS Bedrock, as a third condition alongside Haiku and Opus 5. Was the two-condition grid immediately above.
+
+**The correction, in the user's own words**, when asked to give dry-run scripts for
+"Llama, Haiku, and Opus" and told Llama had no registered condition: *"We use a
+Llama with AWS Bedrock, so it's cool. The one that we use for B3, the same way from
+AWS Bedrock."* Confirmed via `AskUserQuestion` rather than assumed — the two
+options offered were "leave it out" and "add it back on Bedrock, the historical
+condition," and the user chose the latter explicitly.
+
+| Condition | Models | Transport | Calls |
+|---|---|---|---|
+| B3 | Haiku 4.5, Opus 5, Llama 3.1 8B | Haiku + Llama: AWS Bedrock. Opus 5: Anthropic (direct API). | 1 whole-corpus call per model |
+| P1 | Same three | Same split as B3. | N per-doc extraction calls + 4 consolidation-stage calls per model |
+
+**Not a new condition — the original one, restored.** This is the identical
+open-weight condition from the five-model Bedrock grid (`llama318b_bedrock` in the
+original B3-D1, further up this file), on the identical transport, using the
+identical Geo inference ID and the identical 4,096-token output cap (the model
+card's documented ceiling, not a guess — see that entry for the citation). It is
+not deleted from history there either; this revision restores it into the active
+registry under a simplified key (`llama318b`, not `llama318b_bedrock`) since there
+is no longer a sibling `llama318b_groq` condition to disambiguate from — Groq was
+retired entirely in the direct-API-only pivot and never returned.
+
+**A third backend, not a branch on an existing one.** `haiku45` and `opus5` sit on
+`"bedrock"` and `"anthropic_api"` respectively; Llama's native Bedrock shape
+(`prompt`/`max_gen_len` in, `generation`/`stop_reason`/`generation_token_count`
+out) shares nothing with Anthropic-on-Bedrock's shape (`anthropic_version`,
+block-structured `messages`, `content` blocks) beyond the fact that both go through
+the same `invoke_model` call — so it gets its own backend value, `"bedrock_meta"`,
+its own body builder (`_build_bedrock_meta_body`, restoring the Llama 3 chat-template
+wrapping — `<|begin_of_text|>...<|eot_id|>...` — from the original implementation
+verbatim) and its own response reader (`extract_from_bedrock_meta_payload`). The
+one genuinely shared piece is the boto3 client construction, factored into
+`_bedrock_client(spec)` so both Bedrock-hosted backends build it identically rather
+than duplicating the retry-config boilerplate.
+
+**The truncation marker had to become a parameter, not stay a hardcoded
+string.** Anthropic (both transports) signals a capped generation with
+`stop_reason == "max_tokens"`; Meta's native shape uses `stop_reason == "length"`
+for the same fact. `_check_not_truncated()` now takes `marker` (default
+`"max_tokens"`), rather than existing as two near-duplicate functions — one per
+family — that would drift the moment either family's wording changed. No refusal
+check exists for the Meta path: Meta's native shape documents no `stop_reason`
+value analogous to Anthropic's `"refusal"`, so there is nothing to check that would
+mean anything.
+
+**The known risk this condition carries back with it, restated rather than
+rediscovered:** the original whole-corpus Llama run against this exact spec
+truncated at exactly this 4,096 cap, mid-repetition-loop, and produced no scoreable
+output (`results/findings/B3-FINDINGS.md`, "Condition: whole-corpus (Bedrock,
+`llama318b_bedrock`) — truncated, not scored"). That finding is about the Bedrock
+Meta serving limit and this model's behavior under it, not about this pipeline —
+restoring the condition does not fix that risk and is not intended to; a rerun may
+reproduce it, and if so that is itself the finding, per B3-D3's standing decision
+rule that a Llama truncation is never grounds to lower the other conditions' caps.
+
+**What this means for `pipeline/` (P1), without a single line of P1-specific
+code changing:** `pipeline/graph.py` reads `MODELS` from this registry directly
+(P1-D3), so `llama318b` is immediately a valid `--model` choice for the six-stage
+pipeline the moment it exists here — the same "P1 needed zero changes" property
+the mixed-transport revision above already established for Haiku and Opus 5. See
+`pipeline/DECISIONS.md`'s own update to P1-D3 for what this means for the
+"two conditions, not three" note recorded there — it is now stale in the other
+direction and is corrected rather than left standing uncorrected.
+
 ### B3-D1a — Luna runs at `reasoning_effort="low"`, always
 
 The budget tier is only a controlled comparison if both budget models are actually
@@ -1042,6 +1108,70 @@ gets its own equivalent, `boto3.client("bedrock-runtime", config=Config(retries=
 the same "let the SDK do it, don't hand-roll message-substring matching" reasoning
 applied to the transport that needed reintroducing.
 
+### Revised a third time, 2026-08-21: Llama 3.1 8B restored, with its historical cap and sampling settings, unchanged from the original grid
+
+Per B3-D1's third revision, above. A third row, not a change to either existing
+one:
+
+| Condition | Transport | `max_output_tokens` | Sampling | Thinking/effort |
+|---|---|---|---|---|
+| `haiku45` | AWS Bedrock | `16000` | `temperature=0.0` only — Bedrock 400s if `top_p` is also present | none |
+| `opus5` | Anthropic (direct API) | `32000` | none — rejected outright by the API on Opus 4.7+ | `thinking={"type": "adaptive"}`, `output_config={"effort": "high"}` |
+| `llama318b` | AWS Bedrock (native Meta shape) | `4096` — the model card's documented ceiling, unchanged from the original grid | `temperature=0.0`, `top_p=1.0` — both accepted together; unlike Haiku, this model has never shown the "can't combine both" rejection | none |
+
+**`_check_not_truncated` gained a `marker` parameter rather than becoming a third
+near-duplicate function.** Anthropic's two backends both signal a capped
+generation with `stop_reason == "max_tokens"`; Meta's native shape uses
+`stop_reason == "length"` for the identical fact. One shared function, called with
+`marker="length"` from `extract_from_bedrock_meta_payload`, keeps the truncation
+*meaning* in one place even though the wire value differs per family — the same
+reasoning that already justified sharing `_check_not_refused`/`_check_not_truncated`
+across the two Anthropic-shaped backends now extends to a third, structurally
+different one.
+
+**No refusal check exists on the Meta path, and this is not an oversight.** Meta's
+native Bedrock shape documents no `stop_reason` value analogous to Anthropic's
+`"refusal"` — there being nothing to compare against, `extract_from_bedrock_meta_payload`
+only ever raises `TruncatedResponseError` or the shared empty-text `ValueError`,
+never `RefusalError`. If a future call reveals such a mechanism, add the check then,
+against a confirmed real value — not now, against a guess.
+
+### Revised a fourth time, 2026-08-21: `_bedrock_client`'s read timeout raised from boto3's 60s default to 300s
+
+**Confirmed at a real call, not anticipated:** a full-corpus P1 run against
+`haiku45` (`pipeline/nodes/consolidate_types.py`, after the P1-D8 fix reduced
+its prompt to 39,435 chars) raised `botocore.exceptions.ReadTimeoutError` at
+exactly boto3's default 60-second read timeout, on the Stage 2 consolidation
+call. This is unrelated to the P1-D8 repetition fix or to anything about
+Stage 2's prompt content — it is a property of the transport itself, present
+from the moment `invoke_bedrock`/`invoke_bedrock_meta` were first written and
+simply not yet triggered by any call slow enough to hit it.
+
+**Why 60 seconds was never enough, once stated plainly:** `invoke_model` is a
+single blocking call that returns only after the *entire* completion has been
+generated server-side — Bedrock's non-streaming path has no equivalent to the
+direct Anthropic API's `.messages.stream()` (itself adopted specifically
+because "Opus 5's thinking can run long before any visible text appears,"
+same reasoning, different transport). A call permitted up to `haiku45`'s
+16,000-token cap can legitimately take longer than 60 seconds to finish
+generating, entirely independent of whether the content it eventually returns
+is good, truncated, or degenerate.
+
+**Decision:** `_bedrock_client` now sets `read_timeout=300` (`BEDROCK_READ_TIMEOUT`)
+in the same `Config` object that already carries the retry settings. 300
+seconds is comfortable headroom over every current condition's output cap
+(`haiku45` 16,000, `llama318b` 4,096) without leaving a genuinely hung request
+to block the run indefinitely. `connect_timeout` is untouched — establishing
+the TCP connection was never the slow part.
+
+**This also makes the existing retry config meaningfully different, not just
+longer-suffering.** Retrying a read timeout that fires at the *default* 60s
+would, at best, reproduce the identical failure `MAX_RETRIES` times in a row
+if the model consistently needs longer than that to finish — raising
+`read_timeout` first is what makes `mode: "standard"`'s retry actually able to
+succeed on a slow-but-otherwise-fine call, rather than exhausting its
+attempts against a ceiling too low for any of them to clear.
+
 ## B3-D4 — Consolidation across batches is naive, deliberately
 
 Each batch is answered independently, so the same entity arrives under several
@@ -1219,6 +1349,22 @@ reconcile the N results into one schema — resolving cross-wording the way B3-D
 deliberately refuses to. That reconciliation is the entire thing this baseline
 exists to measure the value of; everything else about P1 is held as close to B3 as
 possible so that the comparison isolates it.
+
+**Superseded (not deleted), 2026-08-21: decomposed into a six-stage pipeline,
+moved to top-level `pipeline/`.** The two-stage design recorded below —
+N extraction calls, then one consolidation call handling class merging,
+attribute wording, and relation wording all at once — shipped and is left
+exactly as documented here; its code and any runs already scored against it
+remain valid. A separate architecture, splitting that one consolidation call
+into four independently fault-isolated stages (type consolidation, attribute
+consolidation, relation reconciliation, and a new taxonomy-induction stage
+with no two-stage equivalent), was then built at `pipeline/` — not under
+`baselines/`, since P1 is the paper's contribution rather than one of the
+baselines it is measured against, and the old location was judged
+conceptually wrong once that distinction was made explicit. See
+`pipeline/DECISIONS.md` (P1-D1 through P1-D7) for the full record: what
+changed, why, and the weak-model hypothesis written before either registry
+condition has been run through the new shape.
 
 ## P1-D1 — Two stages: N per-document extraction calls, then one consolidation call
 
